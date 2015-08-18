@@ -57,9 +57,9 @@ public class GLRenderer implements Renderer {
 	float upY = 1.0f;
 	float upZ = 0.0f;
 
-	Square square, square1;
-	Sprite sprite1, sprite2;
-	Background background;
+//	Square square, square1;
+	Sprite background, mountains, forest, person;
+//	Background background;
 
 	public void setEyeX(float offset)
 	{
@@ -104,10 +104,15 @@ public class GLRenderer implements Renderer {
 				2.5f, -2.5f, 2.0f,   // bottom right
 				2.5f,  2.5f, 2.0f }; // top right
 
-//		square1 = new Square(mContext, "drawable/girl2", vertices2, textureNames);
-		square = new Square(mContext, "drawable/squareperson", vertices1, textureNames);
-		background = new Background(mContext, "drawable/squaresky", vertices2, textureNames);
-		sprite1 = new Sprite(mContext, "drawable/squareground", vertices3, textureNames);
+		background = new Sprite(vertices2);
+		forest = new Sprite(vertices3);
+		person = new Sprite(vertices1);
+
+
+//		square = new Square(mContext, "drawable/squareperson", vertices1, textureNames);
+//		background = new Background(mContext, "drawable/squaresky", vertices2, textureNames);
+//		sprite1 = new Sprite(mContext, "drawable/squareground", vertices3, textureNames);
+//		sprite2 = new Sprite(mContext, "drawable/squareground", vertices2, textureNames);
 //		sprite2 = new Sprite(mContext, "drawable/squaremountains.png.png", vertices3, textureNames);
 
 
@@ -134,6 +139,8 @@ public class GLRenderer implements Renderer {
 
 		// Set our shader program
 		GLES20.glUseProgram(riGraphicTools.sp_Image);
+
+		setupImages();
 	}
 
 	@Override
@@ -169,7 +176,7 @@ public class GLRenderer implements Renderer {
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 //		square.draw(mMVPMatrix);
-		background.draw(mMVPMatrix);
+		background.draw(mMVPMatrix, uvBuffer, 0);
 
 
 		float[] scratch1 = new float[16];
@@ -178,7 +185,7 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, eyeX * 0.5f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		sprite1.draw(scratch1);
+		forest.draw(scratch1, uvBuffer, 1);
 
 
 		float[] scratch = new float[16];
@@ -187,10 +194,10 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, -0.5f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, scratch, 0);
-		square.draw(scratch);
+		person.draw(scratch, uvBuffer, 2);
 	}
 
-	private void setupImage()
+	private void setupImages()
 	{
 		// Create our UV coordinates.
 		uvs = new float[] {
@@ -208,160 +215,35 @@ public class GLRenderer implements Renderer {
 		uvBuffer.position(0);
 
 		// Generate Textures, if more needed, alter these numbers.
-		int[] texturenames = new int[2];
-		GLES20.glGenTextures(2, texturenames, 0);
+		int[] texturenames = new int[4];
+		GLES20.glGenTextures(4, texturenames, 0);
 
-		// Retrieve our image from resources.
-//		int id = mContext.getResources().getIdentifier("drawable/girl.png", null, mContext.getPackageName());
-//		int id2 = mContext.getResources().getIdentifier("drawable/girl2.png", null, mContext.getPackageName());
-//
-//		// Temporary create a bitmap
-//		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl);
-//		Bitmap bmp2 = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl2);
 
+		// Temporary create a bitmap
+		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squaresky);
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
-
 		// Set filtering
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-//
-//		// Load the bitmap into the bound texture.
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 1, bmp2, 0);
-//
-//		// We are done using the bitmap so we should recycle it.
-//		bmp.recycle();
-//		bmp2.recycle();
-	}
+		// Load the bitmap into the bound texture.
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-	private void Render(float[] m)
-	{
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squareground);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp,0);
 
-		// clear Screen and Depth Buffer, we have set the clear color as black.
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squareperson);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		// get handle to vertex shader's vPosition member
-		int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
-
-		// Enable generic vertex attribute array
-		GLES20.glEnableVertexAttribArray(mPositionHandle);
-
-		// Prepare the triangle coordinate data
-		GLES20.glVertexAttribPointer(mPositionHandle, 3,
-				GLES20.GL_FLOAT, false,
-				12, vertexBuffer);
-
-		// Get handle to texture coordinates location
-		int mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord" );
-
-		// Enable generic vertex attribute array
-		GLES20.glEnableVertexAttribArray ( mTexCoordLoc );
-
-		// Prepare the texturecoordinates
-		GLES20.glVertexAttribPointer ( mTexCoordLoc, 2, GLES20.GL_FLOAT,
-				false,
-				0, uvBuffer);
-
-		// Get handle to shape's transformation matrix
-		int mtrxhandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
-
-		// Apply the projection and view transformation
-		GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
-
-		// Get handle to textures locations
-		int mSamplerLoc = GLES20.glGetUniformLocation (riGraphicTools.sp_Image, "s_texture" );
-
-		// Set the sampler texture unit to 0, where we have saved the texture.
-		GLES20.glUniform1i(mSamplerLoc, 0);
-
-
-//		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-//		GLES20.glEnable(GLES20.GL_BLEND);
-
-
-		// Draw the triangle
-		GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
-				GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-
-//		GLES20.glDisable(GLES20.GL_BLEND);
-		// Disable vertex array
-		GLES20.glDisableVertexAttribArray(mPositionHandle);
-		GLES20.glDisableVertexAttribArray(mTexCoordLoc);
-
-	}
-
-	public void SetupImage()
-	{
-		// Create our UV coordinates.
-		uvs = new float[] {
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,			
-				1.0f, 0.0f			
-	    };
-		
-		// The texture buffer
-		ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
-		bb.order(ByteOrder.nativeOrder());
-		uvBuffer = bb.asFloatBuffer();
-		uvBuffer.put(uvs);
-		uvBuffer.position(0);
-		
-		// Generate Textures, if more needed, alter these numbers.
-		int[] texturenames = new int[1];
-		GLES20.glGenTextures(1, texturenames, 0);
-		
-		// Retrieve our image from resources.
-		int id = mContext.getResources().getIdentifier("drawable/girl.png", null, mContext.getPackageName());
-		
-		// Temporary create a bitmap
-		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl);
-		
-		// Bind texture to texturename
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
-		
-		// Set filtering
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        
-        // Load the bitmap into the bound texture.
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-        
-        // We are done using the bitmap so we should recycle it.
 		bmp.recycle();
-
-	}
-	
-	public void SetupTriangle()
-	{
-		// We have to create the vertices of our triangle.
-		vertices = new float[]{
-				-0.5f,  0.5f, 0.0f,   // top left
-				-0.5f, -0.5f, 0.0f,   // bottom left
-				0.5f, -0.5f, 0.0f,   // bottom right
-				0.5f,  0.5f, 0.0f }; // top right
-
-		indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
-
-		// The vertex buffer.
-		ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-		bb.order(ByteOrder.nativeOrder());
-		vertexBuffer = bb.asFloatBuffer();
-		vertexBuffer.put(vertices);
-		vertexBuffer.position(0);
-		
-		// initialize byte buffer for the draw list
-		ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
-		dlb.order(ByteOrder.nativeOrder());
-		drawListBuffer = dlb.asShortBuffer();
-		drawListBuffer.put(indices);
-		drawListBuffer.position(0);
-		
-		
 	}
 }

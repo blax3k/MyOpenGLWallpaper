@@ -12,7 +12,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 /**
- * Created by User on 8/15/2015.
+ * Created by Blake Hashimoto on 8/15/2015.
  */
 public class Sprite {
     // Geometric variables
@@ -21,7 +21,7 @@ public class Sprite {
     public static float uvs[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
-    public FloatBuffer uvBuffer;
+//    public FloatBuffer uvBuffer;
     private final int mProgram;
     private int mColorHandle;
     float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
@@ -35,9 +35,9 @@ public class Sprite {
     private final int mTextureCoordinateDataSize = 2;
     private int mTextureDataHandle;
 
-    public Sprite(Context context, String bitmapAddress, float[] mVertices, int[] texturenames)
+    public Sprite(float[] mVertices)
     {
-        this.vertices = mVertices;
+        vertices = mVertices;
         // We have to create the vertices of our triangle.
 //        vertices = new float[]{
 //                -0.5f,  0.5f, 0.0f,   // top left
@@ -71,100 +71,61 @@ public class Sprite {
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
 
-        setupImage(context, bitmapAddress, texturenames);
+//        setupImage(context, bitmapAddress, texturenames);
     }
 
-//    private void setupTriangle()
+//    private void setupImage(Context context, String bitmapAddress, int[] texturenames)
 //    {
-//        // We have to create the vertices of our triangle.
-////        vertices = new float[]{
-////                -0.5f,  0.5f, 0.0f,   // top left
-////                -0.5f, -0.5f, 0.0f,   // bottom left
-////                0.5f, -0.5f, 0.0f,   // bottom right
-////                0.5f,  0.5f, 0.0f }; // top right
+//        // Create our UV coordinates.
+//        uvs = new float[] {
+//                0.0f, 0.0f,
+//                0.0f, 1.0f,
+//                1.0f, 1.0f,
+//                1.0f, 0.0f
+//        };
 //
-//        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
-//
-//        // The vertex buffer.
-//        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+//        // The texture buffer
+//        ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
 //        bb.order(ByteOrder.nativeOrder());
-//        vertexBuffer = bb.asFloatBuffer();
-//        vertexBuffer.put(vertices);
-//        vertexBuffer.position(0);
+//        uvBuffer = bb.asFloatBuffer();
+//        uvBuffer.put(uvs);
+//        uvBuffer.position(0);
 //
-//        // initialize byte buffer for the draw list
-//        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
-//        dlb.order(ByteOrder.nativeOrder());
-//        drawListBuffer = dlb.asShortBuffer();
-//        drawListBuffer.put(indices);
-//        drawListBuffer.position(0);
+////        int id = context.getResources().getIdentifier(bitmapAddress, null, context.getPackageName());
+////        // Temporary create a bitmap
+////        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
+////
+////        // Load the bitmap into the bound texture.
+////        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 //
-//        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
-//                riGraphicTools.vs_Image);
-//        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
-//                riGraphicTools.fs_Image);
+////        // Generate Textures, if more needed, alter these numbers.
+////        int[] texturenames = new int[2];
+////        GLES20.glGenTextures(2, texturenames, 0);
 //
-//        mProgram = GLES20.glCreateProgram();             // create empty OpenGL Program
-//        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-//        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-//        GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
-//    }
-
-    private void setupImage(Context context, String bitmapAddress, int[] texturenames)
-    {
-        // Create our UV coordinates.
-        uvs = new float[] {
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
-        };
-
-        // The texture buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        uvBuffer = bb.asFloatBuffer();
-        uvBuffer.put(uvs);
-        uvBuffer.position(0);
-
+//        // Retrieve our image from resources.
 //        int id = context.getResources().getIdentifier(bitmapAddress, null, context.getPackageName());
+//
 //        // Temporary create a bitmap
 //        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
 //
+//        // Bind texture to texturename
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
+//
+//
+//        // Set filtering
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+//
 //        // Load the bitmap into the bound texture.
 //        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//
+//        // We are done using the bitmap so we should recycle it.
+//        bmp.recycle();
+//    }
 
-//        // Generate Textures, if more needed, alter these numbers.
-//        int[] texturenames = new int[2];
-//        GLES20.glGenTextures(2, texturenames, 0);
-
-        // Retrieve our image from resources.
-        int id = context.getResources().getIdentifier(bitmapAddress, null, context.getPackageName());
-
-        // Temporary create a bitmap
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
-
-        // Bind texture to texturename
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
-
-
-        // Set filtering
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-
-        // Load the bitmap into the bound texture.
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-
-        // We are done using the bitmap so we should recycle it.
-        bmp.recycle();
-    }
-
-    public void draw(float[] m ) {
-
-//        // clear Screen and Depth Buffer, we have set the clear color as black.
-//        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
+    public void draw(float[] m, FloatBuffer uvBuffer, int textureIndex ) {
+        //set the program
         GLES20.glUseProgram(mProgram);
 
         // get handle to vertex shader's vPosition member
@@ -197,7 +158,7 @@ public class Sprite {
         int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
 
         // Set the sampler texture unit to 0, where we have saved the texture.
-        GLES20.glUniform1i(mSamplerLoc, 1);
+        GLES20.glUniform1i(mSamplerLoc, textureIndex);
 
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
 

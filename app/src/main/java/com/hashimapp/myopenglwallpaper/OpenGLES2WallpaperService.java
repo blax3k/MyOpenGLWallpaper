@@ -4,14 +4,16 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 /**
- * Created by User on 8/14/2015.
+ * Created by Blake Hashimoto on 8/14/2015.
  */
-public class OpenGLES2WallpaperService extends GLWallpaperService{
-
+public class OpenGLES2WallpaperService extends GLWallpaperService
+{
     GLRenderer renderer;
+
     @Override
     public Engine onCreateEngine()
     {
@@ -22,9 +24,27 @@ public class OpenGLES2WallpaperService extends GLWallpaperService{
     {
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
-                                     float yStep, int xPixels, int yPixels) {
+                                     float yStep, int xPixels, int yPixels)
+        {
             renderer.setEyeX(xOffset);
         }
+
+//        private float mPreviousX;
+//        @Override
+//        public void onTouchEvent(MotionEvent event)
+//        {
+////            float x = event.getX();
+////            if(event.getAction() == MotionEvent.ACTION_MOVE)
+////            {
+////                float dx = (x - mPreviousX) * 0.003f;
+////                renderer.setEyeX(dx);
+////
+////            }
+////            super.onTouchEvent(event);
+////
+////            mPreviousX = x;
+//        }
+
         @Override
         public void onCreate(SurfaceHolder surfaceHolder)
         {
@@ -34,26 +54,25 @@ public class OpenGLES2WallpaperService extends GLWallpaperService{
             ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
             boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
-            if(supportsEs2)
+            if (supportsEs2)
             {
                 setEGLContextClientVersion(2);
 
                 setPreserveEGLContextOnPause(true);
 
                 setRenderer(getNewRenderer());
+//                mSurfaceView = new OpenGLES2WallpaperGLSurfaceView(OpenGLES2WallpaperService.this);
 
-            }
-            else
-            {
-                return;
             }
         }
+
+
     }
 
-     GLSurfaceView.Renderer getNewRenderer()
-     {
+    GLSurfaceView.Renderer getNewRenderer()
+    {
 
-         renderer = new GLRenderer(this);
-         return renderer;
-     }
+        renderer = new GLRenderer(this);
+        return renderer;
+    }
 }
