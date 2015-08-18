@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.service.wallpaper.WallpaperService;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 /**
@@ -57,6 +58,7 @@ public abstract class GLWallpaperService extends WallpaperService{
                 super.onDetachedFromWindow();
             }
         }
+
       private WallpaperGLSurfaceView glSurfaceView;
       private boolean rendererHasBeenSet;
 
