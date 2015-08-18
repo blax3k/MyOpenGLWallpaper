@@ -209,8 +209,8 @@ public class Square {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, m, 0);
 
         //enable transparency
+        GLES20.glEnable(GLES20.GL_BLEND);
 		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-		GLES20.glEnable(GLES20.GL_BLEND);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
