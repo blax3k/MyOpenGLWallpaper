@@ -14,4 +14,6 @@
                         android:title="Remove first layer"
                         android:summary="delete this later"
                         android:defaultValue="true"/>
+    <CheckBoxPreference android:key="activate_sunset"
+                        android:title="active the sunset" />
 </PreferenceScreen>

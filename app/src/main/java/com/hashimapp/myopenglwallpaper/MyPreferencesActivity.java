@@ -20,7 +20,15 @@ public class MyPreferencesActivity extends PreferenceActivity
                 new PrefsFragment()).commit();
 
     }
-
+    public static class PrefsFragment extends PreferenceFragment
+    {
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.main_preferences);
+        }
+    }
 
     public static class MyPreferenceFragment extends PreferenceFragment
     {

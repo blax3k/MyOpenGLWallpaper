@@ -143,4 +143,14 @@ public class Sprite {
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTexCoordLoc);
     }
+
+    public void changeColor(float[] textureColor)
+    {
+        ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
+        cb.order(ByteOrder.nativeOrder());
+        colorBuffer = cb.asFloatBuffer();
+        colorBuffer.put(colors);
+        colorBuffer.position(0);
+
+    }
 }

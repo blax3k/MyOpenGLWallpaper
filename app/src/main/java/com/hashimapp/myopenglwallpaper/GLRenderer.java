@@ -54,8 +54,14 @@ public class GLRenderer implements Renderer {
 
 	public void setEyeX(float offset)
 	{
-		eyeX = -offset * offsetDifference;
-		lookX = eyeX;
+		if(offset > 1 || offset < -1)
+		{
+
+		}
+		else {
+			eyeX = -offset * offsetDifference;
+			lookX = eyeX;
+		}
 	}
 	
 	public GLRenderer(Context c)
@@ -64,8 +70,8 @@ public class GLRenderer implements Renderer {
 	}
 
 	@Override
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+	public void onSurfaceCreated(GL10 gl, EGLConfig config)
+	{
 		//Load in Preferences
 		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 		// Generate Textures, if more needed, alter these numbers.
@@ -107,6 +113,16 @@ public class GLRenderer implements Renderer {
 						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
 						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
 						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f};
+
+		float[] sceneColor;
+		if(preferences.getBoolean("activate_sunset", false))
+		{
+			sceneColor = sunsetColor;
+		}
+		else
+		{
+			sceneColor = normalColor;
+		}
 
 		person = new Sprite(vertices1, sunsetColor);
 		forest = new Sprite(vertices2, sunsetColor);
@@ -210,7 +226,6 @@ public class GLRenderer implements Renderer {
 
 
 		float[] scratch1 = new float[16];
-////		Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, mtrxView, 0);
 		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.translateM(mModelMatrix, 0, eyeX * 0.5f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
