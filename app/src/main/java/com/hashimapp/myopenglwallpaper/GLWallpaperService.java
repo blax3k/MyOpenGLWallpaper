@@ -26,7 +26,7 @@ import android.view.SurfaceHolder;
 
  animations for various objects. Blowing hair, flickering fires, twinkling stars, moving clouds etc.
 
- Settings page is a must.
+ /Done! Settings page is a must.
 
  options for people without homescreens that do offsets changed.
 
@@ -36,7 +36,7 @@ import android.view.SurfaceHolder;
 
  donation option
 
- link to artists deviantart page
+ /Done! link to artists deviantart page
  */
 public abstract class GLWallpaperService extends WallpaperService{
   public class GLEngine extends Engine{

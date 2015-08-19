@@ -21,12 +21,14 @@ public class Sprite {
     public static float uvs[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
+    public FloatBuffer colorBuffer;
 //    public FloatBuffer uvBuffer;
     private final int mProgram;
-    private int mColorHandle;
     float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
+    public static float colors[];
 
     private int mPositionHandle;
+    private int mColorHandle;
     private int mMVPMatrixHandle;
     //    //Added for Textures
 //    private final FloatBuffer mCubeTextureCoordinates;
@@ -35,17 +37,19 @@ public class Sprite {
     private final int mTextureCoordinateDataSize = 2;
     private int mTextureDataHandle;
 
-    public Sprite(float[] mVertices)
+    public Sprite(float[] mVertices, float[] textureColor)
     {
         vertices = mVertices;
-        // We have to create the vertices of our triangle.
-//        vertices = new float[]{
-//                -0.5f,  0.5f, 0.0f,   // top left
-//                -0.5f, -0.5f, 0.0f,   // bottom left
-//                0.5f, -0.5f, 0.0f,   // bottom right
-//                0.5f,  0.5f, 0.0f }; // top right
 
         indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
+
+        colors = textureColor;
+
+        ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
+        cb.order(ByteOrder.nativeOrder());
+        colorBuffer = cb.asFloatBuffer();
+        colorBuffer.put(colors);
+        colorBuffer.position(0);
 
         // The vertex buffer.
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -74,59 +78,20 @@ public class Sprite {
 //        setupImage(context, bitmapAddress, texturenames);
     }
 
-//    private void setupImage(Context context, String bitmapAddress, int[] texturenames)
-//    {
-//        // Create our UV coordinates.
-//        uvs = new float[] {
-//                0.0f, 0.0f,
-//                0.0f, 1.0f,
-//                1.0f, 1.0f,
-//                1.0f, 0.0f
-//        };
-//
-//        // The texture buffer
-//        ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
-//        bb.order(ByteOrder.nativeOrder());
-//        uvBuffer = bb.asFloatBuffer();
-//        uvBuffer.put(uvs);
-//        uvBuffer.position(0);
-//
-////        int id = context.getResources().getIdentifier(bitmapAddress, null, context.getPackageName());
-////        // Temporary create a bitmap
-////        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
-////
-////        // Load the bitmap into the bound texture.
-////        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//
-////        // Generate Textures, if more needed, alter these numbers.
-////        int[] texturenames = new int[2];
-////        GLES20.glGenTextures(2, texturenames, 0);
-//
-//        // Retrieve our image from resources.
-//        int id = context.getResources().getIdentifier(bitmapAddress, null, context.getPackageName());
-//
-//        // Temporary create a bitmap
-//        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), id);
-//
-//        // Bind texture to texturename
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
-//
-//
-//        // Set filtering
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-//
-//        // Load the bitmap into the bound texture.
-//        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//
-//        // We are done using the bitmap so we should recycle it.
-//        bmp.recycle();
-//    }
-
     public void draw(float[] m, FloatBuffer uvBuffer, int textureIndex ) {
         //set the program
         GLES20.glUseProgram(mProgram);
+
+
+        // get handle to vertex shader's vPosition member
+        int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
+
+// Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+
+// Prepare the triangle coordinate data
+        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
+
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
