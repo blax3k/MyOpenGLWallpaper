@@ -1,9 +1,14 @@
 package com.hashimapp.myopenglwallpaper;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -20,7 +25,7 @@ import android.view.SurfaceHolder;
 
  Things I'd like to add:
 
- dynamic lighting so that the scene will be of different brightnesses and hues depending on the time of day.
+ /Done! dynamic lighting so that the scene will be of different brightnesses and hues depending on the time of day.
 
  different objects, positions, and activities depending on the time of day (sleeping, eating, scavenging, reading etc.).
 
@@ -36,11 +41,34 @@ import android.view.SurfaceHolder;
 
  donation option
 
+ fix wallpaper not responding when it is chosen twice
+
  /Done! link to artists deviantart page
  */
 public abstract class GLWallpaperService extends WallpaperService{
-  public class GLEngine extends Engine{
-        class WallpaperGLSurfaceView extends GLSurfaceView {
+
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private long lastUpdate;
+    public static float x;
+    public static float y;
+    public static float lastX;
+
+  public class GLEngine extends Engine implements SensorEventListener{
+      @Override
+      public void onSensorChanged(SensorEvent event)
+      {
+
+//          Log.d("Sensor info", "Sensor X: " + x + " Sensor Y: " + y);
+      }
+
+      @Override
+      public void onAccuracyChanged(Sensor sensor, int accuracy)
+      {
+
+      }
+
+      class WallpaperGLSurfaceView extends GLSurfaceView {
             private static final String TAG = "WallpaperGLSurfaceView";
 
             WallpaperGLSurfaceView(Context context)
@@ -59,7 +87,7 @@ public abstract class GLWallpaperService extends WallpaperService{
             }
         }
 
-      private WallpaperGLSurfaceView glSurfaceView;
+      protected WallpaperGLSurfaceView glSurfaceView;
       private boolean rendererHasBeenSet;
 
       @Override
@@ -68,21 +96,46 @@ public abstract class GLWallpaperService extends WallpaperService{
           super.onCreate(surfaceHolder);
 
           glSurfaceView = new WallpaperGLSurfaceView(GLWallpaperService.this);
+
+          Log.d("onCreate", "was called");
+          Log.d("glSurfaceView", "glSurfaceView = " + glSurfaceView.toString());
+
+          //set up the accelerometer
+          sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+          if(sensorManager.getSensorList(Sensor.TYPE_GRAVITY).size() > 0)
+          {
+              sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
+                      SensorManager.SENSOR_DELAY_GAME);
+          }
+          accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+          lastUpdate = System.currentTimeMillis();
+
       }
 
       @Override
       public void onVisibilityChanged(boolean visible)
       {
           super.onVisibilityChanged(visible);
-
           if(rendererHasBeenSet)
           {
-              if(visible)
+              if (visible)
               {
                   glSurfaceView.onResume();
-              }else
+
+
+                  sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);
+
+
+                  Log.d("onResume", "was called on " + glSurfaceView.toString());
+              } else
               {
                   glSurfaceView.onPause();
+
+
+                  sensorManager.unregisterListener(this);
+
+
+                  Log.d("onPause", "was called on " + glSurfaceView.toString());
               }
           }
       }
@@ -92,12 +145,20 @@ public abstract class GLWallpaperService extends WallpaperService{
       {
           super.onDestroy();
           glSurfaceView.onDestroy();
+          Log.d("onDestroy", "was called on " + glSurfaceView.toString());
+      }
+
+      @Override
+      public void onSurfaceDestroyed(SurfaceHolder holder)
+      {
+          super.onSurfaceDestroyed(holder);
       }
 
       protected void setRenderer(GLSurfaceView.Renderer renderer)
       {
           glSurfaceView.setRenderer(renderer);
           rendererHasBeenSet = true;
+          Log.d("setRenderer", "was called");
       }
 
       protected void setPreserveEGLContextOnPause(boolean preserve)
@@ -111,6 +172,11 @@ public abstract class GLWallpaperService extends WallpaperService{
       protected void setEGLContextClientVersion(int version)
       {
           glSurfaceView.setEGLContextClientVersion(version);
+      }
+
+      protected void setEGLConfigChooser(GLSurfaceView.EGLConfigChooser configChooser)
+      {
+          glSurfaceView.setEGLConfigChooser(configChooser);
       }
     }
 }

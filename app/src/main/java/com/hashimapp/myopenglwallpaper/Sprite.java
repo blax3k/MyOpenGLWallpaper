@@ -41,7 +41,7 @@ public class Sprite {
     {
         vertices = mVertices;
 
-        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
+        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertex rendering.
 
         colors = textureColor;
 
@@ -82,16 +82,14 @@ public class Sprite {
         //set the program
         GLES20.glUseProgram(mProgram);
 
-
         // get handle to vertex shader's vPosition member
         int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
 
-// Enable generic vertex attribute array
+        // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
-// Prepare the triangle coordinate data
+        // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
-
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
@@ -110,8 +108,9 @@ public class Sprite {
         // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray ( mTexCoordLoc );
 
-        // Prepare the texturecoordinates
+        // Prepare the texture coordinates
         GLES20.glVertexAttribPointer ( mTexCoordLoc, 2, GLES20.GL_FLOAT, false, 0, uvBuffer);
+
 
         // Get handle to shape's transformation matrix
         int mtrxhandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
@@ -122,7 +121,7 @@ public class Sprite {
         // Get handle to textures locations
         int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
 
-        // Set the sampler texture unit to 0, where we have saved the texture.
+        // Set the sampler texture unit to x, where we have saved the texture.
         GLES20.glUniform1i(mSamplerLoc, textureIndex);
 
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
@@ -130,8 +129,10 @@ public class Sprite {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, m, 0);
 
         //enable transparency
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);
+
+        GLES20.glClearColor(0,0,0,0);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
@@ -149,8 +150,7 @@ public class Sprite {
         ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
         cb.order(ByteOrder.nativeOrder());
         colorBuffer = cb.asFloatBuffer();
-        colorBuffer.put(colors);
+        colorBuffer.put(textureColor);
         colorBuffer.position(0);
-
     }
 }

@@ -26,15 +26,15 @@ public class GLRenderer implements Renderer {
 	private final float[] mMVPMatrix = new float[16];
 	private float[] mModelMatrix = new float[16];
 	private int mMVPMatrixHandle;
-	
+
 	// Geometric variables
 	public static float vertices[];
 	public static short indices[];
-	public static float uvs[];
+	public static float uvs[], uvs2[];
 	public FloatBuffer vertexBuffer;
 	public ShortBuffer drawListBuffer;
-	public FloatBuffer uvBuffer;
-	
+	public FloatBuffer uvBuffer, uvBuffer2;
+
 	// Our screenresolution
 	float	mScreenWidth = 1280;
 	float	mScreenHeight = 768;
@@ -47,23 +47,30 @@ public class GLRenderer implements Renderer {
 	//set up our main_preferences
 	SharedPreferences preferences;
 
+    //set up array database
+    ArrayHolder arrayHolder = new ArrayHolder();
+
 //	Square square, square1;
-	Sprite background, mountains, forest, person;
+	Sprite background, mountains, girl, grass;
 	float offsetDifference = 1;
 //	Background background;
 
 	public void setEyeX(float offset)
 	{
-		if(offset > 1 || offset < -1)
-		{
 
-		}
-		else {
+//			Log.d("Renderer", "renderer offsetOnce: " + this.toString());
+
 			eyeX = -offset * offsetDifference;
 			lookX = eyeX;
-		}
+//		Log.d("setEyeX", "eyeX: " + eyeX);
 	}
-	
+
+	public void setEyeY(float offset)
+	{
+		eyeY = offset * offsetDifference;
+		lookY = eyeY;
+	}
+
 	public GLRenderer(Context c)
 	{
 		mContext = c;
@@ -72,63 +79,32 @@ public class GLRenderer implements Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
+		TimeTracker timeTracker = new TimeTracker();
+		timeTracker.getDayPart();
+
+
 		//Load in Preferences
 		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 		// Generate Textures, if more needed, alter these numbers.
 		int[] textureNames = new int[4];
 		GLES20.glGenTextures(4, textureNames, 0);
 
-		float[] vertices1 = new float[]{
-				-1.55f,  1.55f, -2.0f,   // top left
-				-1.55f, -1.55f, -2.0f,   // bottom left
-				1.55f, -1.55f, -2.0f,   // bottom right
-				1.55f,  1.55f, -2.0f }; // top right
-
-		float[] vertices2 = new float[]{
-				-2.9f,  2.9f, 1.98f,   // top left
-				-2.9f, -2.9f, 1.98f,   // bottom left
-				2.9f, -2.9f, 1.98f,   // bottom right
-				2.9f,  2.9f, 1.98f }; // top right
-
-		float[] vertices3 = new float[]{
-				-1.8f,  1.8f, 1.99f,   // top left
-				-1.8f, -1.8f, 1.99f,   // bottom left
-				1.8f, -1.8f, 1.99f,   // bottom right
-				1.8f,  1.8f, 1.99f }; // top right
-
-		float[] vertices4 = new float[]{
-				-1.9f,  2.4f, 2.0f,   // top left
-				-1.9f, -2.4f, 2.0f,   // bottom left
-				1.9f, -2.4f, 2.0f,   // bottom right
-				1.9f,  2.4f, 2.0f }; // top right
-
-		float[] normalColor = new float[]
-						{1f, 1f, 1f, 1f,
-						1f, 1f, 1f, 1f,
-						1f, 1f, 1f, 1f,
-						1f, 1f, 1f, 1f};
-
-		float[] sunsetColor = new float[]
-						{1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
-						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
-						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
-						 1.0f, 0.68235294117f, 0.63921568627f, 1.0f};
-
+        //set the scene color from preferences
 		float[] sceneColor;
 		if(preferences.getBoolean("activate_sunset", false))
 		{
-			sceneColor = sunsetColor;
+			sceneColor = arrayHolder.sunsetColor;
 		}
 		else
 		{
-			sceneColor = normalColor;
+			sceneColor = arrayHolder.normalColor;
 		}
 
-		person = new Sprite(vertices1, sunsetColor);
-		forest = new Sprite(vertices2, sunsetColor);
-		mountains = new Sprite(vertices3, sunsetColor);
-		background = new Sprite(vertices4, sunsetColor);
-
+        //create the sprites
+		grass = new Sprite(arrayHolder.grassVertices, sceneColor);
+		girl = new Sprite(arrayHolder.girlVertices, sceneColor);
+//		mountains = new Sprite(arrayHolder.vertices3, sceneColor);
+		background = new Sprite(arrayHolder.fieldVertices, sceneColor);
 
 		// Set the clear color to white
 		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -195,42 +171,48 @@ public class GLRenderer implements Renderer {
 	float upY = 1.0f;
 	float upZ = 0.0f;
 
+	boolean colorIsRed;
+
+	boolean runOnce, firstOffsetChanged = false;
+
+
 	@Override
 	public void onDrawFrame(GL10 unused) {
-		// Setup our screen width and height for normal sprite translation.
-//	    Matrix.orthoM(mtrxProjection, 0, 0f, mScreenWidth, 0.0f, mScreenHeight, 0, 50);
+
+//			Log.d("Renderer", "renderer drew one frame: " + this.toString());
 
 		// Set the camera position (View matrix)
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
 
+//		Log.d("onDrawFrame", "eyeX: " + eyeX);
 		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
 
 		// Calculate the projection and view transformation
 //		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mtrxView, 0);
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, eyeX, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, eyeX * 0.2f, 0.0f, 1.0f);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 		background.draw(mMVPMatrix, uvBuffer, 0);
 
-		float[] scratch2 = new float[16];
-////		Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, mtrxView, 0);
-		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, eyeX * 0.9f, 0.0f, 1.0f);
-		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
-		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-		mountains.draw(scratch2, uvBuffer, 3);
+//		float[] scratch2 = new float[16];
+//////		Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, mtrxView, 0);
+//		Matrix.setIdentityM(mModelMatrix, 0);
+//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.9f, 0.0f, 1.0f);
+//		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
+//		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
+//		mountains.draw(scratch2, uvBuffer, 3);
 
 
 		float[] scratch1 = new float[16];
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, eyeX * 0.5f, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		forest.draw(scratch1, uvBuffer, 1);
+		girl.draw(scratch1, uvBuffer, 1);
 
 
 		if(!preferences.getBoolean("pref_key_remove_layer", true))
@@ -238,13 +220,28 @@ public class GLRenderer implements Renderer {
 			float[] scratch = new float[16];
 ////		Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, mtrxView, 0);
 			Matrix.setIdentityM(mModelMatrix, 0);
-			Matrix.translateM(mModelMatrix, 0, -0.5f, 0.3f, 1.0f);
+			Matrix.translateM(mModelMatrix, 0, eyeX * -0.5f - 0.8f, 0.3f, 1.0f);
 			Matrix.multiplyMM(scratch, 0, mtrxView, 0, mModelMatrix, 0);
 			Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, scratch, 0);
-			person.draw(scratch, uvBuffer, 2);
+			grass.draw(scratch, uvBuffer, 2);
 		}
-
 	}
+
+    public void changeColor(int colorCode)
+    {
+        float[] newColor = arrayHolder.normalColor;
+        switch(colorCode){
+            case 0: newColor = arrayHolder.normalColor;
+                break;
+            case 1: newColor = arrayHolder.sunsetColor;
+                break;
+        }
+
+        grass.changeColor(newColor);
+        girl.changeColor(newColor);
+//        mountains.changeColor(newColor);
+        background.changeColor(newColor);
+    }
 
 	private void setupImages()
 	{
@@ -256,6 +253,13 @@ public class GLRenderer implements Renderer {
 				1.0f, 0.0f
 		};
 
+		uvs2 = new float[] {
+				0.0f, 0.0f,
+				0.0f, 0.5f,
+				0.5f, 0.5f,
+				0.5f, 0.0f
+		};
+
 		// The texture buffer
 		ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
 		bb.order(ByteOrder.nativeOrder());
@@ -263,41 +267,48 @@ public class GLRenderer implements Renderer {
 		uvBuffer.put(uvs);
 		uvBuffer.position(0);
 
+		ByteBuffer bb2 = ByteBuffer.allocateDirect(uvs2.length * 4);
+		bb2.order(ByteOrder.nativeOrder());
+		uvBuffer2 = bb2.asFloatBuffer();
+		uvBuffer2.put(uvs2);
+		uvBuffer2.position(0);
+
 		// Generate Textures, if more needed, alter these numbers.
 		int[] texturenames = new int[4];
 		GLES20.glGenTextures(4, texturenames, 0);
 
-
 		// Temporary create a bitmap
-		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squaresky);
+		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
 		// Set filtering
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 		// Load the bitmap into the bound texture.
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squareground);
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl2crop);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squareperson);
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.grass);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squaremountains);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		bmp.recycle();

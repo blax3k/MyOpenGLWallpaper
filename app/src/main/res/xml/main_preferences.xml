@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <CheckBoxPreference android:key="pref_key_sim_scroll"
-                        android:title="Simulated Scrolling"
+                        android:title="3D Parallax Effect"
                         android:summary="If scrolling is not supported by your launcher"
                         android:defaultValue="false"/>
+
     <Preference android:key="view_artist"
                 android:title="Go to artists's website">
                 <intent android:action="android.intent.action.VIEW"
                         android:data="http://quirkilicious.deviantart.com/" />
-        </Preference>
+    </Preference>
+
     <CheckBoxPreference android:key="pref_key_remove_layer"
                         android:title="Remove first layer"
                         android:summary="delete this later"
-                        android:defaultValue="true"/>
+                        android:defaultValue="false"/>
     <CheckBoxPreference android:key="activate_sunset"
-                        android:title="active the sunset" />
+                        android:title="activate the sunset" />
+
+    <Preference android:key="set_wallpaper"
+                android:title="Set Wallpaper">
+        <intent android:action="android.intent.action.SET_WALLPAPER"
+                />
+    </Preference>
+
+
 </PreferenceScreen>
