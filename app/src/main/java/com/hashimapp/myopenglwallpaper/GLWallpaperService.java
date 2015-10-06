@@ -89,6 +89,7 @@ public abstract class GLWallpaperService extends WallpaperService{
 
       protected WallpaperGLSurfaceView glSurfaceView;
       private boolean rendererHasBeenSet;
+      GLRenderer renderer;
 
       @Override
       public void onCreate(SurfaceHolder surfaceHolder)
@@ -121,20 +122,12 @@ public abstract class GLWallpaperService extends WallpaperService{
               if (visible)
               {
                   glSurfaceView.onResume();
-
-
                   sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);
-
-
                   Log.d("onResume", "was called on " + glSurfaceView.toString());
               } else
               {
                   glSurfaceView.onPause();
-
-
                   sensorManager.unregisterListener(this);
-
-
                   Log.d("onPause", "was called on " + glSurfaceView.toString());
               }
           }
@@ -154,11 +147,13 @@ public abstract class GLWallpaperService extends WallpaperService{
           super.onSurfaceDestroyed(holder);
       }
 
+
       protected void setRenderer(GLSurfaceView.Renderer renderer)
       {
+          this.renderer = (GLRenderer) renderer;
           glSurfaceView.setRenderer(renderer);
           rendererHasBeenSet = true;
-          Log.d("setRenderer", "was called");
+          Log.d("setRenderer", "the set renderer is " + this.renderer.toString());
       }
 
       protected void setPreserveEGLContextOnPause(boolean preserve)

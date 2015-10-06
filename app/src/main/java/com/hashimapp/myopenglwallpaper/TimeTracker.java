@@ -24,7 +24,7 @@ public class TimeTracker
         currentTime = new Date();
     }
 
-    public int getDayPart()
+    public int getDayHour()
     {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         Log.d("Hour of day", "Hour of day: " + hour);

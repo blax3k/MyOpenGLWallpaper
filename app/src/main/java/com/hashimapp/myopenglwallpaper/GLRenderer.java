@@ -17,6 +17,7 @@ import android.opengl.GLUtils;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class GLRenderer implements Renderer {
 
@@ -46,6 +47,7 @@ public class GLRenderer implements Renderer {
 
 	//set up our main_preferences
 	SharedPreferences preferences;
+	private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     //set up array database
     ArrayHolder arrayHolder = new ArrayHolder();
@@ -79,21 +81,23 @@ public class GLRenderer implements Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
+		initializePreferences();
 		TimeTracker timeTracker = new TimeTracker();
-		timeTracker.getDayPart();
+		timeTracker.getDayHour();
 
 
 		//Load in Preferences
 		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 		// Generate Textures, if more needed, alter these numbers.
-		int[] textureNames = new int[4];
-		GLES20.glGenTextures(4, textureNames, 0);
+		int[] textureNames = new int[7];
+		GLES20.glGenTextures(7, textureNames, 0);
 
         //set the scene color from preferences
 		float[] sceneColor;
-		if(preferences.getBoolean("activate_sunset", false))
+
+		if(preferences.getBoolean("activate_sunset", true))
 		{
-			sceneColor = arrayHolder.sunsetColor;
+			sceneColor = arrayHolder.nightColor;
 		}
 		else
 		{
@@ -131,6 +135,31 @@ public class GLRenderer implements Renderer {
 		GLES20.glUseProgram(riGraphicTools.sp_Image);
 
 		setupImages();
+	}
+
+	private void initializePreferences()
+	{
+		//set up preference listener
+		SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		//set up the colors
+		prefListener = new SharedPreferences.OnSharedPreferenceChangeListener()
+		{
+			@Override
+			public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
+			{
+				Log.d("change color", "The preferences were changed");
+				if (sharedPrefs.getBoolean("activate_sunset", true))
+				{
+//					Log.d("change color", "The colors were changed on renderer " +  renderer);
+					changeColor(1);
+				} else
+				{
+//					Log.d("change color", "The colors were changed on renderer " + renderer);
+					changeColor(0);
+				}
+			}
+		};
+		mPrefs.registerOnSharedPreferenceChangeListener(prefListener);
 	}
 
 	@Override
@@ -229,11 +258,12 @@ public class GLRenderer implements Renderer {
 
     public void changeColor(int colorCode)
     {
+
         float[] newColor = arrayHolder.normalColor;
         switch(colorCode){
             case 0: newColor = arrayHolder.normalColor;
                 break;
-            case 1: newColor = arrayHolder.sunsetColor;
+            case 1: newColor = arrayHolder.nightColor;
                 break;
         }
 
@@ -274,8 +304,8 @@ public class GLRenderer implements Renderer {
 		uvBuffer2.position(0);
 
 		// Generate Textures, if more needed, alter these numbers.
-		int[] texturenames = new int[4];
-		GLES20.glGenTextures(4, texturenames, 0);
+		int[] texturenames = new int[7];
+		GLES20.glGenTextures(7, texturenames, 0);
 
 		// Temporary create a bitmap
 		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
@@ -303,9 +333,26 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.squaremountains);
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE5);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[5]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);

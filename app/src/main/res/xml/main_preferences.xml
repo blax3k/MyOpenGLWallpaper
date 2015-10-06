@@ -18,7 +18,7 @@
                         android:summary="delete this later"
                         android:defaultValue="false"/>
     <CheckBoxPreference android:key="activate_sunset"
-                        android:title="activate the sunset" />
+                        android:title="Activate night time" />
 
     <Preference android:key="set_wallpaper"
                 android:title="Set Wallpaper">

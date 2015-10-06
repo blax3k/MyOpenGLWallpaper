@@ -6,10 +6,12 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 
 /**
@@ -77,13 +79,38 @@ public class MyPreferencesActivity extends PreferenceActivity
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    Log.d("stuff", "onPreferenceclick() was clicked");
-                    Intent setWallpaperIntent = new Intent("android.service.wallpaper.LIVE_WALLPAPER_CHOOSER");
-                    startActivity(setWallpaperIntent);
+                    if(Build.VERSION.SDK_INT >= 16)
+                    {
+                        Log.d("Live wallpaper chooser", "tried launching the chooser");
+                        Intent intent = new Intent();
+                        intent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+                        String pkg = GLWallpaperService.class.getPackage().getName();
+                        String cls = GLWallpaperService.class.getCanonicalName();
+                        intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(pkg, cls));
+                        try
+                        {
+                            startActivity(intent);
+                            Log.d("Live wallpaper chooser", "activity was started");
+                        }
+                        catch(Exception anfe)
+                        {
+                            Log.d("Live wallpaper chooser", "not launched");
+                            intent = new Intent("android.service.wallpaper.CHANGE_LIVE_WALLPAPER");
+                            startActivity(intent);
+                        }
+                    }
+                    else
+                    {
+                        Log.d("Live wallpaper chooser", "skipped the thing");
+                        Intent intent = new Intent("android.service.wallpaper.CHANGE_LIVE_WALLPAPER");
+                        startActivity(intent);
+                    }
+//                    Log.d("stuff", "onPreferenceclick() was clicked");
                     
                     return true;
                 }
             });
+
         }
     }
 }

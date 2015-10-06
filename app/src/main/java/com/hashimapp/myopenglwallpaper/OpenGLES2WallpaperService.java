@@ -26,8 +26,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
     //set up our main_preferences
     SharedPreferences preferences;
-    GLRenderer renderer;
-    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     private float xOffset = 0;
     Display display;
 
@@ -35,19 +33,23 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
     @Override
     public Engine onCreateEngine()
     {
-        Log.d("GLES2 onCreateEngine", "engine was created");
-        getNewRenderer();
+//        Log.d("GLES2 onCreateEngine", "engine was created");
         return new OpenGLES2Engine();
 
     }
 
     class OpenGLES2Engine extends GLWallpaperService.GLEngine
     {
+        OpenGLES2Engine()
+        {
+            super();
+        }
+
         @Override
         public void onCreate(SurfaceHolder surfaceHolder)
         {
             super.onCreate(surfaceHolder);
-            Log.d("GLES2 onCreate", "surface was created");
+            Log.d("GLES2 onCreate", "surface was created on " + this.glSurfaceView);
 
             display = ((WindowManager)
                     getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -62,32 +64,13 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
             if (supportsEs2)
             {
-                setEGLContextClientVersion(2);
+                    setEGLContextClientVersion(2);
 
-                setPreserveEGLContextOnPause(true);
+                    setPreserveEGLContextOnPause(true);
 
-                setEGLConfigChooser(new MyConfigChooser());
+                    setEGLConfigChooser(new MyConfigChooser());
 
-                setRenderer(renderer);
-
-                //set up preference listener
-                final SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(OpenGLES2WallpaperService.this);
-                //set up the colors
-                prefListener = new SharedPreferences.OnSharedPreferenceChangeListener()
-                {
-                    @Override
-                    public void onSharedPreferenceChanged(SharedPreferences mprefs, String key) {
-                        if(mPrefs.getBoolean("activate_sunset", true))
-                        {
-                            renderer.changeColor(1);
-                        }
-                        else
-                        {
-                            renderer.changeColor(0);
-                        }
-                    }
-                };
-                mPrefs.registerOnSharedPreferenceChangeListener(prefListener);
+                    setRenderer(OpenGLES2WallpaperService.this.getNewRenderer());
             }
         }
 
@@ -103,10 +86,12 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         }
 
         private float xVelocity, xAcceleration, xPosition;
-        private float xMax = 1.0f;
-        private float xMin = -2.0f;
+        private float xMax = 0.0f;
+        private float xMin = 0.0f;
         public float frameTime = 0.666f;
         private float[] rawSensorData = new float[3];
+        float ALPHA = 0.2f;
+        float accelVals[] = new float[3];
 
         @Override
         public void onSensorChanged(SensorEvent event)
@@ -135,19 +120,20 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     }
 
                     accelVals = lowPass(rawSensorData, accelVals);
+
                     if(accelVals[0] > 10)
                         accelVals[0] = 10;
                     if(accelVals[0] < -10)
                         accelVals[0] = -10;
 
-                    if(accelVals[1] > 5)
-                        accelVals[1] = 5;
+                    if(accelVals[1] > 10)
+                        accelVals[1] = 10;
                     if(accelVals[1] < 0)
                         accelVals[1] = 0;
 
 
                     float newX = accelVals[0] * 0.03f +.5f;
-                    float newY = accelVals[1] * .02f;
+                    float newY = accelVals[1] * .015f;
 
                     renderer.setEyeX(newX);
                     renderer.setEyeY(newY);
@@ -155,8 +141,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             }
         }
 
-        float ALPHA = 0.2f;
-        float accelVals[] = new float[3];
 
         protected float[] lowPass(float[] input, float[] output)
         {
@@ -226,13 +210,11 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             Log.d("GLES2 RedrawNeeded", "the surface was redrawn");
 
         }
-
     }
 
     GLSurfaceView.Renderer getNewRenderer()
     {
-        renderer = new GLRenderer(OpenGLES2WallpaperService.this);
-        Log.d("getNewRenderer called", "new renderer" + renderer.toString());
-        return renderer;
+        Log.d("getNewRenderer called", "OpenGLES2WallpaperService " + OpenGLES2WallpaperService.this.toString());
+        return new GLRenderer(OpenGLES2WallpaperService.this);
     }
 }
