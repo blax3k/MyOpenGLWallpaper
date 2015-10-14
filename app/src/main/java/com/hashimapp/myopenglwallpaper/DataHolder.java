@@ -1,16 +1,49 @@
 package com.hashimapp.myopenglwallpaper;
 
-import java.lang.reflect.Array;
-
 /**
  * Created by Blake on 8/19/2015.
  */
-public class ArrayHolder
+public class DataHolder
 {
-    public ArrayHolder()
+    public DataHolder()
     {
 
     }
+
+    private float opacity = 0.5f;
+
+    public float getOpacity()
+    {
+        return opacity;
+    }
+
+    public void setOpacity(float newOpacity)
+    {
+        if(newOpacity > 1)
+            opacity = 1;
+        else if(opacity < 0)
+            opacity = 0;
+        else
+            opacity = newOpacity;
+        updateGirlColor();
+    }
+
+    public void updateGirlColor()
+    {
+       float[] newNormalColor = new float[]
+            {1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity};
+        normalColorGirl = newNormalColor;
+        float[] newNightcolor = new float[]
+                {0.17f, 0.27f, 0.27f, opacity,
+                        0.17f, 0.27f, 0.63921568627f, opacity,
+                        0.17f, 0.27f, 0.63921568627f, opacity,
+                        0.17f, 0.27f, 0.63921568627f, opacity};
+        nightColorGirl = newNightcolor;
+    }
+
 
     //Sprite posisitions
     public float[] vertices1 = new float[]{
@@ -80,6 +113,18 @@ public class ArrayHolder
                     1f, 1f, 1f, 1f,
                     1f, 1f, 1f, 1f};
 
+    public float[] normalColorGirl = new float[]
+            {1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity,
+                    1f, 1f, 1f, opacity};
+
+    public float[] nightColorGirl = new float[]
+            {0.17f, 0.27f, 0.27f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity};
+
     public float[] sunsetColor = new float[]
             {1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
                     1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
@@ -90,5 +135,11 @@ public class ArrayHolder
                                     0.17f, 0.27f, 0.63921568627f, 1.0f,
                                     0.17f, 0.27f, 0.63921568627f, 1.0f,
                                     0.17f, 0.27f, 0.63921568627f, 1.0f};
+    public float[] transparentColor = new float[]
+            {1f, 1f, 1f, 0.3f,
+                    1f, 1f, 1f, 0.3f,
+                    1f, 1f, 1f, 0.3f,
+                    1f, 1f, 1f, 0.3f
+            };
 
 }

@@ -26,7 +26,7 @@ public class MyPreferencesActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new PrefsFragment()).commit();
+                new MyPreferenceFragment()).commit();
 
 
     }
@@ -58,20 +58,7 @@ public class MyPreferencesActivity extends PreferenceActivity
             super.onCreate(savedInstanceState);
             //set the preference file
             addPreferencesFromResource(R.xml.main_preferences);
-            //set the website for the deviantart page
-//            findPreference("view_artist");
-//            Preference viewArtistPref = (Preference) findPreference("view_artist");
-//            viewArtistPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-//            {
-//                @Override
-//                public boolean onPreferenceClick(Preference preference)
-//                {
-//                    Intent deviantArtIntent = new Intent(Intent.ACTION_VIEW,
-//                            Uri.parse("http://quirkilicious.deviantart.com/"));
-//                    startActivity(deviantArtIntent);
-//                    return true;
-//                }
-//            });
+
             findPreference("set_wallpaper");
             Preference setWallpaperPref = (Preference) findPreference("set_wallpaper");
             setWallpaperPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -84,11 +71,12 @@ public class MyPreferencesActivity extends PreferenceActivity
                         Log.d("Live wallpaper chooser", "tried launching the chooser");
                         Intent intent = new Intent();
                         intent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                        String pkg = GLWallpaperService.class.getPackage().getName();
-                        String cls = GLWallpaperService.class.getCanonicalName();
+                        String pkg = OpenGLES2WallpaperService.class.getPackage().getName();
+                        String cls = OpenGLES2WallpaperService.class.getCanonicalName();
                         intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(pkg, cls));
                         try
                         {
+                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             startActivity(intent);
                             Log.d("Live wallpaper chooser", "activity was started");
                         }

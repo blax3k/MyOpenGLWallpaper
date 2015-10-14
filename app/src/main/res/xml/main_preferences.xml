@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <CheckBoxPreference android:key="pref_key_sim_scroll"
                         android:title="3D Parallax Effect"
                         android:summary="If scrolling is not supported by your launcher"
                         android:defaultValue="false"/>
+    <ListPreference
+        android:key="texture_model"
+        android:title="texture_choice"
+        android:defaultValue="1"
+        android:entries="@array/listArray"
+        android:entryValues="@array/listValues"/>
 
     <Preference android:key="view_artist"
                 android:title="Go to artists's website">
@@ -22,9 +27,12 @@
 
     <Preference android:key="set_wallpaper"
                 android:title="Set Wallpaper">
-        <intent android:action="android.intent.action.SET_WALLPAPER"
-                />
+        <!--<intent android:action="android.intent.action.VIEW"-->
+                <!--android:targetPackage="com.hashimapp.myopenglwallpaper"-->
+                <!--android:targetClass="com.hashimapp.myopenglwallpaper.WallpaperLauncherActivity"-->
+                <!--/>-->
     </Preference>
+
 
 
 </PreferenceScreen>

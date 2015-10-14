@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MyOpenGLWallpaper</string>
     <string name="label">My Open GL Live Wallpaper</string>
+    <string name="title_activity_launch_live_wallpaper_chooser">LaunchLiveWallpaperChooserActivity
+    </string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

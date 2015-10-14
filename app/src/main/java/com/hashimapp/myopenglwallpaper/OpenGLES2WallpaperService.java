@@ -18,14 +18,15 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import java.util.prefs.Preferences;
+
 /**
  * Created by Blake Hashimoto on 8/14/2015.
  */
 public class OpenGLES2WallpaperService extends GLWallpaperService
 {
-
-    //set up our main_preferences
     SharedPreferences preferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     private float xOffset = 0;
     Display display;
 
@@ -49,12 +50,11 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         public void onCreate(SurfaceHolder surfaceHolder)
         {
             super.onCreate(surfaceHolder);
-            Log.d("GLES2 onCreate", "surface was created on " + this.glSurfaceView);
+//            Log.d("GLES2 onCreate", "surface was created on " + this.glSurfaceView);
 
             display = ((WindowManager)
                     getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-            //set the current preferences
             preferences = PreferenceManager.getDefaultSharedPreferences(OpenGLES2WallpaperService.this);
 
             //check for GLES2 support
@@ -68,7 +68,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
                     setPreserveEGLContextOnPause(true);
 
-                    setEGLConfigChooser(new MyConfigChooser());
+//                    setEGLConfigChooser(new MyConfigChooser());
 
                     setRenderer(OpenGLES2WallpaperService.this.getNewRenderer());
             }
@@ -92,12 +92,14 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         private float[] rawSensorData = new float[3];
         float ALPHA = 0.2f;
         float accelVals[] = new float[3];
+        float prevAccelVals[] = new float[3];
 
         @Override
         public void onSensorChanged(SensorEvent event)
         {
             if(preferences.getBoolean("pref_key_sim_scroll", true))
             {
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
                 {
                     switch (display.getRotation()) {
@@ -118,9 +120,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                             rawSensorData[1] = -event.values[0];
                             break;
                     }
-
                     accelVals = lowPass(rawSensorData, accelVals);
-
                     if(accelVals[0] > 10)
                         accelVals[0] = 10;
                     if(accelVals[0] < -10)
@@ -131,13 +131,17 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     if(accelVals[1] < 0)
                         accelVals[1] = 0;
 
-
                     float newX = accelVals[0] * 0.03f +.5f;
                     float newY = accelVals[1] * .015f;
 
-                    renderer.setEyeX(newX);
-                    renderer.setEyeY(newY);
+                    this.renderer.setEyeX(newX);
+                    this.renderer.setEyeY(newY);
                 }
+            }
+            else
+            {
+                sensorManager.unregisterListener(this);
+                renderer.setEyeY(0);
             }
         }
 

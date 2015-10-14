@@ -35,30 +35,30 @@ import android.view.SurfaceHolder;
 
  options for people without homescreens that do offsets changed.
 
- camera translations based on the gyroscope/acclerometer
+ /Done! camera translations based on the gyroscope/acclerometer
 
  weather changes based on user preference or real life weather data
 
  donation option
 
- fix wallpaper not responding when it is chosen twice
+ /Done! fix wallpaper not responding when it is chosen twice
 
  /Done! link to artists deviantart page
  */
 public abstract class GLWallpaperService extends WallpaperService{
 
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
+    protected SensorManager sensorManager;
+    protected Sensor accelerometer;
     private long lastUpdate;
     public static float x;
     public static float y;
     public static float lastX;
+    boolean rendererSet = false;
 
   public class GLEngine extends Engine implements SensorEventListener{
       @Override
       public void onSensorChanged(SensorEvent event)
       {
-
 //          Log.d("Sensor info", "Sensor X: " + x + " Sensor Y: " + y);
       }
 
@@ -89,7 +89,7 @@ public abstract class GLWallpaperService extends WallpaperService{
 
       protected WallpaperGLSurfaceView glSurfaceView;
       private boolean rendererHasBeenSet;
-      GLRenderer renderer;
+      public GLRenderer renderer;
 
       @Override
       public void onCreate(SurfaceHolder surfaceHolder)
@@ -101,7 +101,7 @@ public abstract class GLWallpaperService extends WallpaperService{
           Log.d("onCreate", "was called");
           Log.d("glSurfaceView", "glSurfaceView = " + glSurfaceView.toString());
 
-          //set up the accelerometer
+//          //set up the accelerometer
           sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
           if(sensorManager.getSensorList(Sensor.TYPE_GRAVITY).size() > 0)
           {
@@ -117,18 +117,29 @@ public abstract class GLWallpaperService extends WallpaperService{
       public void onVisibilityChanged(boolean visible)
       {
           super.onVisibilityChanged(visible);
-          if(rendererHasBeenSet)
-          {
               if (visible)
               {
                   glSurfaceView.onResume();
+                  glSurfaceView.queueEvent(new Runnable()
+                  {
+                      // This method will be called on the rendering
+                      // thread:
+                      public void run()
+                      {
+                          renderer.refresh();
+                      }
+                  });
                   sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);
                   Log.d("onResume", "was called on " + glSurfaceView.toString());
               } else
               {
-                  glSurfaceView.onPause();
-                  sensorManager.unregisterListener(this);
-                  Log.d("onPause", "was called on " + glSurfaceView.toString());
+                  if(rendererHasBeenSet)
+                  {
+                      renderer.setOpacity(0);
+                      glSurfaceView.requestRender();
+                      glSurfaceView.onPause();
+//                  sensorManager.unregisterListener(this);
+                      Log.d("onPause", "was called on " + glSurfaceView.toString());
               }
           }
       }
