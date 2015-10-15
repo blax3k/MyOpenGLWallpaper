@@ -36,7 +36,9 @@ public class GLRenderer implements Renderer {
 	public ShortBuffer drawListBuffer;
 	public FloatBuffer uvBuffer, uvBuffer2;
 //	private int frameBuffer;
-	int[] texturenames;
+	int[] texturenames = new int[7];
+
+	SceneSetter sceneSetter;
 
 	public int opacity = 0;
 
@@ -56,7 +58,7 @@ public class GLRenderer implements Renderer {
 	private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     //set up array database
-    DataHolder dataHolder = new DataHolder();
+//    DataHolder dataHolder = new DataHolder();
 
 //	Square square, square1;
 	Sprite background, mountains, girl, grass;
@@ -81,6 +83,9 @@ public class GLRenderer implements Renderer {
 	public GLRenderer(Context c)
 	{
 		mContext = c;
+		//Load in Preferences
+		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+		sceneSetter = new SceneSetter(preferences);
 	}
 
 	@Override
@@ -90,8 +95,8 @@ public class GLRenderer implements Renderer {
 		TimeTracker timeTracker = new TimeTracker();
 		timeTracker.getDayHour();
 
-		//Load in Preferences
-		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+		sceneSetter = new SceneSetter(preferences);
 		// Generate Textures, if more needed, alter these numbers.
 		int[] textureNames = new int[7];
 		GLES20.glGenTextures(7, textureNames, 0);
@@ -99,20 +104,20 @@ public class GLRenderer implements Renderer {
         //set the scene color from preferences
 		float[] sceneColor;
 
-		if(preferences.getBoolean("activate_sunset", true))
-		{
-			sceneColor = dataHolder.nightColor;
-		}
-		else
-		{
-			sceneColor = dataHolder.normalColor;
-		}
+//		if(preferences.getBoolean("activate_sunset", true))
+//		{
+//			sceneColor = dataHolder.nightColor;
+//		}
+//		else
+//		{
+//			sceneColor = dataHolder.normalColor;
+//		}
 
         //create the sprites
-		grass = new Sprite(dataHolder.grassVertices, sceneColor);
-		girl = new Sprite(dataHolder.girlVertices, sceneColor);
+		grass = new Sprite(sceneSetter.getSpriteVertices("grass"), sceneSetter.getSpriteColor("grass"));
+		girl = new Sprite(sceneSetter.getSpriteVertices("girl"), sceneSetter.getSpriteColor("girl"));
 //		mountains = new Sprite(arrayHolder.vertices3, sceneColor);
-		background = new Sprite(dataHolder.fieldVertices, sceneColor);
+		background = new Sprite(sceneSetter.getSpriteVertices("field"), sceneSetter.getSpriteColor("field"));
 
 		// Set the clear color to white
 		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -164,15 +169,9 @@ public class GLRenderer implements Renderer {
 				Log.d("preferences", "The preferences were changed");
 				if(key.equals("activate_sunset"))
 				{
-					if (sharedPrefs.getBoolean("activate_sunset", true))
-					{
-//					Log.d("change color", "The colors were changed on renderer " +  renderer);
-						changeColor(1);
-					} else
-					{
-//					Log.d("change color", "The colors were changed on renderer " + renderer);
-						changeColor(0);
-					}
+					changeColor("girl");
+					changeColor("grass");
+					changeColor("field");
 				}
 				if(key.equals("texture_model"))
 				{
@@ -226,9 +225,9 @@ public class GLRenderer implements Renderer {
 
 	public void setOpacity(float newOpacity)
 	{
-		dataHolder.setOpacity(newOpacity);
+		sceneSetter.setOpacity(newOpacity);
 		if(girl != null)
-		changeColor(0);
+		changeColor("girl");
 	}
 
 	@Override
@@ -251,16 +250,11 @@ public class GLRenderer implements Renderer {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		//increase opacity from zero
-		if(dataHolder.getOpacity() < 1.0f)
+		if(sceneSetter.getOpacity() < 1.0f)
 		{
-			Log.d("set Opacity: ", " opacity is less than 1.0f");
-			dataHolder.setOpacity(dataHolder.getOpacity() + 0.04f);
-			int temp = 0;
-			if(preferences.getBoolean("activate_sunset", true))
-				temp = 1;
-			else
-				temp = 0;
-			changeColor(temp);
+//			Log.d("set Opacity: ", " opacity is less than 1.0f");
+			sceneSetter.setOpacity(sceneSetter.getOpacity() + 0.04f);
+			changeColor("girl");
 		}
 
 		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
@@ -303,29 +297,30 @@ public class GLRenderer implements Renderer {
 
 	}
 
-    public void changeColor(int colorCode)
-    {
 
-        float[] newColor = dataHolder.normalColor;
-		float[] girlColor = dataHolder.normalColorGirl;
-        switch(colorCode){
-            case 0: newColor = dataHolder.normalColor;
-				girlColor = dataHolder.normalColorGirl;
-                break;
-			case 1: newColor = dataHolder.nightColor;
-				girlColor = dataHolder.nightColorGirl;
-                break;
-        }
-
-		for(int i = 0; i < newColor.length; i+= 4)
+	public void changeColor(String sprite)
+	{
+		if(sprite.equals("girl"))
 		{
-			Log.d("current color", "new color: " + newColor[i] +newColor[i + 1] +newColor[i + 2] +newColor[i + 3]);
+			girl.setColor(sceneSetter.getSpriteColor("girl"));
 		}
-        grass.setColor(newColor);
-        girl.setColor(girlColor);
-//        mountains.setColor(newColor);
-        background.setColor(newColor);
-    }
+		else if(sprite.equals("grass"))
+		{
+			grass.setColor(sceneSetter.getSpriteColor("grass"));
+		}else
+		{
+			background.setColor(sceneSetter.getSpriteColor("background"));
+		}
+
+//		for(int i = 0; i < newColor.length; i+= 4)
+//		{
+//			Log.d("current color", "new color: " + newColor[i] +newColor[i + 1] +newColor[i + 2] +newColor[i + 3]);
+//		}
+//		grass.setColor(newColor);
+//		girl.setColor(girlColor);
+////        mountains.setColor(newColor);
+//		background.setColor(newColor);
+	}
 
 	public void refresh()
 	{

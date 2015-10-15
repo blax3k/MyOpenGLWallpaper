@@ -10,7 +10,7 @@ public class DataHolder
 
     }
 
-    private float opacity = 0.5f;
+    private float opacity = 0.0f;
 
     public float getOpacity()
     {

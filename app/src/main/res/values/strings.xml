@@ -1,9 +1,25 @@
 <resources>
-    <string name="app_name">MyOpenGLWallpaper</string>
+    <string name="app_name">My Wallpaper</string>
     <string name="label">My Open GL Live Wallpaper</string>
     <string name="title_activity_launch_live_wallpaper_chooser">LaunchLiveWallpaperChooserActivity
     </string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    //Preference Strings
+    //remove layer
+    <string name="remove_layer">Remove layer</string>
+    <string name="remove_layer_summary">Remove the subject from the background</string>
+    //change lighting
+    <string name="activate_night">Activate night time</string>
+    //set Wallpaper
+    <string name="set_wallpaper">Set Wallpaper</string>
+    //go to artist's website
+    <string name="texture_choice">Choose subject</string>
+    //accelerometer scrolling
+    <string name="sim_scrolling">3D parallax effect</string>
+    <string name="sim_scrolling_summary">Control parallax effect with accelerometer</string>
+
+
 </resources>

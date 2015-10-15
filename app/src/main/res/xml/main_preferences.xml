@@ -2,12 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference android:key="pref_key_sim_scroll"
-                        android:title="3D Parallax Effect"
-                        android:summary="If scrolling is not supported by your launcher"
+                        android:title="@string/sim_scrolling"
+                        android:summary="@string/sim_scrolling_summary"
                         android:defaultValue="false"/>
     <ListPreference
         android:key="texture_model"
-        android:title="texture_choice"
+        android:title="@string/texture_choice"
         android:defaultValue="1"
         android:entries="@array/listArray"
         android:entryValues="@array/listValues"/>
@@ -19,18 +19,14 @@
     </Preference>
 
     <CheckBoxPreference android:key="pref_key_remove_layer"
-                        android:title="Remove first layer"
-                        android:summary="delete this later"
+                        android:title="@string/remove_layer"
+                        android:summary="@string/remove_layer_summary"
                         android:defaultValue="false"/>
     <CheckBoxPreference android:key="activate_sunset"
-                        android:title="Activate night time" />
+                        android:title="@string/activate_night"/>
 
     <Preference android:key="set_wallpaper"
-                android:title="Set Wallpaper">
-        <!--<intent android:action="android.intent.action.VIEW"-->
-                <!--android:targetPackage="com.hashimapp.myopenglwallpaper"-->
-                <!--android:targetClass="com.hashimapp.myopenglwallpaper.WallpaperLauncherActivity"-->
-                <!--/>-->
+                android:title="@string/set_wallpaper">
     </Preference>
 
 
