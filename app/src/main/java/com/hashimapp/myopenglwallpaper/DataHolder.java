@@ -55,8 +55,8 @@ public class DataHolder
     public float[] grassVertices = new float[]{
             -1.5f,  -0.8f, -2.0f,   // top left
             -1.5f, -1.3f, -2.0f,   // bottom left
-            1.5f, -1.3f, -2.0f,   // bottom right
-            1.5f,  -0.8f, -2.0f }; // top right
+            1.8f, -1.3f, -2.0f,   // bottom right
+            1.8f,  -0.8f, -2.0f }; // top right
 
 //    public float[] vertices2 = new float[]{
 //            -2.9f,  2.9f, 1.98f,   // top left
@@ -101,10 +101,10 @@ public class DataHolder
             0.87f,  1.44f, 2.0f }; // top right
 
     public float[] girlVertices = new float[]{
-            -0.435f,  0.2f, 0.0f,   // top left
-            -0.435f, -1.235f, 0.0f,   // bottom left
-            0.435f, -1.235f, 0.0f,   // bottom right
-            0.435f,  0.2f, 0.0f }; // top right
+            -0.435f,  0.0f, 0.0f,   // top left
+            -0.435f, -1.435f, 0.0f,   // bottom left
+            0.435f, -1.435f, 0.0f,   // bottom right
+            0.435f,  0.0f, 0.0f }; // top right
 
     //Texture colors
     public float[] normalColor = new float[]

@@ -90,7 +90,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         private float xMin = 0.0f;
         public float frameTime = 0.666f;
         private float[] rawSensorData = new float[3];
-        float ALPHA = 0.2f;
+        float ALPHA = 0.1f;
         float accelVals[] = new float[3];
         float prevAccelVals[] = new float[3];
 
@@ -131,7 +131,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     if(accelVals[1] < 0)
                         accelVals[1] = 0;
 
-                    float newX = accelVals[0] * 0.03f +.5f;
+                    float newX = accelVals[0] * 0.05f +.5f;
                     float newY = accelVals[1] * .015f;
 
                     this.renderer.setEyeX(newX);
@@ -141,11 +141,16 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             else
             {
                 sensorManager.unregisterListener(this);
-                renderer.setEyeY(0);
+                if(renderer.portraitOrientation)
+                    renderer.setEyeY(0);
+                else
+                    renderer.setEyeY(-0.3f);
             }
         }
 
-
+        /*
+        smooths the data in the input array and returns the smoothed data in the output
+         */
         protected float[] lowPass(float[] input, float[] output)
         {
             if (output == null) return input;

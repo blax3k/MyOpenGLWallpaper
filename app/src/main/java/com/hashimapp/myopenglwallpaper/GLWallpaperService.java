@@ -101,7 +101,7 @@ public abstract class GLWallpaperService extends WallpaperService{
           Log.d("onCreate", "was called");
           Log.d("glSurfaceView", "glSurfaceView = " + glSurfaceView.toString());
 
-//          //set up the accelerometer
+          //set up the accelerometer
           sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
           if(sensorManager.getSensorList(Sensor.TYPE_GRAVITY).size() > 0)
           {
@@ -122,8 +122,6 @@ public abstract class GLWallpaperService extends WallpaperService{
                   glSurfaceView.onResume();
                   glSurfaceView.queueEvent(new Runnable()
                   {
-                      // This method will be called on the rendering
-                      // thread:
                       public void run()
                       {
                           renderer.refresh();
@@ -138,13 +136,16 @@ public abstract class GLWallpaperService extends WallpaperService{
                       renderer.setOpacity(0);
                       glSurfaceView.requestRender();
                       glSurfaceView.onPause();
-//                  sensorManager.unregisterListener(this);
+                      sensorManager.unregisterListener(this);
                       Log.d("onPause", "was called on " + glSurfaceView.toString());
               }
           }
       }
 
       @Override
+      /*
+      destroys the surface
+       */
       public void onDestroy()
       {
           super.onDestroy();
@@ -158,7 +159,9 @@ public abstract class GLWallpaperService extends WallpaperService{
           super.onSurfaceDestroyed(holder);
       }
 
-
+      /*
+      sets the renderer for the surface view and sets this.renderer to the input renderer
+       */
       protected void setRenderer(GLSurfaceView.Renderer renderer)
       {
           this.renderer = (GLRenderer) renderer;

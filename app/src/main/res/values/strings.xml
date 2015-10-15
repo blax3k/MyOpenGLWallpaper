@@ -17,6 +17,9 @@
     <string name="set_wallpaper">Set Wallpaper</string>
     //go to artist's website
     <string name="texture_choice">Choose subject</string>
+    <string name="girl1">Girl 1</string>
+    <string name="girl2">Girl 2</string>
+    <string name="girl3">Girl 3</string>
     //accelerometer scrolling
     <string name="sim_scrolling">3D parallax effect</string>
     <string name="sim_scrolling_summary">Control parallax effect with accelerometer</string>
