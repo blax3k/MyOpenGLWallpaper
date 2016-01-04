@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="listArray">
-        <item>@string/girl1</item>
-        <item>@string/girl2</item>
-        <item>@string/girl3</item>
+        <item>@string/girl_front_1</item>
+        <item>@string/girl_front_2</item>
+        <item>@string/girl_mid_1</item>
+        <item>@string/girl_mid_2</item>
+        <item>@string/girl_back_1</item>
+        <item>@string/girl_back_2</item>
     </string-array>
     <string-array name="listValues">
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
     </string-array>
 </resources>

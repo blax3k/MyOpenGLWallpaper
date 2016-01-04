@@ -10,7 +10,7 @@ public class DataHolder
 
     }
 
-    private float opacity = 0.0f;
+    private float opacity = 1.0f;
 
     public float getOpacity()
     {
@@ -36,110 +36,110 @@ public class DataHolder
                     1f, 1f, 1f, opacity,
                     1f, 1f, 1f, opacity};
         normalColorGirl = newNormalColor;
-        float[] newNightcolor = new float[]
+        float[] newNightColor = new float[]
                 {0.17f, 0.27f, 0.27f, opacity,
                         0.17f, 0.27f, 0.63921568627f, opacity,
                         0.17f, 0.27f, 0.63921568627f, opacity,
                         0.17f, 0.27f, 0.63921568627f, opacity};
-        nightColorGirl = newNightcolor;
+        nightColorGirl = newNightColor;
     }
 
 
     //Sprite posisitions
-    public float[] vertices1 = new float[]{
-            -1.55f,  1.55f, -2.0f,   // top left
-            -1.55f, -1.55f, -2.0f,   // bottom left
-            1.55f, -1.55f, -2.0f,   // bottom right
-            1.55f,  1.55f, -2.0f }; // top right
+    public float[] tableVertices = new float[]{
+            -4.5f,  -0.8f, -2.0f,   // top left
+            -4.5f, -1.3f, -2.0f,   // bottom left
+            0.8f, -1.3f, -2.0f,   // bottom right
+            0.8f,  -0.8f, -2.0f }; // top right
 
-    public float[] grassVertices = new float[]{
-            -1.5f,  -0.8f, -2.0f,   // top left
-            -1.5f, -1.3f, -2.0f,   // bottom left
-            1.8f, -1.3f, -2.0f,   // bottom right
-            1.8f,  -0.8f, -2.0f }; // top right
+    public float[] roomVertices = new float[]{
+            -5.6f,  3.2f, 2.0f,   // top left
+            -5.6f, -2.0f, 2.0f,   // bottom left
+            2.0f, -2.0f, 2.0f,   // bottom right
+            2.0f,  3.2f, 2.0f }; // top right
 
-//    public float[] vertices2 = new float[]{
-//            -2.9f,  2.9f, 1.98f,   // top left
-//            -2.9f, -2.9f, 1.98f,   // bottom left
-//            2.9f, -2.9f, 1.98f,   // bottom right
-//            2.9f,  2.9f, 1.98f }; // top right
+    public float[] buildingVertices = new float[]{
+            3.3f,  4.7f, 4.0f,   // top left
+            3.3f, -2.0f, 4.0f,   // bottom left
+            -1.0f, -2.0f, 4.0f,   // bottom right
+            -1.0f,  4.7f, 4.0f }; // top right
 
-    public float[] vertices2 = new float[]{
-            -1.0f,  1.0f, 1.98f,   // top left
-            -1.0f, -1.0f, 1.98f,   // bottom left
-            1.0f, -1.0f, 1.98f,   // bottom right
-            1.0f,  1.0f, 1.98f }; // top right
+    public float[] girlMidStanding = new float[]{
+            -2.04f,  1.1f, 0.0f,   // top left
+            -2.04f, -1.2f, 0.0f,   // bottom left
+            -0.37f, -1.2f, 0.0f,   // bottom right
+            -0.37f,  1.1f, 0.0f }; // top right
 
-    public float[] vertices3 = new float[]{
-            -1.8f,  1.8f, 1.99f,   // top left
-            -1.8f, -1.8f, 1.99f,   // bottom left
-            1.8f, -1.8f, 1.99f,   // bottom right
-            1.8f,  1.8f, 1.99f }; // top right
+    public float[] girlBackSitting = new float[]{
+            -1.24f,  2.3f, 1.9999f,   // top left
+            -1.24f, -0.75f, 1.9999f,   // bottom left
+            0.87f, -0.75f, 1.9999f,   // bottom right
+            0.87f,  2.3f, 1.9999f }; // top right
 
-//    public float[] vertices4 = new float[]{
-//            -1.9f,  2.4f, 2.0f,   // top left
-//            -1.9f, -2.4f, 2.0f,   // bottom left
-//            1.9f, -2.4f, 2.0f,   // bottom right
-//            1.9f,  2.4f, 2.0f }; // top right
+//    public float[] girlFrontReading = new float[]{
+//            -2.04f,  1.1f, -1.9999f,   // top left
+//            -2.04f, -1.0f, -1.9999f,   // bottom left
+//            -0.87f, -1.0f, -1.9999f,   // bottom right
+//            -0.87f,  1.1f, -1.9999f }; // top right
+ public float[] girlFrontReading = new float[]{
+            -0.87f,  0.8f, -2.0f,   // top right
+            -0.87f, -1.0f, -2.0f,   // bottom right
+            -2.04f, -1.0f, -2.0f,   // bottom left
+            -2.04f,  0.8f, -2.0f }; // top left
 
-    public float[] vertices4 = new float[]{
-            -2.0f,  2.5f, 2.0f,   // top left
-            -2.0f, -0.0f, 2.0f,   // bottom left
-            2.0f, -0.0f, 2.0f,   // bottom right
-            2.0f,  2.5f, 2.0f }; // top right
-
-    public float[] fieldVertices = new float[]{
-            -4.0f,  2.5f, 2.0f,   // top left
-            -4.0f, -2.5f, 2.0f,   // bottom left
-            4.0f, -2.5f, 2.0f,   // bottom right
-            4.0f,  2.5f, 2.0f }; // top right
-
-    public float[] vertices5 = new float[]{
-            -0.87f,  1.44f, 2.0f,   // top left
-            -0.87f, -1.44f, 2.0f,   // bottom left
-            0.87f, -1.44f, 2.0f,   // bottom right
-            0.87f,  1.44f, 2.0f }; // top right
-
-    public float[] girlVertices = new float[]{
+    public float[] girlSwordVertices = new float[]{
             -0.435f,  0.0f, 0.0f,   // top left
             -0.435f, -1.435f, 0.0f,   // bottom left
             0.435f, -1.435f, 0.0f,   // bottom right
             0.435f,  0.0f, 0.0f }; // top right
 
+    public float[] cityVertices = new float[]{
+            -5.0f,  2.4f, 2.0f,   // top left
+            -5.0f, -2.3f, 2.0f,   // bottom left
+            1.8f, -2.3f, 2.0f,   // bottom right
+            1.8f,  2.4f, 2.0f }; // top right
+
+    public float[] skyVertices = new float[]{
+            -5.0f,  3.4f, 2.0f,   // top left
+            -5.0f, 0.7f, 2.0f,   // bottom left
+            1.8f, 0.7f, 2.0f,   // bottom right
+            1.8f,  3.4f, 2.0f }; // top right
+
+
     //Texture colors
-    public float[] normalColor = new float[]
-            {1f, 1f, 1f, 1f,
-                    1f, 1f, 1f, 1f,
-                    1f, 1f, 1f, 1f,
-                    1f, 1f, 1f, 1f};
+    public float[] normalColor = new float[]{
+            1f, 1f, 1f, 1f,
+            1f, 1f, 1f, 1f,
+            1f, 1f, 1f, 1f,
+            1f, 1f, 1f, 1f
+    };
 
     public float[] normalColorGirl = new float[]
-            {1f, 1f, 1f, opacity,
-                    1f, 1f, 1f, opacity,
-                    1f, 1f, 1f, opacity,
-                    1f, 1f, 1f, opacity};
+            {
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity
+            };
 
     public float[] nightColorGirl = new float[]
-            {0.17f, 0.27f, 0.27f, opacity,
+            {
                     0.17f, 0.27f, 0.63921568627f, opacity,
                     0.17f, 0.27f, 0.63921568627f, opacity,
-                    0.17f, 0.27f, 0.63921568627f, opacity};
+                    0.17f, 0.27f, 0.63921568627f, opacity,
+                    0.17f, 0.27f, 0.63921568627f, opacity
+            };
 
     public float[] sunsetColor = new float[]
             {1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
                     1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
                     1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
                     1.0f, 0.68235294117f, 0.63921568627f, 1.0f};
+
     public float[] nightColor = new float[]
-                                    {0.17f, 0.27f, 0.27f, 1.0f,
-                                    0.17f, 0.27f, 0.63921568627f, 1.0f,
-                                    0.17f, 0.27f, 0.63921568627f, 1.0f,
-                                    0.17f, 0.27f, 0.63921568627f, 1.0f};
-    public float[] transparentColor = new float[]
-            {1f, 1f, 1f, 0.3f,
-                    1f, 1f, 1f, 0.3f,
-                    1f, 1f, 1f, 0.3f,
-                    1f, 1f, 1f, 0.3f
-            };
+            {0.27f, 0.37f, 0.73921568627f, 1.0f,
+                    0.27f, 0.37f, 0.73921568627f, 1.0f,
+                    0.27f, 0.37f, 0.73921568627f, 1.0f,
+                    0.27f, 0.37f, 0.73921568627f, 1.0f};
 
 }

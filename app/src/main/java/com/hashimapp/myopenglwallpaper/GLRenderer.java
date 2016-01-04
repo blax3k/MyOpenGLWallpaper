@@ -3,7 +3,6 @@ package com.hashimapp.myopenglwallpaper;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -24,23 +23,21 @@ public class GLRenderer implements Renderer {
 	// Our matrices
 	private final float[] mtrxProjection = new float[16];
 	private final float[] mtrxView = new float[16];
-	private final float[] mMVPMatrix = new float[16];
+	private final float[] mMVPMatrix = new float[16],
+			scratch0 = new float[16],
+			scratch1 = new float[16],
+			scratch2 = new float[16],
+			scratch3 = new float[16];
 	private float[] mModelMatrix = new float[16];
 	private int mMVPMatrixHandle;
 
 	// Geometric variables
-	public static float vertices[];
-	public static short indices[];
-	public static float uvs[], uvs2[];
-	public FloatBuffer vertexBuffer;
-	public ShortBuffer drawListBuffer;
-	public FloatBuffer uvBuffer, uvBuffer2;
+	public static float uvs[];
+	public FloatBuffer uvBuffer;
 //	private int frameBuffer;
-	int[] texturenames = new int[7];
+	int[] texturenames;
 
 	SceneSetter sceneSetter;
-
-	public int opacity = 0;
 
 	// Our screenresolution
 	float	mScreenWidth = 1280;
@@ -48,7 +45,6 @@ public class GLRenderer implements Renderer {
 
 	// Misc
 	Context mContext;
-	long mLastTime;
 	int mProgram;
 
 	long startTime = System.currentTimeMillis();
@@ -61,23 +57,52 @@ public class GLRenderer implements Renderer {
 //    DataHolder dataHolder = new DataHolder();
 
 //	Square square, square1;
-	Sprite background, mountains, girl, grass;
-	float offsetDifference = 1;
-//	Background background;
+	Sprite room, city, building, sky, girl, table;//, girlMid, girlFront, girlBack;
+	float offsetDifferenceX = 1;
+	float offsetDifferenceY = 1;
+//	Background room;
 
 	public void setEyeX(float offset)
 	{
 //			Log.d("Renderer", "renderer offsetOnce: " + this.toString());
-
-			eyeX = -offset * offsetDifference;
-			lookX = eyeX;
+			if(portraitOrientation)
+			{
+				eyeX = -offset * offsetDifferenceX;
+				if(simScroll)
+					eyeX -= 1.5f;
+				lookX = eyeX;
+			}
+		else //landscape orientation
+			{
+				eyeX = -offset * offsetDifferenceX - 1.40f;
+				lookX = eyeX;
+			}
+//			lookX = -offset * offsetDifferenceX * 4;
 //		Log.d("setEyeX", "eyeX: " + eyeX);
+	}
+
+	public void resetEyeY(float offset)
+	{
+		eyeY = offset;
+		lookY = eyeY;
 	}
 
 	public void setEyeY(float offset)
 	{
-		eyeY = offset * offsetDifference;
-		lookY = eyeY;
+		if(portraitOrientation)
+		{
+			eyeY = offset * offsetDifferenceY;
+			if(simScroll)
+				eyeY += 0.25f;
+			lookY = eyeY;
+//			lookY = offset* offsetDifferenceX *4;
+		}
+		else
+		{
+			eyeY = offset * offsetDifferenceY; // - 0.3f;
+			lookY = eyeY;
+//			lookY = offset * offsetDifferenceX * 4;
+		}
 	}
 
 	public GLRenderer(Context c)
@@ -85,26 +110,34 @@ public class GLRenderer implements Renderer {
 		mContext = c;
 		//Load in Preferences
 		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-		sceneSetter = new SceneSetter(preferences);
+		sceneSetter = new SceneSetter(preferences, c);
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
 		initializePreferences();
+		if(preferences.getBoolean("pref_key_sim_scroll", true))
+					setSimScroll(true);
+		else		setSimScroll(false);
+
 		TimeTracker timeTracker = new TimeTracker();
 		timeTracker.getDayHour();
 
-
-		sceneSetter = new SceneSetter(preferences);
 		// Generate Textures, if more needed, alter these numbers.
-		int[] textureNames = new int[7];
-		GLES20.glGenTextures(7, textureNames, 0);
+//		int[] textureNames = new int[9];
+//		GLES20.glGenTextures(9, textureNames, 0);
 
         //create the sprites
-		grass = new Sprite(sceneSetter.getSpriteVertices("grass"), sceneSetter.getSpriteColor("grass"));
+		table = new Sprite(sceneSetter.getSpriteVertices("table"), sceneSetter.getSpriteColor("table"));
+//		girlFront = new Sprite(sceneSetter.getSpriteVertices("girlFront"), sceneSetter.getSpriteColor("girlFront"));
+//		girlMid = new Sprite(sceneSetter.getSpriteVertices("girlMid"), sceneSetter.getSpriteColor("girlMid"));
+//		girlBack = new Sprite(sceneSetter.getSpriteVertices("girlBack"), sceneSetter.getSpriteColor("girlBack"));
 		girl = new Sprite(sceneSetter.getSpriteVertices("girl"), sceneSetter.getSpriteColor("girl"));
-		background = new Sprite(sceneSetter.getSpriteVertices("field"), sceneSetter.getSpriteColor("field"));
+		room = new Sprite(sceneSetter.getSpriteVertices("room"), sceneSetter.getSpriteColor("field"));
+		building = new Sprite(sceneSetter.getSpriteVertices("building"), sceneSetter.getSpriteColor("building"));
+		city = new Sprite(sceneSetter.getSpriteVertices("city"), sceneSetter.getSpriteColor("city"));
+		sky = new Sprite(sceneSetter.getSpriteVertices("sky"), sceneSetter.getSpriteColor("sky"));
 
 		// Set the clear color to white
 		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -131,16 +164,6 @@ public class GLRenderer implements Renderer {
 		GLES20.glUseProgram(riGraphicTools.sp_Image);
 		//load the images
 		loadTextures();
-
-//		//set up the frame buffer
-//		int[] frameBuffers = new int[1];
-//		GLES20.glGenFramebuffers(1, frameBuffers, 0);
-//		frameBuffer = frameBuffers[0];
-//		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer);
-//		GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureNames[1], 0);
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-
-
 	}
 
 	private void initializePreferences()
@@ -156,20 +179,54 @@ public class GLRenderer implements Renderer {
 				Log.d("preferences", "The preferences were changed");
 				if(key.equals("activate_sunset"))
 				{
-					changeColor("girl");
-					changeColor("grass");
-					changeColor("field");
+					refreshColors();
 				}
 				if(key.equals("texture_model"))
 				{
 					refresh();
+				}
+				if(key.equals("pref_key_sim_scroll"))
+				{
+					if(sharedPrefs.getBoolean("pref_key_sim_scroll", true))
+						setSimScroll(true);
+					else
+						setSimScroll(false);
 				}
 			}
 		};
 		mPrefs.registerOnSharedPreferenceChangeListener(prefListener);
 	}
 
-	public boolean portraitOrientation;
+	public void setSimScroll(boolean mSimScroll)
+	{
+		simScroll = mSimScroll;
+		if(simScroll)
+		{
+			if(portraitOrientation)
+			{
+				eyeZ = -2.7f;
+				offsetDifferenceX = getOffsetDifference(0);
+			}
+			else
+			{
+				eyeZ = -3.4f;
+			}
+		}
+		else
+		{
+			if(portraitOrientation)
+			{
+				eyeZ = -2.7f;
+			}
+			else
+			{
+				eyeZ = -3.4f;
+			}
+
+		}
+	}
+
+	public boolean portraitOrientation, simScroll;
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -184,25 +241,78 @@ public class GLRenderer implements Renderer {
 		{
 			portraitOrientation = true;
 			ratio = (float) width / height;
-			Matrix.frustumM(mtrxProjection,0, -ratio, ratio, -1, 1, 3, 7);
-			offsetDifference = 1;
+			Matrix.frustumM(mtrxProjection, 0, -ratio, ratio, -1, 1, 2, 10);
+			eyeZ = -3.0f;
+			offsetDifferenceX = getOffsetDifference(0);
+			offsetDifferenceY = getOffsetDifference(1);
 			setEyeY(0);
 		}
 		else //landscape
 		{
 			portraitOrientation = false;
 			ratio = (float) height / width;
-			Matrix.frustumM(mtrxProjection,0, -1, 1, -ratio, ratio,  3, 7);
-			offsetDifference = 0.8f;
-			setEyeY(-0.3f);
+			Matrix.frustumM(mtrxProjection, 0, -1, 1, -ratio, ratio, 2, 10);
+			eyeZ = -3.8f;
+			offsetDifferenceX = getOffsetDifference(0);
+			offsetDifferenceY = getOffsetDifference(1);
+			setEyeY(0);
+//			resetEyeY(-0.2f);
 		}
-
 	}
+
+	private float getOffsetDifference(int choice)
+	{
+		if (choice == 0) //x
+		{
+			if (portraitOrientation)
+			{
+				if (simScroll)
+				{
+					return 3.0f;
+				} else
+				{
+					return 3.8f;
+				}
+			} else //landscape orientation
+			{
+				if (simScroll)
+				{
+					return 0.3f;
+				} else
+				{
+					return 0.8f;
+				}
+			}
+		} else //y
+		{
+			if (portraitOrientation)
+			{
+					if (simScroll)
+					{
+						return 0.1f;
+					} else
+					{
+						return 0.8f;
+					}
+			} else //landscape orientation
+			{
+					if (simScroll)
+					{
+						return 0.3f;
+					} else
+					{
+						return 0.5f;
+					}
+			}
+		}
+	}
+
+
 
 	// Position the eye in front of the origin.
 	float eyeX = 0.0f;
 	float eyeY = 0.0f;
-	float eyeZ = -4.0f;
+	float eyeZ = -3.0f;
 	// We are looking toward the distance
 	float lookX = 0.0f;
 	float lookY = 0.0f;
@@ -219,132 +329,68 @@ public class GLRenderer implements Renderer {
 	public void setOpacity(float newOpacity)
 	{
 		sceneSetter.setOpacity(newOpacity);
+//		if(girlMid != null)
 		if(girl != null)
-		changeColor("girl");
+			changeColor("girl");
 	}
 
-	@Override
-	public void onDrawFrame(GL10 unused) {
-		long endTime = System.currentTimeMillis();
-		long dt = endTime - startTime;
-		if(dt < 10)
-		{
-			try
-			{
-				Thread.sleep(10 - dt);
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-		}
-			startTime = System.currentTimeMillis();
+	float skyXOffset = 0.0f;
 
-			// Set the camera position (View matrix)
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-			//increase opacity from zero
-			if (sceneSetter.getOpacity() < 1.0f) {
-				sceneSetter.setOpacity(sceneSetter.getOpacity() + 0.04f);
-				changeColor("girl");
-			}
-
-			mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
-
-//		Log.d("onDrawFrame", "eyeX: " + eyeX);
-			Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
-
-
-			// Calculate the projection and view transformation
-			Matrix.setIdentityM(mModelMatrix, 0);
-			Matrix.translateM(mModelMatrix, 0, eyeX * 0.2f, 0.0f, 1.0f);
-			Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
-			Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
-			background.draw(mMVPMatrix, uvBuffer, 0);
-
-//		float[] scratch2 = new float[16];
-//		Matrix.setIdentityM(mModelMatrix, 0);
-//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.9f, 0.0f, 1.0f);
-//		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
-//		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-//		mountains.draw(scratch2, uvBuffer, 3);
-
-			if (!preferences.getBoolean("pref_key_remove_layer", true)) {
-				float[] scratch1 = new float[16];
-				Matrix.setIdentityM(mModelMatrix, 0);
-				Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
-				Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
-				Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-				girl.draw(scratch1, uvBuffer, 1);
-			}
-
-
-			float[] scratch = new float[16];
-			Matrix.setIdentityM(mModelMatrix, 0);
-			Matrix.translateM(mModelMatrix, 0, eyeX * -0.5f - 0.8f, 0.3f, 1.0f);
-			Matrix.multiplyMM(scratch, 0, mtrxView, 0, mModelMatrix, 0);
-			Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, scratch, 0);
-			grass.draw(scratch, uvBuffer, 2);
+	public void refreshColors()
+	{
+			table.setColor(sceneSetter.getSpriteColor("table"));
+//			girlMid.setColor(sceneSetter.getSpriteColor("girlMid"));
+			girl.setColor(sceneSetter.getSpriteColor("girl"));
+			room.setColor(sceneSetter.getSpriteColor("room"));
+			city.setColor(sceneSetter.getSpriteColor("city"));
+			sky.setColor(sceneSetter.getSpriteColor("sky"));
 	}
-
 
 	public void changeColor(String sprite)
 	{
 		if(sprite.equals("girl"))
 		{
+//			girlMid.setColor(sceneSetter.getSpriteColor("girlMid"));
 			girl.setColor(sceneSetter.getSpriteColor("girl"));
 		}
-		else if(sprite.equals("grass"))
+		else if(sprite.equals("table"))
 		{
-			grass.setColor(sceneSetter.getSpriteColor("grass"));
+			table.setColor(sceneSetter.getSpriteColor("table"));
 		}else
 		{
-			background.setColor(sceneSetter.getSpriteColor("background"));
+			room.setColor(sceneSetter.getSpriteColor("room"));
 		}
-
-//		for(int i = 0; i < newColor.length; i+= 4)
-//		{
-//			Log.d("current color", "new color: " + newColor[i] +newColor[i + 1] +newColor[i + 2] +newColor[i + 3]);
-//		}
-//		grass.setColor(newColor);
-//		girl.setColor(girlColor);
-////        mountains.setColor(newColor);
-//		background.setColor(newColor);
 	}
 
 	public void refresh()
 	{
-		if(preferences != null)
+		if(preferences != null && girl != null)// girlFront != null && girlMid != null && girlBack != null)
 		{
-			String imageID = preferences.getString("texture_model", "1");
-			Log.d("texture change", "changeTexture called with imageID: " + preferences.getString("texture_model", "1"));
-			Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl2crop);
-			switch (imageID)
-			{
-				case "1":
-					bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl2crop);
-					Log.d("texture change", "texture 1 called");
-					break;
-				case "2":
-					bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlstudentcrop);
-					Log.d("texture change", "texture 2 called");
-					break;
-				case "3":
-					bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlbluecrop);
-					Log.d("texture change", "texture 3 called");
-					break;
-			}
+			girl.setVertices(sceneSetter.getSpriteVertices("girl"));
+//			switch(sceneSetter.getGirlRender())
+//			{
+//				case 1:
+//					girlFront.setVertices(sceneSetter.getSpriteVertices("girlFront"));
+//					break;
+//				case 2:
+//					girlMid.setVertices(sceneSetter.getSpriteVertices("girlMid"));
+//					break;
+//				case 3:
+//					girlBack.setVertices(sceneSetter.getSpriteVertices("girlBack"));
+//					break;
+//			}
+			Bitmap bmp = sceneSetter.getTexture("girl");
 
 			// Bind texture to texturename
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
-			// Set filtering
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-			// Load the bitmap into the bound texture.
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 			GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, bmp);
 
 			bmp.recycle();
 		}
-
 	}
 
 	private void loadTextures()
@@ -365,11 +411,12 @@ public class GLRenderer implements Renderer {
 		uvBuffer.position(0);
 
 		// Generate Textures, if more needed, alter these numbers.
-		texturenames = new int[7];
-		GLES20.glGenTextures(7, texturenames, 0);
+		texturenames = new int[9];
+		GLES20.glGenTextures(9, texturenames, 0);
 
+		//texture 0
 		// Temporary create a bitmap
-		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
+		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.room);
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
@@ -381,7 +428,8 @@ public class GLRenderer implements Renderer {
 		// Load the bitmap into the bound texture.
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girl2crop);
+		//texture 1
+		bmp = sceneSetter.getTexture("girl");
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -389,7 +437,24 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.grass);
+//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlsword);
+//		GLES20.glActiveTexture(GLES20.GL_TEXTURE5);
+//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[5]);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//
+//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlsit);
+//		GLES20.glActiveTexture(GLES20.GL_TEXTURE6);
+//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[6]);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		//texture 2
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -397,31 +462,118 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
-//		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
-//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//
-//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
-//		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
-//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//
-//
-//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.field);
-//		GLES20.glActiveTexture(GLES20.GL_TEXTURE5);
-//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[5]);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+		//texture 3
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.city);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.building);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 		bmp.recycle();
+	}
+
+	@Override
+	public void onDrawFrame(GL10 unused) {
+		skyXOffset += 0.001f;
+		if(skyXOffset > 3.0f)
+			skyXOffset = 0.0f;
+
+		long endTime = System.currentTimeMillis();
+		long dt = endTime - startTime;
+		if(dt < 10)
+		{
+			try
+			{
+				Thread.sleep(10 - dt);
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		startTime = System.currentTimeMillis();
+
+		// Set the camera position (View matrix)
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+		//increase opacity from zero
+		if (sceneSetter.getOpacity() < 1.0f) {
+			sceneSetter.setOpacity(sceneSetter.getOpacity() + 0.04f);
+			changeColor("girl");
+		}
+
+		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
+
+//		Log.d("onDrawFrame", "eyeX: " + eyeX);
+		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+
+
+		// Calculate the projection and view transformation
+		//Draw the sky
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f + skyXOffset, 0.0f, 1.0f);
+		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
+		sky.draw(scratch0, uvBuffer, 4);
+		//Draw the City
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
+		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
+		city.draw(scratch1, uvBuffer, 3);
+		//draw the building
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
+		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
+		building.draw(scratch2, uvBuffer, 7);
+		//draw the room
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
+		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
+		room.draw(mMVPMatrix, uvBuffer, 0);
+		//draw the girl
+		float[] scratch3 = new float[16];
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
+		Matrix.multiplyMM(scratch3, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(scratch3, 0, mtrxProjection, 0, scratch3, 0);
+//		girl.draw(scratch1, uvBuffer, 1);
+		if(sceneSetter.getGirlRender() == 0)
+		{            //don't render
+		}else
+			girl.draw(scratch3, uvBuffer, 1);
+//		}else if(sceneSetter.getGirlRender() == 1)
+//		{	girlFront.draw(scratch3, uvBuffer, 1);
+//		}else if(sceneSetter.getGirlRender() == 2)
+//		{	girlMid.draw(scratch3, uvBuffer, 5);
+//		}else if(sceneSetter.getGirlRender() == 3)
+//		{	girlBack.draw(scratch3, uvBuffer, 6);
+//		}
+
+		//draw the table
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
+		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
+		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
+		table.draw(this.scratch3, uvBuffer, 2);
+
 	}
 }

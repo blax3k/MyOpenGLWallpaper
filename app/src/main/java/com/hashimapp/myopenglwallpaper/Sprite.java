@@ -153,4 +153,11 @@ public class Sprite {
         colorBuffer.put(textureColor);
         colorBuffer.position(0);
     }
+
+    public void setVertices(float[] vertices)
+    {
+        this.vertices = vertices;
+        vertexBuffer.put(this.vertices);
+        vertexBuffer.position(0);
+    }
 }

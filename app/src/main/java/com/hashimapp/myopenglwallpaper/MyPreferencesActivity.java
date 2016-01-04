@@ -58,7 +58,6 @@ public class MyPreferencesActivity extends PreferenceActivity
             super.onCreate(savedInstanceState);
             //set the preference file
             addPreferencesFromResource(R.xml.main_preferences);
-
             findPreference("set_wallpaper");
             Preference setWallpaperPref = (Preference) findPreference("set_wallpaper");
             setWallpaperPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -94,11 +93,10 @@ public class MyPreferencesActivity extends PreferenceActivity
                         startActivity(intent);
                     }
 //                    Log.d("stuff", "onPreferenceclick() was clicked");
-                    
+
                     return true;
                 }
             });
-
         }
     }
 }

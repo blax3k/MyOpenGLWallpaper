@@ -20,7 +20,7 @@ import android.view.SurfaceHolder;
  the (cool) illusion of a 3d environment by using the parallax effect.
 
  I will need a blurred out foreground layer which is basically the top of a table with various tools, a midground layer, which is the
- subject and the room itself, another layer further back, which will serve as the city backdrop outside of the room, and a background
+ subject and the room itself, another layer further back, which will serve as the city backdrop outside of the room, and a room
  which will serve as the sky.
 
  Things I'd like to add:
@@ -117,19 +117,20 @@ public abstract class GLWallpaperService extends WallpaperService{
       public void onVisibilityChanged(boolean visible)
       {
           super.onVisibilityChanged(visible);
-              if (visible)
+              if (visible)//resume
               {
                   glSurfaceView.onResume();
                   glSurfaceView.queueEvent(new Runnable()
                   {
                       public void run()
                       {
+//                          renderer.setOpacity(0);
                           renderer.refresh();
                       }
                   });
                   sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);
                   Log.d("onResume", "was called on " + glSurfaceView.toString());
-              } else
+              } else //pause
               {
                   if(rendererHasBeenSet)
                   {

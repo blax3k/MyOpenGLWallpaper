@@ -15,10 +15,10 @@
     <Preference android:key="view_artist"
                 android:title="Go to artists's website">
                 <intent android:action="android.intent.action.VIEW"
-                        android:data="http://quirkilicious.deviantart.com/" />
+                        android:data="http://www.soundlesswind.com/" />
     </Preference>
 
-    <CheckBoxPreference android:key="pref_key_remove_layer"
+    <CheckBoxPreference android:key="remove_layer"
                         android:title="@string/remove_layer"
                         android:summary="@string/remove_layer_summary"
                         android:defaultValue="false"/>
