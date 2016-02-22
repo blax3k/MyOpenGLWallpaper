@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 /**
  * Created by Blake on 9/19/2015.
@@ -192,6 +193,15 @@ public class SceneSetter
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlbackstand);
                     break;
             }
+        }
+        else if (sprite.equals("table"))
+        {
+            Log.d("Scene Setter" , "table was called");
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.table);
+        }
+        else if (sprite.equals("room"))
+        {
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.room);
         }
         return bmp;
     }

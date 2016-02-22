@@ -53,10 +53,15 @@ public class DataHolder
             0.8f,  -0.8f, -2.0f }; // top right
 
     public float[] roomVertices = new float[]{
-            -5.6f,  3.2f, 2.0f,   // top left
-            -5.6f, -2.0f, 2.0f,   // bottom left
-            2.0f, -2.0f, 2.0f,   // bottom right
-            2.0f,  3.2f, 2.0f }; // top right
+//    -5.7f,  3.2f, 2.0f,   // top left
+//            -5.7f, -2.0f, 2.0f,   // bottom left
+//            2.1f, -2.0f, 2.0f,   // bottom right
+//            2.1f,  3.2f, 2.0f }; // top right
+
+            3.2f,  3.1f, 2.0f, //top right
+            3.2f, -2.0f, 2.0f,   //bottom right
+            -7.0f, -2.0f, 2.0f,   // bottom left
+            -7.0f,  3.1f, 2.0f};   // top left
 
     public float[] buildingVertices = new float[]{
             3.3f,  4.7f, 4.0f,   // top left
@@ -65,10 +70,10 @@ public class DataHolder
             -1.0f,  4.7f, 4.0f }; // top right
 
     public float[] girlMidStanding = new float[]{
-            -2.04f,  1.1f, 0.0f,   // top left
-            -2.04f, -1.2f, 0.0f,   // bottom left
-            -0.37f, -1.2f, 0.0f,   // bottom right
-            -0.37f,  1.1f, 0.0f }; // top right
+            -1.04f,  1.1f, 0.0f,   // top left
+            -1.04f, -1.2f, 0.0f,   // bottom left
+            0.37f, -1.2f, 0.0f,   // bottom right
+            0.37f,  1.1f, 0.0f }; // top right
 
     public float[] girlBackSitting = new float[]{
             -1.24f,  2.3f, 1.9999f,   // top left

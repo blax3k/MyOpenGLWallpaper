@@ -57,7 +57,7 @@ public class GLRenderer implements Renderer {
 //    DataHolder dataHolder = new DataHolder();
 
 //	Square square, square1;
-	Sprite room, city, building, sky, girl, table;//, girlMid, girlFront, girlBack;
+	Sprite girl, table, room, city, building, sky;//, girlMid, girlFront, girlBack;
 	float offsetDifferenceX = 1;
 	float offsetDifferenceY = 1;
 //	Background room;
@@ -252,7 +252,7 @@ public class GLRenderer implements Renderer {
 			portraitOrientation = false;
 			ratio = (float) height / width;
 			Matrix.frustumM(mtrxProjection, 0, -1, 1, -ratio, ratio, 2, 10);
-			eyeZ = -3.8f;
+			eyeZ = -4.7f;
 			offsetDifferenceX = getOffsetDifference(0);
 			offsetDifferenceY = getOffsetDifference(1);
 			setEyeY(0);
@@ -342,8 +342,8 @@ public class GLRenderer implements Renderer {
 //			girlMid.setColor(sceneSetter.getSpriteColor("girlMid"));
 			girl.setColor(sceneSetter.getSpriteColor("girl"));
 			room.setColor(sceneSetter.getSpriteColor("room"));
-			city.setColor(sceneSetter.getSpriteColor("city"));
-			sky.setColor(sceneSetter.getSpriteColor("sky"));
+//			city.setColor(sceneSetter.getSpriteColor("city"));
+//			sky.setColor(sceneSetter.getSpriteColor("sky"));
 	}
 
 	public void changeColor(String sprite)
@@ -389,6 +389,14 @@ public class GLRenderer implements Renderer {
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 			GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, bmp);
 
+			bmp = sceneSetter.getTexture("table");
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+			GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, bmp);
+
 			bmp.recycle();
 		}
 	}
@@ -416,7 +424,7 @@ public class GLRenderer implements Renderer {
 
 		//texture 0
 		// Temporary create a bitmap
-		Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.room);
+		Bitmap bmp = sceneSetter.getTexture("room");
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
@@ -454,7 +462,7 @@ public class GLRenderer implements Renderer {
 //		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 2
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
+		bmp = sceneSetter.getTexture("table");//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
