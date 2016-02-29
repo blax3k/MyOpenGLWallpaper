@@ -81,12 +81,12 @@ public class DataHolder
             0.87f, -0.75f, 1.9999f,   // bottom right
             0.87f,  2.3f, 1.9999f }; // top right
 
-//    public float[] girlFrontReading = new float[]{
+    //    public float[] girlFrontReading = new float[]{
 //            -2.04f,  1.1f, -1.9999f,   // top left
 //            -2.04f, -1.0f, -1.9999f,   // bottom left
 //            -0.87f, -1.0f, -1.9999f,   // bottom right
 //            -0.87f,  1.1f, -1.9999f }; // top right
- public float[] girlFrontReading = new float[]{
+    public float[] girlFrontReading = new float[]{
             -0.87f,  0.8f, -2.0f,   // top right
             -0.87f, -1.0f, -2.0f,   // bottom right
             -2.04f, -1.0f, -2.0f,   // bottom left
@@ -106,8 +106,8 @@ public class DataHolder
 
     public float[] skyVertices = new float[]{
             -5.0f,  3.4f, 2.0f,   // top left
-            -5.0f, 0.7f, 2.0f,   // bottom left
-            1.8f, 0.7f, 2.0f,   // bottom right
+            -5.0f, 0.3f, 2.0f,   // bottom left
+            1.8f, 0.3f, 2.0f,   // bottom right
             1.8f,  3.4f, 2.0f }; // top right
 
 

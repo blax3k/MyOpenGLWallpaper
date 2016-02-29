@@ -15,6 +15,7 @@ public class SceneSetter
     SharedPreferences preferences;
     Context context;
     private float[] currentGirlVertices;
+    private float girlOffset;
 
     public SceneSetter(SharedPreferences nPreferences, Context nContext)
     {
@@ -81,6 +82,11 @@ public class SceneSetter
     public void setNewScene()
     {
 
+    }
+
+    public float getGirlOffset()
+    {
+        return girlOffset;
     }
 
     public float[] getSpriteColor(String sprite)
@@ -176,21 +182,27 @@ public class SceneSetter
                 case("1"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontbook);
                     bmp = BlurBuilder.blur(context, bmp);
+                    girlOffset = 1.0f;
                     break;
                 case("2"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontflower);
+                    girlOffset = 1.0f;
                     break;
                 case("3"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlmidsword);
+                    girlOffset = 0.98f;
                     break;
                 case("4"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlmidheadphones);
+                    girlOffset = 0.98f;
                     break;
                 case("5"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlbacksit);
+                    girlOffset = 0.95f;
                     break;
                 case("6"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlbackstand);
+                    girlOffset = 0.95f;
                     break;
             }
         }

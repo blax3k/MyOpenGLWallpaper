@@ -26,6 +26,7 @@ public class MainActivity extends Activity
         Intent intent = new Intent(this, MyPreferencesActivity.class);
         startActivity(intent);
     }
+
     public void setWallpaper(View view)
     {
         if (Build.VERSION.SDK_INT >= 16)

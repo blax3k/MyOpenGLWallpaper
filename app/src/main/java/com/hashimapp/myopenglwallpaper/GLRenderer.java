@@ -15,6 +15,7 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -61,22 +62,35 @@ public class GLRenderer implements Renderer {
 	float offsetDifferenceX = 1;
 	float offsetDifferenceY = 1;
 //	Background room;
-
+	float xOffset;
 	public void setEyeX(float offset)
 	{
-//			Log.d("Renderer", "renderer offsetOnce: " + this.toString());
 			if(portraitOrientation)
 			{
-				eyeX = -offset * offsetDifferenceX;
+				xOffset = offset * offsetDifferenceX;
 				if(simScroll)
-					eyeX -= 1.5f;
-				lookX = eyeX;
+					xOffset -= 1.5f;
+//				lookX = xOffset;
 			}
 		else //landscape orientation
 			{
-				eyeX = -offset * offsetDifferenceX - 1.40f;
-				lookX = eyeX;
+				xOffset = offset * offsetDifferenceX + 1.2f;
+//				lookX = xOffset;
 			}
+
+//		if(portraitOrientation)
+//		{
+//			eyeX = -offset * offsetDifferenceX;
+//			if(simScroll)
+//				eyeX -= 1.5f;
+//			lookX = eyeX;
+//		}
+//		else //landscape orientation
+//		{
+//			eyeX = -offset * offsetDifferenceX - 1.40f;
+//			lookX = eyeX;
+//		}
+
 //			lookX = -offset * offsetDifferenceX * 4;
 //		Log.d("setEyeX", "eyeX: " + eyeX);
 	}
@@ -140,7 +154,7 @@ public class GLRenderer implements Renderer {
 		sky = new Sprite(sceneSetter.getSpriteVertices("sky"), sceneSetter.getSpriteColor("sky"));
 
 		// Set the clear color to white
-		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
+//		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
 
 		// Create the shaders, solid color
 		int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_SolidColor);
@@ -228,6 +242,7 @@ public class GLRenderer implements Renderer {
 
 	public boolean portraitOrientation, simScroll;
 
+	float ratio;
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 
@@ -236,13 +251,16 @@ public class GLRenderer implements Renderer {
 		mScreenHeight = height;
 		GLES20.glViewport(0, 0, width, height);
 
-		float ratio;
 		if(height > width) //portrait
 		{
 			portraitOrientation = true;
 			ratio = (float) width / height;
-			Matrix.frustumM(mtrxProjection, 0, -ratio, ratio, -1, 1, 2, 10);
+//			Matrix.frustumM(mtrxProjection, 0, -ratio, ratio, -1, 1, 2, 10);
+			Matrix.perspectiveM(mtrxProjection, 0, 53.0f, ratio, 2, 10);
 			eyeZ = -3.0f;
+			eyeX = 0.0f;
+			lookX = eyeX;
+			Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 			offsetDifferenceX = getOffsetDifference(0);
 			offsetDifferenceY = getOffsetDifference(1);
 			setEyeY(0);
@@ -250,9 +268,13 @@ public class GLRenderer implements Renderer {
 		else //landscape
 		{
 			portraitOrientation = false;
-			ratio = (float) height / width;
-			Matrix.frustumM(mtrxProjection, 0, -1, 1, -ratio, ratio, 2, 10);
-			eyeZ = -4.7f;
+			ratio = (float) width / height;
+//			Matrix.frustumM(mtrxProjection, 0, -1, 1, -ratio, ratio, 2, 10);
+			Matrix.perspectiveM(mtrxProjection, 0, 45.0f, ratio, 2, 10);
+			eyeZ = -3.0f;
+			eyeX = 0.0f;
+			lookX = eyeX;
+			Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 			offsetDifferenceX = getOffsetDifference(0);
 			offsetDifferenceY = getOffsetDifference(1);
 			setEyeY(0);
@@ -280,7 +302,7 @@ public class GLRenderer implements Renderer {
 					return 0.3f;
 				} else
 				{
-					return 0.8f;
+					return 1.0f;
 				}
 			}
 		} else //y
@@ -517,8 +539,9 @@ public class GLRenderer implements Renderer {
 		}
 		startTime = System.currentTimeMillis();
 
+
 		// Set the camera position (View matrix)
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+//		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		//increase opacity from zero
 		if (sceneSetter.getOpacity() < 1.0f) {
@@ -526,41 +549,44 @@ public class GLRenderer implements Renderer {
 			changeColor("girl");
 		}
 
-		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
+//		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
 
 //		Log.d("onDrawFrame", "eyeX: " + eyeX);
-		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+//		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
 
 		// Calculate the projection and view transformation
 		//Draw the sky
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f + skyXOffset, 0.0f, 1.0f);
+//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f + skyXOffset, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
 		sky.draw(scratch0, uvBuffer, 4);
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
+//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
 		city.draw(scratch1, uvBuffer, 3);
 		//draw the building
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
+//		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * 0.6f, 0.3f, 1.0f);
 		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
 		building.draw(scratch2, uvBuffer, 7);
 		//draw the room
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * 0.95f, 0.0f, 1.0f);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 		room.draw(mMVPMatrix, uvBuffer, 0);
 		//draw the girl
 		float[] scratch3 = new float[16];
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * sceneSetter.getGirlOffset(), 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch3, 0, mtrxProjection, 0, scratch3, 0);
 //		girl.draw(scratch1, uvBuffer, 1);
@@ -578,7 +604,7 @@ public class GLRenderer implements Renderer {
 
 		//draw the table
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset, 0.3f, 1.0f);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
 		table.draw(this.scratch3, uvBuffer, 2);

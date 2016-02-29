@@ -17,18 +17,17 @@ import android.util.Log;
 /**
  * Created by Blake on 8/18/2015.
  */
-public class MyPreferencesActivity extends PreferenceActivity
+public class MyPreferencesActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private int REQUEST_CODE = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        Log.d("Live Wallpaper Chooser", "onCreate reached 1");
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 new MyPreferenceFragment()).commit();
-
-
     }
 
     SharedPreferences.OnSharedPreferenceChangeListener spChanged = new SharedPreferences.OnSharedPreferenceChangeListener()
@@ -39,6 +38,12 @@ public class MyPreferencesActivity extends PreferenceActivity
 
         }
     };
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+    {
+
+    }
 
     public static class PrefsFragment extends PreferenceFragment
     {
@@ -55,9 +60,12 @@ public class MyPreferencesActivity extends PreferenceActivity
         @Override
         public void onCreate(final Bundle savedInstanceState)
         {
+            Log.d("Live Wallpaper Chooser", "onCreate reached");
             super.onCreate(savedInstanceState);
             //set the preference file
             addPreferencesFromResource(R.xml.main_preferences);
+
+            //Set Wallpaper Button
             findPreference("set_wallpaper");
             Preference setWallpaperPref = (Preference) findPreference("set_wallpaper");
             setWallpaperPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
