@@ -26,6 +26,10 @@
     //accelerometer scrolling
     <string name="sim_scrolling">3D parallax effect</string>
     <string name="sim_scrolling_summary">Control parallax effect with accelerometer</string>
+    //camera blur
+    <string name="blur_none">No camera blur</string>
+    <string name="blur_low">Slight camera blur</string>
+    <string name="blur_high">Heavy camera blur</string>
 
 
 </resources>

@@ -8,9 +8,18 @@
     <ListPreference
         android:key="texture_model"
         android:title="@string/texture_choice"
-        android:defaultValue="1"
+        android:defaultValue="3"
         android:entries="@array/listArray"
         android:entryValues="@array/listValues"/>
+
+    <ListPreference
+        android:key="camera_blur"
+        android:title="Camera Blur"
+        android:defaultValue="1"
+        android:entries="@array/blurArray"
+        android:entryValues="@array/blurValues"/>
+
+        />
 
     <Preference android:key="view_artist"
                 android:title="Go to artists's website">
@@ -22,8 +31,10 @@
                         android:title="@string/remove_layer"
                         android:summary="@string/remove_layer_summary"
                         android:defaultValue="false"/>
+
     <CheckBoxPreference android:key="activate_sunset"
-                        android:title="@string/activate_night"/>
+                        android:title="@string/activate_night"
+                        android:defaultValue="false"/>
 
     <Preference android:key="set_wallpaper"
                 android:title="@string/set_wallpaper">

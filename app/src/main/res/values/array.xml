@@ -16,4 +16,14 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+    <string-array name="blurArray">
+        <item>@string/blur_none</item>
+        <item>@string/blur_low</item>
+        <item>@string/blur_high</item>
+    </string-array>
+    <string-array name="blurValues">
+        <item>none</item>
+        <item>low</item>
+        <item>high</item>
+    </string-array>
 </resources>

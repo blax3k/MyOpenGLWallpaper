@@ -10,12 +10,10 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -77,22 +75,6 @@ public class GLRenderer implements Renderer {
 				xOffset = offset * offsetDifferenceX + 1.2f;
 //				lookX = xOffset;
 			}
-
-//		if(portraitOrientation)
-//		{
-//			eyeX = -offset * offsetDifferenceX;
-//			if(simScroll)
-//				eyeX -= 1.5f;
-//			lookX = eyeX;
-//		}
-//		else //landscape orientation
-//		{
-//			eyeX = -offset * offsetDifferenceX - 1.40f;
-//			lookX = eyeX;
-//		}
-
-//			lookX = -offset * offsetDifferenceX * 4;
-//		Log.d("setEyeX", "eyeX: " + eyeX);
 	}
 
 	public void resetEyeY(float offset)
@@ -143,15 +125,15 @@ public class GLRenderer implements Renderer {
 //		GLES20.glGenTextures(9, textureNames, 0);
 
         //create the sprites
-		table = new Sprite(sceneSetter.getSpriteVertices("table"), sceneSetter.getSpriteColor("table"));
+		table = new Sprite(sceneSetter.getSpriteVertices(DataHolder.TABLE), sceneSetter.getSpriteColor("table"));
 //		girlFront = new Sprite(sceneSetter.getSpriteVertices("girlFront"), sceneSetter.getSpriteColor("girlFront"));
 //		girlMid = new Sprite(sceneSetter.getSpriteVertices("girlMid"), sceneSetter.getSpriteColor("girlMid"));
 //		girlBack = new Sprite(sceneSetter.getSpriteVertices("girlBack"), sceneSetter.getSpriteColor("girlBack"));
-		girl = new Sprite(sceneSetter.getSpriteVertices("girl"), sceneSetter.getSpriteColor("girl"));
-		room = new Sprite(sceneSetter.getSpriteVertices("room"), sceneSetter.getSpriteColor("field"));
-		building = new Sprite(sceneSetter.getSpriteVertices("building"), sceneSetter.getSpriteColor("building"));
-		city = new Sprite(sceneSetter.getSpriteVertices("city"), sceneSetter.getSpriteColor("city"));
-		sky = new Sprite(sceneSetter.getSpriteVertices("sky"), sceneSetter.getSpriteColor("sky"));
+		girl = new Sprite(sceneSetter.getSpriteVertices(DataHolder.GIRL), sceneSetter.getSpriteColor("girl"));
+		room = new Sprite(sceneSetter.getSpriteVertices(DataHolder.ROOM), sceneSetter.getSpriteColor("field"));
+		building = new Sprite(sceneSetter.getSpriteVertices(DataHolder.BUILDING), sceneSetter.getSpriteColor("building"));
+		city = new Sprite(sceneSetter.getSpriteVertices(DataHolder.CITY), sceneSetter.getSpriteColor("city"));
+		sky = new Sprite(sceneSetter.getSpriteVertices(DataHolder.SKY), sceneSetter.getSpriteColor("sky"));
 
 		// Set the clear color to white
 //		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -197,7 +179,7 @@ public class GLRenderer implements Renderer {
 				}
 				if(key.equals("texture_model"))
 				{
-					refresh();
+					refreshTexture(DataHolder.GIRL);
 				}
 				if(key.equals("pref_key_sim_scroll"))
 				{
@@ -205,6 +187,18 @@ public class GLRenderer implements Renderer {
 						setSimScroll(true);
 					else
 						setSimScroll(false);
+				}
+				if(key.equals("camera_blur"))
+				{
+					String temp = preferences.getString("camera_blur", "1");
+					sceneSetter.setBlur(temp);
+//                    refreshTexture(DataHolder.GIRL);
+//                    refreshTexture(DataHolder.ROOM);
+                    refreshTexture(DataHolder.TABLE);
+                    refreshTexture(DataHolder.CITY);
+                    refreshTexture(DataHolder.SKY);
+                    refreshTexture(DataHolder.BUILDING);
+					//reload images
 				}
 			}
 		};
@@ -270,7 +264,7 @@ public class GLRenderer implements Renderer {
 			portraitOrientation = false;
 			ratio = (float) width / height;
 //			Matrix.frustumM(mtrxProjection, 0, -1, 1, -ratio, ratio, 2, 10);
-			Matrix.perspectiveM(mtrxProjection, 0, 45.0f, ratio, 2, 10);
+			Matrix.perspectiveM(mtrxProjection, 0, 43.0f, ratio, 2, 10);
 			eyeZ = -3.0f;
 			eyeX = 0.0f;
 			lookX = eyeX;
@@ -280,6 +274,11 @@ public class GLRenderer implements Renderer {
 			setEyeY(0);
 //			resetEyeY(-0.2f);
 		}
+	}
+
+	private void setVertices(int rotation)
+	{
+
 	}
 
 	private float getOffsetDifference(int choice)
@@ -384,40 +383,85 @@ public class GLRenderer implements Renderer {
 		}
 	}
 
-	public void refresh()
+
+	public void refreshTexture(int texture)
 	{
 		if(preferences != null && girl != null)// girlFront != null && girlMid != null && girlBack != null)
 		{
-			girl.setVertices(sceneSetter.getSpriteVertices("girl"));
-//			switch(sceneSetter.getGirlRender())
-//			{
-//				case 1:
-//					girlFront.setVertices(sceneSetter.getSpriteVertices("girlFront"));
-//					break;
-//				case 2:
-//					girlMid.setVertices(sceneSetter.getSpriteVertices("girlMid"));
-//					break;
-//				case 3:
-//					girlBack.setVertices(sceneSetter.getSpriteVertices("girlBack"));
-//					break;
-//			}
-			Bitmap bmp = sceneSetter.getTexture("girl");
+            Bitmap bmp = sceneSetter.getTexture(DataHolder.GIRL);
+			//Texture 0 The Room
+            if(texture == DataHolder.ROOM)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.ROOM);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
 
-			// Bind texture to texturename
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-			GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, bmp);
+			//texture 1 The Girl
+            else if(texture == DataHolder.GIRL)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.GIRL);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
 
-			bmp = sceneSetter.getTexture("table");
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
-			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-			GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, bmp);
+			//texture 2 The Table
+            else if(texture == DataHolder.TABLE)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
+
+			//texture 3 The City
+            else if(texture == DataHolder.CITY)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.CITY);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
+
+			//texture 4 The Sky
+            else if(texture == DataHolder.SKY)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.SKY);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
+
+			//texture 7 The Building
+            else if(texture == DataHolder.BUILDING)
+            {
+                bmp = sceneSetter.getTexture(DataHolder.BUILDING);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+            }
+			bmp.recycle();
+
 
 			bmp.recycle();
 		}
@@ -446,7 +490,7 @@ public class GLRenderer implements Renderer {
 
 		//texture 0
 		// Temporary create a bitmap
-		Bitmap bmp = sceneSetter.getTexture("room");
+		Bitmap bmp = sceneSetter.getTexture(DataHolder.ROOM);
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
@@ -459,7 +503,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 1
-		bmp = sceneSetter.getTexture("girl");
+		bmp = sceneSetter.getTexture(DataHolder.GIRL);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -467,24 +511,8 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlsword);
-//		GLES20.glActiveTexture(GLES20.GL_TEXTURE5);
-//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[5]);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-//
-//		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.girlsit);
-//		GLES20.glActiveTexture(GLES20.GL_TEXTURE6);
-//		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[6]);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-//		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-//		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-
 		//texture 2
-		bmp = sceneSetter.getTexture("table");//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
+		bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -493,7 +521,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 3
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.city);
+		bmp = sceneSetter.getTexture(DataHolder.CITY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -501,7 +529,7 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky);
+		bmp = sceneSetter.getTexture(DataHolder.SKY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -509,7 +537,7 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.building);
+		bmp = sceneSetter.getTexture(DataHolder.BUILDING);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);

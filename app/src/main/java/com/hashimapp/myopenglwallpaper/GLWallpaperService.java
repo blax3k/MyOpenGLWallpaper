@@ -9,7 +9,6 @@ import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 /**
@@ -125,7 +124,7 @@ public abstract class GLWallpaperService extends WallpaperService{
                       public void run()
                       {
 //                          renderer.setOpacity(0);
-                          renderer.refresh();
+                          renderer.refreshTexture(DataHolder.GIRL);
                       }
                   });
                   sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);

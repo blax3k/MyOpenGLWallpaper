@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 /**
@@ -11,6 +12,11 @@ import android.util.Log;
  */
 public class SceneSetter
 {
+    static int BLUR_NONE = 300;
+    static int BLUR_LOW = 301;
+    static int BLUR_HIGH = 302;
+    private int blurSetting;
+
     DataHolder dataHolder = new DataHolder();
     SharedPreferences preferences;
     Context context;
@@ -23,13 +29,13 @@ public class SceneSetter
         this.context = nContext;
     }
 
-    public float[] getSpriteVertices(String sprite)
+    public float[] getSpriteVertices(int sprite)
     {
-        if(sprite.equals("table"))
+        if(sprite == DataHolder.TABLE)
         {
             return dataHolder.tableVertices;
         }
-        else if(sprite.equals("girl"))
+        else if(sprite == DataHolder.GIRL)
         {
             String choice = preferences.getString("texture_model", "1");
             switch(choice)
@@ -48,31 +54,20 @@ public class SceneSetter
                     return dataHolder.girlBackSitting;
             }
         }
-//        else if(sprite.equals("girlFront"))
-//        {
-//            return dataHolder.girlFrontReading;
-//        }
-//        else if(sprite.equals("girlMid"))
-//        {
-//            return dataHolder.girlMidStanding;
-//        }
-//        else if(sprite.equals("girlBack"))
-//        {
-//            return dataHolder.girlBackSitting;
-//        }
-        else if(sprite.contentEquals("building"))
+
+        else if(sprite == DataHolder.BUILDING)
         {
             return dataHolder.buildingVertices;
         }
-        else if (sprite.equals("city"))
+        else if (sprite == DataHolder.CITY)
         {
             return dataHolder.cityVertices;
         }
-        else if (sprite.equals("sky"))
+        else if (sprite == DataHolder.SKY)
         {
             return dataHolder.skyVertices;
         }
-        else //it's the room (field)
+        else //it's the room
         {
             return dataHolder.roomVertices;
         }
@@ -161,9 +156,15 @@ public class SceneSetter
         }
         return 1;
     }
+
     public void setOpacity(float newOpacity)
     {
-        dataHolder.setOpacity(newOpacity);
+        float temp = newOpacity;
+        if(temp > 1.0f)
+            temp = 1.0f;
+        if(temp < 0.0f)
+            temp = 0.0f;
+        dataHolder.setOpacity(temp);
     }
 
     public float getOpacity()
@@ -171,21 +172,44 @@ public class SceneSetter
         return dataHolder.getOpacity();
     }
 
-    public Bitmap getTexture(String sprite)
+    public void setBlur(String blurString)
+    {
+        if(blurString.equals("none"))
+            blurSetting = BLUR_NONE;
+        else if(blurString.equals("low"))
+            blurSetting = BLUR_LOW;
+        else if(blurString.equals("high"))
+            blurSetting = BLUR_HIGH;
+    }
+
+    public Bitmap getTexture(int sprite)
     {
         Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlmidsword);
-        if(sprite.equals("girl"))
+        if(sprite == DataHolder.GIRL)
         {
             String choice = preferences.getString("texture_model", "1");
             switch(choice)
             {
                 case("1"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontbook);
-                    bmp = BlurBuilder.blur(context, bmp);
+                    if(blurSetting != BLUR_NONE)
+                    {
+                        if(blurSetting == BLUR_LOW)
+                            bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                        else
+                            bmp = BlurBuilder.blur(context, bmp, 10.5f);
+                    }
                     girlOffset = 1.0f;
                     break;
                 case("2"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontflower);
+                    if(blurSetting != BLUR_NONE)
+                    {
+                        if(blurSetting == BLUR_LOW)
+                            bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                        else
+                            bmp = BlurBuilder.blur(context, bmp, 10.5f);
+                    }
                     girlOffset = 1.0f;
                     break;
                 case("3"):
@@ -206,15 +230,59 @@ public class SceneSetter
                     break;
             }
         }
-        else if (sprite.equals("table"))
+        else if (sprite == DataHolder.TABLE)
         {
             Log.d("Scene Setter" , "table was called");
             bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.table);
+            if(blurSetting != BLUR_NONE)
+            {
+                if(blurSetting == BLUR_LOW)
+                    bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                else
+                    bmp = BlurBuilder.blur(context, bmp, 10.5f);
+            }
         }
-        else if (sprite.equals("room"))
+        else if (sprite == DataHolder.ROOM)
         {
             bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.room);
         }
+        else if (sprite == DataHolder.BUILDING)
+        {
+            Log.d("Scene Setter" , "table was called");
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.building);
+            if(blurSetting != BLUR_NONE)
+            {
+                if(blurSetting == BLUR_LOW)
+                    bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                else
+                    bmp = BlurBuilder.blur(context, bmp, 10.5f);
+            }
+        }
+        else if (sprite == DataHolder.CITY)
+        {
+            Log.d("Scene Setter" , "city was called");
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.city);
+            if(blurSetting != BLUR_NONE)
+            {
+                if(blurSetting == BLUR_LOW)
+                    bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                else
+                    bmp = BlurBuilder.blur(context, bmp, 10.5f);
+            }
+        }
+        else if (sprite == DataHolder.SKY)
+        {
+            Log.d("Scene Setter" , "sky was called");
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky);
+            if(blurSetting != BLUR_NONE)
+            {
+                if(blurSetting == BLUR_LOW)
+                    bmp = BlurBuilder.blur(context, bmp, 9.5f);
+                else
+                    bmp = BlurBuilder.blur(context, bmp, 10.5f);
+            }
+        }
+
         return bmp;
     }
 }
