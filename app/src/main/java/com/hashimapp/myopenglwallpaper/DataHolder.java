@@ -76,10 +76,10 @@ public class DataHolder
             -7.0f,  3.1f, 2.0f};   // top left
 
     public float[] buildingVertices = new float[]{
-            3.3f,  4.7f, 4.0f,   // top left
-            3.3f, -2.0f, 4.0f,   // bottom left
-            -1.0f, -2.0f, 4.0f,   // bottom right
-            -1.0f,  4.7f, 4.0f }; // top right
+            4.3f,  4.7f, 4.0f,   // top left
+            4.3f, -2.0f, 4.0f,   // bottom left
+            0.0f, -2.0f, 4.0f,   // bottom right
+            0.0f,  4.7f, 4.0f }; // top right
 
     public float[] girlMidStanding = new float[]{
             -1.04f,  1.1f, 0.0f,   // top left
@@ -111,8 +111,8 @@ public class DataHolder
             0.435f,  0.0f, 0.0f }; // top right
 
     public float[] cityVertices = new float[]{
-            -5.0f,  2.4f, 2.0f,   // top left
-            -5.0f, -2.3f, 2.0f,   // bottom left
+            -3.0f,  2.4f, 2.0f,   // top left
+            -3.0f, -2.3f, 2.0f,   // bottom left
             1.8f, -2.3f, 2.0f,   // bottom right
             1.8f,  2.4f, 2.0f }; // top right
 

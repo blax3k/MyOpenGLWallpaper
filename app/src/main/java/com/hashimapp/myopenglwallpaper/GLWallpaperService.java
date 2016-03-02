@@ -112,6 +112,8 @@ public abstract class GLWallpaperService extends WallpaperService{
 
       }
 
+      String previousTexture;
+
       @Override
       public void onVisibilityChanged(boolean visible)
       {
@@ -124,7 +126,12 @@ public abstract class GLWallpaperService extends WallpaperService{
                       public void run()
                       {
 //                          renderer.setOpacity(0);
-                          renderer.refreshTexture(DataHolder.GIRL);
+                          String newTexture = renderer.preferences.getString("texture_model", "1");
+                          if(!newTexture.equals(previousTexture))
+                          {
+                              renderer.refreshTexture(DataHolder.GIRL);
+                              previousTexture = newTexture;
+                          }
                       }
                   });
                   sensorManager.registerListener(this,accelerometer, SensorManager.SENSOR_DELAY_GAME);

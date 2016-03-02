@@ -10,11 +10,13 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 public class GLRenderer implements Renderer {
@@ -180,6 +182,7 @@ public class GLRenderer implements Renderer {
 				if(key.equals("texture_model"))
 				{
 					refreshTexture(DataHolder.GIRL);
+					refreshVertices(DataHolder.GIRL);
 				}
 				if(key.equals("pref_key_sim_scroll"))
 				{
@@ -194,10 +197,10 @@ public class GLRenderer implements Renderer {
 					sceneSetter.setBlur(temp);
 //                    refreshTexture(DataHolder.GIRL);
 //                    refreshTexture(DataHolder.ROOM);
-                    refreshTexture(DataHolder.TABLE);
+//                    refreshTexture(DataHolder.TABLE);
                     refreshTexture(DataHolder.CITY);
-                    refreshTexture(DataHolder.SKY);
-                    refreshTexture(DataHolder.BUILDING);
+//                    refreshTexture(DataHolder.SKY);
+//                    refreshTexture(DataHolder.BUILDING);
 					//reload images
 				}
 			}
@@ -357,6 +360,14 @@ public class GLRenderer implements Renderer {
 
 	float skyXOffset = 0.0f;
 
+	public void refreshVertices(int sprite)
+	{
+		if(sprite == DataHolder.GIRL)
+		{
+			girl.setVertices(sceneSetter.getSpriteVertices(DataHolder.GIRL));
+		}
+	}
+
 	public void refreshColors()
 	{
 			table.setColor(sceneSetter.getSpriteColor("table"));
@@ -390,19 +401,19 @@ public class GLRenderer implements Renderer {
 		{
             Bitmap bmp = sceneSetter.getTexture(DataHolder.GIRL);
 			//Texture 0 The Room
-            if(texture == DataHolder.ROOM)
-            {
-                bmp = sceneSetter.getTexture(DataHolder.ROOM);
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-            }
+//            if(texture == DataHolder.ROOM)
+//            {
+//                bmp = sceneSetter.getTexture(DataHolder.ROOM);
+//                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//            }
 
 			//texture 1 The Girl
-            else if(texture == DataHolder.GIRL)
+            if(texture == DataHolder.GIRL)
             {
                 bmp = sceneSetter.getTexture(DataHolder.GIRL);
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
@@ -413,54 +424,53 @@ public class GLRenderer implements Renderer {
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
             }
 
-			//texture 2 The Table
-            else if(texture == DataHolder.TABLE)
-            {
-                bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-            }
+//			//texture 2 The Table
+//            else if(texture == DataHolder.TABLE)
+//            {
+//                bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
+//                GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//            }
 
 			//texture 3 The City
-            else if(texture == DataHolder.CITY)
-            {
-                bmp = sceneSetter.getTexture(DataHolder.CITY);
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-            }
-
-			//texture 4 The Sky
-            else if(texture == DataHolder.SKY)
-            {
-                bmp = sceneSetter.getTexture(DataHolder.SKY);
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-            }
-
-			//texture 7 The Building
-            else if(texture == DataHolder.BUILDING)
-            {
-                bmp = sceneSetter.getTexture(DataHolder.BUILDING);
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-            }
-			bmp.recycle();
+//            else if(texture == DataHolder.CITY)
+//            {
+//                bmp = sceneSetter.getTexture(DataHolder.CITY);
+//                GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//            }
+//
+//			//texture 4 The Sky
+//            else if(texture == DataHolder.SKY)
+//            {
+//                bmp = sceneSetter.getTexture(DataHolder.SKY);
+//                GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//            }
+//
+//			//texture 7 The Building
+//            else if(texture == DataHolder.BUILDING)
+//            {
+//                bmp = sceneSetter.getTexture(DataHolder.BUILDING);
+//                GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+//            }
 
 
 			bmp.recycle();
@@ -485,8 +495,8 @@ public class GLRenderer implements Renderer {
 		uvBuffer.position(0);
 
 		// Generate Textures, if more needed, alter these numbers.
-		texturenames = new int[9];
-		GLES20.glGenTextures(9, texturenames, 0);
+		texturenames = new int[20];
+		GLES20.glGenTextures(20, texturenames, 0);
 
 		//texture 0
 		// Temporary create a bitmap
@@ -511,7 +521,7 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		//texture 2
+		//texture 2 Table
 		bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
@@ -520,7 +530,15 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-		//texture 3
+		bmp = BlurBuilder.blur(mContext, bmp, 10.5f, 0.2f);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE12);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[12]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		//texture 3 City
 		bmp = sceneSetter.getTexture(DataHolder.CITY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
@@ -529,6 +547,15 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
+		bmp = BlurBuilder.blur(mContext, bmp, 10.5f, 0.4f);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE13);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[13]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		//Texture 4 Sky
 		bmp = sceneSetter.getTexture(DataHolder.SKY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
@@ -536,7 +563,16 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+		//Texture 14 Blurred Sky
+		bmp = BlurBuilder.blur(mContext, bmp, 10.5f, 0.2f);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE14);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[14]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
+		//Texture 7 Building
 		bmp = sceneSetter.getTexture(DataHolder.BUILDING);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
@@ -544,6 +580,15 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		bmp = BlurBuilder.blur(mContext, bmp, 9.5f, 0.4f);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE17);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[17]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
 		bmp.recycle();
 	}
 
@@ -590,21 +635,21 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
-		sky.draw(scratch0, uvBuffer, 4);
+		sky.draw(scratch0, uvBuffer, getTextureIndex(DataHolder.SKY));
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		city.draw(scratch1, uvBuffer, 3);
+		city.draw(scratch1, uvBuffer, getTextureIndex(DataHolder.CITY));
 		//draw the building
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
-		Matrix.translateM(mModelMatrix, 0, xOffset * 0.6f, 0.3f, 1.0f);
+		Matrix.translateM(mModelMatrix, 0, xOffset * 0.3f, 0.3f, 1.0f);
 		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-		building.draw(scratch2, uvBuffer, 7);
+		building.draw(scratch2, uvBuffer, getTextureIndex(DataHolder.BUILDING));
 		//draw the room
 		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.95f, 0.0f, 1.0f);
@@ -635,7 +680,45 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, xOffset, 0.3f, 1.0f);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
-		table.draw(this.scratch3, uvBuffer, 2);
+		table.draw(this.scratch3, uvBuffer, getTextureIndex(DataHolder.TABLE));
 
+	}
+
+
+	private int getTextureIndex(int texture)
+	{
+		if(texture == DataHolder.CITY)
+		{
+			if(preferences.getString("camera_blur", "none").equals("none"))
+			{
+				return 3;
+			}
+			return 13;
+		}
+		else if(texture == DataHolder.BUILDING)
+		{
+			if(preferences.getString("camera_blur", "none").equals("none"))
+			{
+				return 7;
+			}
+			return 17;
+		}
+		else if(texture == DataHolder.SKY)
+		{
+			if(preferences.getString("camera_blur", "none").equals("none"))
+			{
+				return 4;
+			}
+			return 14;
+		}
+		else if(texture == DataHolder.TABLE)
+		{
+			if(preferences.getString("camera_blur", "none").equals("none"))
+			{
+				return 2;
+			}
+			return 12;
+		}
+		return 0;
 	}
 }

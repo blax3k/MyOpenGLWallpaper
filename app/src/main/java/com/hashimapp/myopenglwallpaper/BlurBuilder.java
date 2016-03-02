@@ -15,11 +15,11 @@ public class BlurBuilder
     private static final float BITMAP_SCALE = 0.4f;
     private static final float BLUR_RADIUS = 9.5f;
 
-    public static Bitmap blur(Context context, Bitmap image, float blurRadius) {
-//        int width = Math.round(image.getWidth() * BITMAP_SCALE);
-//        int height = Math.round(image.getHeight() * BITMAP_SCALE);
-        int width = image.getWidth();
-        int height = image.getHeight();
+    public static Bitmap blur(Context context, Bitmap image, float blurRadius, float scale) {
+        int width = Math.round(image.getWidth() * scale);
+        int height = Math.round(image.getHeight() * scale);
+//        int width = image.getWidth();
+//        int height = image.getHeight();
 
         Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
         Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
@@ -32,6 +32,7 @@ public class BlurBuilder
         theIntrinsic.setInput(tmpIn);
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);
+        outputBitmap = Bitmap.createScaledBitmap(outputBitmap, image.getWidth(), image.getHeight(), false);
 
         return outputBitmap;
     }
