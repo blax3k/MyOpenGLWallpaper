@@ -115,7 +115,7 @@ public class GLRenderer implements Renderer {
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
 		initializePreferences();
-		if(preferences.getBoolean("pref_key_sim_scroll", true))
+		if(preferences.getBoolean("pref_key_sim_scroll", false))
 					setSimScroll(true);
 		else		setSimScroll(false);
 
@@ -127,15 +127,15 @@ public class GLRenderer implements Renderer {
 //		GLES20.glGenTextures(9, textureNames, 0);
 
         //create the sprites
-		table = new Sprite(sceneSetter.getSpriteVertices(DataHolder.TABLE), sceneSetter.getSpriteColor("table"));
+		table = new Sprite(sceneSetter.getSpriteVertices(DataCodes.TABLE), sceneSetter.getSpriteColor("table"));
 //		girlFront = new Sprite(sceneSetter.getSpriteVertices("girlFront"), sceneSetter.getSpriteColor("girlFront"));
 //		girlMid = new Sprite(sceneSetter.getSpriteVertices("girlMid"), sceneSetter.getSpriteColor("girlMid"));
 //		girlBack = new Sprite(sceneSetter.getSpriteVertices("girlBack"), sceneSetter.getSpriteColor("girlBack"));
-		girl = new Sprite(sceneSetter.getSpriteVertices(DataHolder.GIRL), sceneSetter.getSpriteColor("girl"));
-		room = new Sprite(sceneSetter.getSpriteVertices(DataHolder.ROOM), sceneSetter.getSpriteColor("field"));
-		building = new Sprite(sceneSetter.getSpriteVertices(DataHolder.BUILDING), sceneSetter.getSpriteColor("building"));
-		city = new Sprite(sceneSetter.getSpriteVertices(DataHolder.CITY), sceneSetter.getSpriteColor("city"));
-		sky = new Sprite(sceneSetter.getSpriteVertices(DataHolder.SKY), sceneSetter.getSpriteColor("sky"));
+		girl = new Sprite(sceneSetter.getSpriteVertices(DataCodes.GIRL), sceneSetter.getSpriteColor("girl"));
+		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor("field"));
+		building = new Sprite(sceneSetter.getSpriteVertices(DataCodes.BUILDING), sceneSetter.getSpriteColor("building"));
+		city = new Sprite(sceneSetter.getSpriteVertices(DataCodes.CITY), sceneSetter.getSpriteColor("city"));
+		sky = new Sprite(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
 
 		// Set the clear color to white
 //		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -160,8 +160,13 @@ public class GLRenderer implements Renderer {
 
 		// Set our shader program
 		GLES20.glUseProgram(riGraphicTools.sp_Image);
+
+		String temp = preferences.getString("camera_blur", "none");
+		sceneSetter.setBlur(temp);
+
 		//load the images
 		loadTextures();
+
 	}
 
 	private void initializePreferences()
@@ -181,8 +186,8 @@ public class GLRenderer implements Renderer {
 				}
 				if(key.equals("texture_model"))
 				{
-					refreshTexture(DataHolder.GIRL);
-					refreshVertices(DataHolder.GIRL);
+					refreshTexture(DataCodes.GIRL);
+					refreshVertices(DataCodes.GIRL);
 				}
 				if(key.equals("pref_key_sim_scroll"))
 				{
@@ -193,12 +198,12 @@ public class GLRenderer implements Renderer {
 				}
 				if(key.equals("camera_blur"))
 				{
-					String temp = preferences.getString("camera_blur", "1");
+					String temp = preferences.getString("camera_blur", "none");
 					sceneSetter.setBlur(temp);
-//                    refreshTexture(DataHolder.GIRL);
+					refreshTexture(DataCodes.GIRL);
 //                    refreshTexture(DataHolder.ROOM);
 //                    refreshTexture(DataHolder.TABLE);
-                    refreshTexture(DataHolder.CITY);
+//                    refreshTexture(DataCodes.CITY);
 //                    refreshTexture(DataHolder.SKY);
 //                    refreshTexture(DataHolder.BUILDING);
 					//reload images
@@ -247,6 +252,9 @@ public class GLRenderer implements Renderer {
 		mScreenWidth = width;
 		mScreenHeight = height;
 		GLES20.glViewport(0, 0, width, height);
+
+		String temp = preferences.getString("camera_blur", "none");
+		sceneSetter.setBlur(temp);
 
 		if(height > width) //portrait
 		{
@@ -362,9 +370,9 @@ public class GLRenderer implements Renderer {
 
 	public void refreshVertices(int sprite)
 	{
-		if(sprite == DataHolder.GIRL)
+		if(sprite == DataCodes.GIRL)
 		{
-			girl.setVertices(sceneSetter.getSpriteVertices(DataHolder.GIRL));
+			girl.setVertices(sceneSetter.getSpriteVertices(DataCodes.GIRL));
 		}
 	}
 
@@ -374,8 +382,8 @@ public class GLRenderer implements Renderer {
 //			girlMid.setColor(sceneSetter.getSpriteColor("girlMid"));
 			girl.setColor(sceneSetter.getSpriteColor("girl"));
 			room.setColor(sceneSetter.getSpriteColor("room"));
-//			city.setColor(sceneSetter.getSpriteColor("city"));
-//			sky.setColor(sceneSetter.getSpriteColor("sky"));
+			city.setColor(sceneSetter.getSpriteColor("city"));
+			sky.setColor(sceneSetter.getSpriteColor("sky"));
 	}
 
 	public void changeColor(String sprite)
@@ -399,7 +407,7 @@ public class GLRenderer implements Renderer {
 	{
 		if(preferences != null && girl != null)// girlFront != null && girlMid != null && girlBack != null)
 		{
-            Bitmap bmp = sceneSetter.getTexture(DataHolder.GIRL);
+            Bitmap bmp = null;// = sceneSetter.getTexture(DataCodes.GIRL);
 			//Texture 0 The Room
 //            if(texture == DataHolder.ROOM)
 //            {
@@ -413,15 +421,17 @@ public class GLRenderer implements Renderer {
 //            }
 
 			//texture 1 The Girl
-            if(texture == DataHolder.GIRL)
+            if(texture == DataCodes.GIRL)
             {
-                bmp = sceneSetter.getTexture(DataHolder.GIRL);
+                bmp = sceneSetter.getTexture(DataCodes.GIRL);
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+				Log.d("Renderer", "image refreshed");
             }
 
 //			//texture 2 The Table
@@ -500,7 +510,7 @@ public class GLRenderer implements Renderer {
 
 		//texture 0
 		// Temporary create a bitmap
-		Bitmap bmp = sceneSetter.getTexture(DataHolder.ROOM);
+		Bitmap bmp = sceneSetter.getTexture(DataCodes.ROOM);
 		// Bind texture to texturename
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
@@ -513,7 +523,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 1
-		bmp = sceneSetter.getTexture(DataHolder.GIRL);
+		bmp = sceneSetter.getTexture(DataCodes.GIRL);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -522,7 +532,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 2 Table
-		bmp = sceneSetter.getTexture(DataHolder.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
+		bmp = sceneSetter.getTexture(DataCodes.TABLE);//BitmapFactory.decodeResource(mContext.getResources(), R.drawable.table);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[2]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -539,7 +549,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//texture 3 City
-		bmp = sceneSetter.getTexture(DataHolder.CITY);
+		bmp = sceneSetter.getTexture(DataCodes.CITY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[3]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -556,7 +566,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//Texture 4 Sky
-		bmp = sceneSetter.getTexture(DataHolder.SKY);
+		bmp = sceneSetter.getTexture(DataCodes.SKY);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[4]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -573,7 +583,7 @@ public class GLRenderer implements Renderer {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
 		//Texture 7 Building
-		bmp = sceneSetter.getTexture(DataHolder.BUILDING);
+		bmp = sceneSetter.getTexture(DataCodes.BUILDING);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE7);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[7]);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -635,21 +645,21 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
-		sky.draw(scratch0, uvBuffer, getTextureIndex(DataHolder.SKY));
+		sky.draw(scratch0, uvBuffer, getTextureIndex(DataCodes.SKY));
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		city.draw(scratch1, uvBuffer, getTextureIndex(DataHolder.CITY));
+		city.draw(scratch1, uvBuffer, getTextureIndex(DataCodes.CITY));
 		//draw the building
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.3f, 0.3f, 1.0f);
 		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-		building.draw(scratch2, uvBuffer, getTextureIndex(DataHolder.BUILDING));
+		building.draw(scratch2, uvBuffer, getTextureIndex(DataCodes.BUILDING));
 		//draw the room
 		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.95f, 0.0f, 1.0f);
@@ -680,14 +690,14 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, xOffset, 0.3f, 1.0f);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
-		table.draw(this.scratch3, uvBuffer, getTextureIndex(DataHolder.TABLE));
+		table.draw(this.scratch3, uvBuffer, getTextureIndex(DataCodes.TABLE));
 
 	}
 
 
 	private int getTextureIndex(int texture)
 	{
-		if(texture == DataHolder.CITY)
+		if(texture == DataCodes.CITY)
 		{
 			if(preferences.getString("camera_blur", "none").equals("none"))
 			{
@@ -695,7 +705,7 @@ public class GLRenderer implements Renderer {
 			}
 			return 13;
 		}
-		else if(texture == DataHolder.BUILDING)
+		else if(texture == DataCodes.BUILDING)
 		{
 			if(preferences.getString("camera_blur", "none").equals("none"))
 			{
@@ -703,7 +713,7 @@ public class GLRenderer implements Renderer {
 			}
 			return 17;
 		}
-		else if(texture == DataHolder.SKY)
+		else if(texture == DataCodes.SKY)
 		{
 			if(preferences.getString("camera_blur", "none").equals("none"))
 			{
@@ -711,7 +721,7 @@ public class GLRenderer implements Renderer {
 			}
 			return 14;
 		}
-		else if(texture == DataHolder.TABLE)
+		else if(texture == DataCodes.TABLE)
 		{
 			if(preferences.getString("camera_blur", "none").equals("none"))
 			{

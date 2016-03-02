@@ -126,10 +126,12 @@ public abstract class GLWallpaperService extends WallpaperService{
                       public void run()
                       {
 //                          renderer.setOpacity(0);
-                          String newTexture = renderer.preferences.getString("texture_model", "1");
+                          String newTexture = renderer.preferences.getString("texture_model", "1")+
+                                  renderer.preferences.getString("camera_blur", "none");
+
                           if(!newTexture.equals(previousTexture))
                           {
-                              renderer.refreshTexture(DataHolder.GIRL);
+                              renderer.refreshTexture(DataCodes.GIRL);
                               previousTexture = newTexture;
                           }
                       }

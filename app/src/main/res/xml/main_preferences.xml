@@ -34,7 +34,7 @@
 
     <CheckBoxPreference android:key="activate_sunset"
                         android:title="@string/activate_night"
-                        android:defaultValue="false"/>
+                        android:defaultValue="true"/>
 
     <Preference android:key="set_wallpaper"
                 android:title="@string/set_wallpaper">
