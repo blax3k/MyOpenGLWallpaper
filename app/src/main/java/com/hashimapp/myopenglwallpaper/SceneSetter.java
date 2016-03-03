@@ -137,7 +137,7 @@ public class SceneSetter
             {
                 return dataHolder.nightColor;
             }
-            return dataHolder.normalColor;
+            return dataHolder.skyColor;
         }
     }
 

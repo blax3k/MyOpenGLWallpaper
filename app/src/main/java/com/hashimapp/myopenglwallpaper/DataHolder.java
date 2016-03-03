@@ -136,10 +136,16 @@ public class DataHolder
                     0.17f, 0.27f, 0.63921568627f, opacity
             };
 
+    public float[] skyColor = new float[]
+            {0.0f, 0.0f, 1.0f, 1.0f,
+                    0.0f, 0.0f, 1.0f, 1.0f,
+                    1.0f, 1.0f, 1.0f, 1.0f,
+                    1.0f, 1.0f, 1.0f, 1.0f};
+
     public float[] sunsetColor = new float[]
-            {1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
-                    1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
-                    1.0f, 0.68235294117f, 0.63921568627f, 1.0f,
+            {0.0f, 0.0f, 1.0f, 1.0f,
+                    0.0f, 0.0f, 1.0f, 1.0f,
+                    1.0f, 1.0f, 1.0f, 1.0f,
                     1.0f, 0.68235294117f, 0.63921568627f, 1.0f};
 
     public float[] nightColor = new float[]

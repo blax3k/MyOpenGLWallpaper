@@ -132,7 +132,7 @@ public class GLRenderer implements Renderer {
 //		girlMid = new Sprite(sceneSetter.getSpriteVertices("girlMid"), sceneSetter.getSpriteColor("girlMid"));
 //		girlBack = new Sprite(sceneSetter.getSpriteVertices("girlBack"), sceneSetter.getSpriteColor("girlBack"));
 		girl = new Sprite(sceneSetter.getSpriteVertices(DataCodes.GIRL), sceneSetter.getSpriteColor("girl"));
-		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor("field"));
+		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor("room"));
 		building = new Sprite(sceneSetter.getSpriteVertices(DataCodes.BUILDING), sceneSetter.getSpriteColor("building"));
 		city = new Sprite(sceneSetter.getSpriteVertices(DataCodes.CITY), sceneSetter.getSpriteColor("city"));
 		sky = new Sprite(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
@@ -643,29 +643,29 @@ public class GLRenderer implements Renderer {
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f + skyXOffset, 0.0f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
-		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
-		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
-		sky.draw(scratch0, uvBuffer, getTextureIndex(DataCodes.SKY));
+//		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
+//		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
+		sky.draw(scratch0, uvBuffer, -1, false);
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, 0.0f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		city.draw(scratch1, uvBuffer, getTextureIndex(DataCodes.CITY));
+		city.draw(scratch1, uvBuffer, getTextureIndex(DataCodes.CITY), true);
 		//draw the building
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.3f, 0.3f, 1.0f);
 		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-		building.draw(scratch2, uvBuffer, getTextureIndex(DataCodes.BUILDING));
+		building.draw(scratch2, uvBuffer, getTextureIndex(DataCodes.BUILDING), true);
 		//draw the room
 		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.95f, 0.0f, 1.0f);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
-		room.draw(mMVPMatrix, uvBuffer, 0);
+		room.draw(mMVPMatrix, uvBuffer, 0, true);
 		//draw the girl
 		float[] scratch3 = new float[16];
 		Matrix.setIdentityM(mModelMatrix, 0);
@@ -676,7 +676,7 @@ public class GLRenderer implements Renderer {
 		if(sceneSetter.getGirlRender() == 0)
 		{            //don't render
 		}else
-			girl.draw(scratch3, uvBuffer, 1);
+			girl.draw(scratch3, uvBuffer, 1, true);
 //		}else if(sceneSetter.getGirlRender() == 1)
 //		{	girlFront.draw(scratch3, uvBuffer, 1);
 //		}else if(sceneSetter.getGirlRender() == 2)
@@ -690,8 +690,7 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, xOffset, 0.3f, 1.0f);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
-		table.draw(this.scratch3, uvBuffer, getTextureIndex(DataCodes.TABLE));
-
+		table.draw(this.scratch3, uvBuffer, getTextureIndex(DataCodes.TABLE), true);
 	}
 
 
