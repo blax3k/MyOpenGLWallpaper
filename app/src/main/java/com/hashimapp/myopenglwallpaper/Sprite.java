@@ -17,7 +17,7 @@ import java.nio.ShortBuffer;
 public class Sprite {
     // Geometric variables
     public static float vertices[];
-    public static short indices[];
+    public static short indices[] ={0, 1, 2, 0, 2, 3};
     public static float uvs[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
@@ -40,8 +40,6 @@ public class Sprite {
     public Sprite(float[] mVertices, float[] textureColor)
     {
         vertices = mVertices;
-
-        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertex rendering.
 
         colors = textureColor;
 
@@ -84,23 +82,17 @@ public class Sprite {
 
         // get handle to vertex shader's vPosition member
         int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
-
         // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray(mColorHandle);
-
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
-
         // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray(mPositionHandle);
-
         // Prepare the triangle coordinate data
-        GLES20.glVertexAttribPointer(mPositionHandle, 3,
-                GLES20.GL_FLOAT, false,
-                12, vertexBuffer);
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer);
 
         int mTexCoordLoc = 0;
         if(textureIndex >= 0)
@@ -125,10 +117,10 @@ public class Sprite {
 
             // Set the sampler texture unit to x, where we have saved the texture.
             GLES20.glUniform1i(mSamplerLoc, textureIndex);
-
+        }
 
             GLES20.glUniform4fv(mColorHandle, 1, color, 0);
-        }
+
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, m, 0);
 

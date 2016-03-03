@@ -58,7 +58,8 @@ public class GLRenderer implements Renderer {
 //    DataHolder dataHolder = new DataHolder();
 
 //	Square square, square1;
-	Sprite girl, table, room, city, building, sky;//, girlMid, girlFront, girlBack;
+	Sprite girl, table, room, city, building;//, sky;//, girlMid, girlFront, girlBack;
+	Square sky;
 	float offsetDifferenceX = 1;
 	float offsetDifferenceY = 1;
 //	Background room;
@@ -135,8 +136,8 @@ public class GLRenderer implements Renderer {
 		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor("room"));
 		building = new Sprite(sceneSetter.getSpriteVertices(DataCodes.BUILDING), sceneSetter.getSpriteColor("building"));
 		city = new Sprite(sceneSetter.getSpriteVertices(DataCodes.CITY), sceneSetter.getSpriteColor("city"));
-		sky = new Sprite(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
-
+//		sky = new Sprite(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
+		sky = new Square(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
 		// Set the clear color to white
 //		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
 
@@ -624,7 +625,7 @@ public class GLRenderer implements Renderer {
 
 
 		// Set the camera position (View matrix)
-//		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		//increase opacity from zero
 		if (sceneSetter.getOpacity() < 1.0f) {
@@ -638,14 +639,14 @@ public class GLRenderer implements Renderer {
 //		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
 
-		// Calculate the projection and view transformation
-		//Draw the sky
-		Matrix.setIdentityM(mModelMatrix, 0);
-//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f + skyXOffset, 0.0f, 1.0f);
-		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
+		// Calculate the projection and vie		Matrix.setIdentityM(mModelMatrix, 0);
+//		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f + skyXOffset, 0.0f, 1.0f);
 //		Matrix.multiplyMM(scratch0, 0, mtrxView, 0, mModelMatrix, 0);
-//		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);
-		sky.draw(scratch0, uvBuffer, -1, false);
+//		Matrix.multiplyMM(scratch0, 0, mtrxProjection, 0, scratch0, 0);w transformation
+		//Draw the sky
+//
+//		sky.draw(scratch0, uvBuffer, -1, false);
+//		sky.draw(scratch0);
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
 //		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
