@@ -114,6 +114,7 @@ public abstract class GLWallpaperService extends WallpaperService{
 
       String previousTexture;
 
+      long startTime, endTime;
       @Override
       public void onVisibilityChanged(boolean visible)
       {
@@ -125,14 +126,22 @@ public abstract class GLWallpaperService extends WallpaperService{
                   {
                       public void run()
                       {
-//                          renderer.setOpacity(0);
-                          String newTexture = renderer.preferences.getString("texture_model", "1")+
-                                  renderer.preferences.getString("camera_blur", "none");
-
-                          if(!newTexture.equals(previousTexture))
+                          endTime = System.currentTimeMillis();
+                          long elapsed = endTime - startTime;
+                          renderer.refreshColors();
+                          if(elapsed > 2000)
                           {
+//                          renderer.setOpacity(0);
+                              String newTexture = renderer.preferences.getString("texture_model", "1")+
+                                      renderer.preferences.getString("camera_blur", "none");
+
+//                          if(!newTexture.equals(previousTexture))
+//                          {
+                              renderer.sceneSetter.shuffleScene();
                               renderer.refreshTexture(DataCodes.GIRL);
+                              renderer.refreshVertices(DataCodes.GIRL);
                               previousTexture = newTexture;
+//                          }
                           }
                       }
                   });
@@ -142,6 +151,7 @@ public abstract class GLWallpaperService extends WallpaperService{
               {
                   if(rendererHasBeenSet)
                   {
+                      startTime = System.currentTimeMillis();
                       renderer.setOpacity(0);
                       glSurfaceView.requestRender();
                       glSurfaceView.onPause();

@@ -118,19 +118,18 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                             break;
                     }
                     accelVals = lowPass(rawSensorData, accelVals);
-                    if(accelVals[0] > 10)
-                        accelVals[0] = 10;
-                    if(accelVals[0] < -10)
-                        accelVals[0] = -10;
-
-                    if(accelVals[1] > 10)
-                        accelVals[1] = 10;
-                    if(accelVals[1] < 0)
-                        accelVals[1] = 0;
+//                    if(accelVals[0] > 10)
+//                        accelVals[0] = 10;
+//                    if(accelVals[0] < -10)
+//                        accelVals[0] = -10;
+//
+//                    if(accelVals[1] > 10)
+//                        accelVals[1] = 10;
+//                    if(accelVals[1] < 0)
+//                        accelVals[1] = 0;
 
                     float newX = accelVals[0] * 0.05f;
                     float newY = accelVals[1] * 0.05f;
-
                     this.renderer.setEyeX(-newX);
                     this.renderer.setEyeY(-newY);
                 }

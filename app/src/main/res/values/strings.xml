@@ -12,11 +12,12 @@
     <string name="remove_layer">Remove layer</string>
     <string name="remove_layer_summary">Remove the subject from the background</string>
     //change lighting
-    <string name="activate_night">Activate night time</string>
+    <string name="set_time_title">Set Time of Day</string>
     //set Wallpaper
     <string name="set_wallpaper">Set Wallpaper</string>
     //go to artist's website
     <string name="texture_choice">Choose subject</string>
+    <string name="girl_automatic">Automatic</string>
     <string name="girl_front_1">Girl Front 1</string>
     <string name="girl_front_2">Girl Front 2</string>
     <string name="girl_mid_1">Girl Middle 1</string>
@@ -30,6 +31,12 @@
     <string name="blur_none">No camera blur</string>
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_high">Heavy camera blur</string>
+
+    <string name="time_automatic">Automatic</string>
+    <string name="time_dawn">Dawn</string>
+    <string name="time_day">Day</string>
+    <string name="time_sunset">Sunset</string>
+    <string name="time_night">Night</string>
 
 
 </resources>

@@ -4,18 +4,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.provider.ContactsContract;
 import android.util.Log;
+import java.util.Random;
 
 /**
  * Created by Blake on 9/19/2015.
  */
 public class SceneSetter
 {
-    static int BLUR_NONE = 300;
-    static int BLUR_LOW = 301;
-    static int BLUR_HIGH = 302;
     private int blurSetting;
+    Random randomGenerator;
+    private int girlTextureChoice;
+    private String girlTextureArray[] = {"1", "2", "3", "4", "5", "6"};
+
 
     private int textureIndexTable, textureIndexCity, textureIndexBuilding, textureIndexSky;
 
@@ -25,11 +26,29 @@ public class SceneSetter
     Context context;
     private float[] currentGirlVertices;
     private float girlOffset;
+    TimeTracker timeTracker;
+    private int lastDayHour;
 
     public SceneSetter(SharedPreferences nPreferences, Context nContext)
     {
         this.preferences = nPreferences;
         this.context = nContext;
+        randomGenerator = new Random();
+        shuffleScene();
+        Log.d("Scene Setter", "Constructor. girlTextureChoice: " + girlTextureChoice);
+        timeTracker = new TimeTracker();
+
+    }
+
+    public boolean shuffleScene()
+    {
+        String choice = preferences.getString("texture_model", "3");
+            if(choice.equals("0"))
+            {
+                shuffleGirl();
+                return true;
+            }
+        return false;
     }
 
     public float[] getSpriteVertices(int sprite)
@@ -40,7 +59,9 @@ public class SceneSetter
         }
         else if(sprite == DataCodes.GIRL)
         {
-            String choice = preferences.getString("texture_model", "1");
+            String choice = preferences.getString("texture_model", "3");
+            if(choice.equals("0"))
+                choice = girlTextureArray[girlTextureChoice];
             switch(choice)
             {
                 case("1"):
@@ -88,59 +109,88 @@ public class SceneSetter
         return girlOffset;
     }
 
-    public float[] getSpriteColor(String sprite)
+    public float[] getSpriteColor(int sprite)
     {
-        if(sprite.equals("table"))
+        int choice = Integer.parseInt(preferences.getString("set_time", "30"));
+        if(choice == DataCodes.AUTOMATIC)
         {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
-                return dataHolder.nightColor;
-            }
+            choice = timeTracker.getDayHour();
+            lastDayHour = choice;
+            Log.d("Scene Setter: ", "color chosen from automatic: " + choice);
+        }
+        if(sprite == DataCodes.GIRL)
+        {
+            if(choice == DataCodes.DAY)
+                return dataHolder.normalColorGirl;
+            else if(choice == DataCodes.SUNSET)
+                return dataHolder.sunsetColorGirl;
+            else if(choice == DataCodes.NIGHT)
+                return dataHolder.nightColorGirl;
+            else if(choice == DataCodes.DAWN)
+                return dataHolder.dawnColorGirl;
                 return dataHolder.normalColor;
         }
-        else if(sprite.equals("girl"))
+        else if(sprite == DataCodes.SKY)
         {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
-                return dataHolder.nightColorGirl;
-            }
-            return dataHolder.normalColorGirl;
-        }
-        else if(sprite.equals("room"))
-        {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
-                return dataHolder.nightColor;
-            }
-            return dataHolder.normalColor;
-        }
-        else if(sprite.equals("city"))
-        {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
-                return dataHolder.nightColor;
-            }
-            return dataHolder.normalColor;
-        }
-        else if(sprite.equals("building"))
-        {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
-                return dataHolder.nightColor;
-            }
-            return dataHolder.normalColor;
+            Log.d("Scene Setter: ", "Sky colors chosen");
+            if(choice == DataCodes.DAY)
+                return dataHolder.skyColorNormal;
+            else if(choice == DataCodes.SUNSET)
+                return dataHolder.skyColorSunset;
+            else if(choice == DataCodes.NIGHT)
+                return dataHolder.skyColorNight;
+            else if(choice == DataCodes.DAWN)
+                return dataHolder.skyColorDawn;
 
+            return dataHolder.skyColorNormal;
         }
-        else //it's the sky
+//        else if(sprite == DataCodes.ROOM)
+//        {
+//            if(choice == DataCodes.NIGHT)
+//            {
+//                return dataHolder.nightColor;
+//            }
+//            return dataHolder.normalColor;
+//        }
+//        else if(sprite== DataCodes.CITY)
+//        {
+//            if(choice == DataCodes.NIGHT)
+//            {
+//                return dataHolder.nightColor;
+//            }
+//            return dataHolder.normalColor;
+//        }
+//        else if(sprite == DataCodes.BUILDING)
+//        {
+//            if(choice == DataCodes.NIGHT)
+//            {
+//                return dataHolder.nightColor;
+//            }
+//            return dataHolder.normalColor;
+//
+//        }
+        else //it's an object in the room
         {
-            if(preferences.getBoolean("activate_sunset", true))
-            {
+            if(choice == DataCodes.DAY)
+                return dataHolder.normalColor;
+            else if(choice == DataCodes.SUNSET)
+                return dataHolder.sunsetColor;
+            else if(choice == DataCodes.NIGHT)
                 return dataHolder.nightColor;
-            }
-            return dataHolder.skyColor;
+            else if(choice == DataCodes.DAWN)
+                return dataHolder.dawnColor;
+
+            return dataHolder.normalColor;
         }
     }
 
+    public boolean needsColorRefresh()
+    {
+        int currentTime = timeTracker.getDayHour();
+        if(currentTime != lastDayHour)
+            return true;
+        return false;
+    }
     public int getGirlRender()
     {
         if(preferences.getBoolean("remove_layer", true))
@@ -180,18 +230,18 @@ public class SceneSetter
         Log.d("Scene Setter", "blur string: " + blurString);
         if(blurString.equals("none"))
         {
-            blurSetting = BLUR_NONE;
-            Log.d("Scene Setter", "none chosen");
+            blurSetting = DataCodes.BLUR_NONE;
+            Log.d("Scene Setter", "no blur chosen");
         }
         else if(blurString.equals("low"))
         {
-            blurSetting = BLUR_LOW;
-            Log.d("Scene Setter", "low chosen");
+            blurSetting = DataCodes.BLUR_LOW;
+            Log.d("Scene Setter", "low blur chosen");
         }
         else if(blurString.equals("high"))
         {
-            blurSetting = BLUR_HIGH;
-            Log.d("Scene Setter", "high chosen");
+            blurSetting = DataCodes.BLUR_HIGH;
+            Log.d("Scene Setter", "high blur chosen");
         }
     }
 
@@ -200,14 +250,16 @@ public class SceneSetter
         Bitmap bmp = null; //BitmapFactory.decodeResource(context.getResources(), R.drawable.girlmidsword);
         if(sprite == DataCodes.GIRL)
         {
-            String choice = preferences.getString("texture_model", "1");
+            String choice = preferences.getString("texture_model", "3");
+            if(choice.equals("0"))
+                choice = girlTextureArray[girlTextureChoice];
             switch(choice)
             {
                 case("1"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontbook);
-                    if(blurSetting != BLUR_NONE)
+                    if(blurSetting != DataCodes.BLUR_NONE)
                     {
-                        if(blurSetting == BLUR_LOW)
+                        if(blurSetting == DataCodes.BLUR_LOW)
                             bmp = BlurBuilder.blur(context, bmp, 9.5f, 0.8f);
                         else
                             bmp = BlurBuilder.blur(context, bmp, 13.5f, 0.5f);
@@ -216,9 +268,9 @@ public class SceneSetter
                     break;
                 case("2"):
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.girlfrontflower);
-                    if(blurSetting != BLUR_NONE)
+                    if(blurSetting != DataCodes.BLUR_NONE)
                     {
-                        if(blurSetting == BLUR_LOW)
+                        if(blurSetting == DataCodes.BLUR_LOW)
                             bmp = BlurBuilder.blur(context, bmp, 9.5f, 0.8f);
                         else
                             bmp = BlurBuilder.blur(context, bmp, 13.5f, 0.5f);
@@ -310,5 +362,55 @@ public class SceneSetter
         }
 
         return bmp;
+    }
+    public int getTextureIndex(int texture)
+    {
+        if(texture == DataCodes.CITY)
+        {
+            if(preferences.getString("camera_blur", "none").equals("none"))
+            {
+                return 3;
+            }
+            return 13;
+        }
+        else if(texture == DataCodes.BUILDING)
+        {
+            if(preferences.getString("camera_blur", "none").equals("none"))
+            {
+                return 7;
+            }
+            return 17;
+        }
+        else if(texture == DataCodes.SKY)
+        {
+            if(preferences.getString("camera_blur", "none").equals("none"))
+            {
+                return 4;
+            }
+            return 14;
+        }
+        else if(texture == DataCodes.TABLE)
+        {
+            if(preferences.getString("camera_blur", "none").equals("none"))
+            {
+                return 2;
+            }
+            return 12;
+        }
+        return 0;
+    }
+    private void shuffleGirl()
+    {
+        Log.d("Scene Setter" , "girl was shuffled. chose: " + girlTextureChoice);
+        int choice = randomGenerator.nextInt(5);
+        if(choice == girlTextureChoice)
+        {
+            if (choice == 5)
+                choice = 5 - randomGenerator.nextInt(3) + 1;
+            else
+                choice++;
+        }
+        girlTextureChoice = choice;
+        Log.d("Scene Setter" , "girl was shuffled. chose: " + girlTextureChoice);
     }
 }

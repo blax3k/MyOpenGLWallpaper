@@ -7,6 +7,7 @@ public class riGraphicTools {
 	// Program variables
 	public static int sp_SolidColor;
 	public static int sp_Image;
+	public static int sp_Color;
 	
 	
 	/* SHADER Solid
@@ -15,17 +16,21 @@ public class riGraphicTools {
 	 * 
 	 */
 	public static final String vs_SolidColor =
-		"uniform 	mat4 		uMVPMatrix;" +
-		"attribute 	vec4 		vPosition;" +
-	    "void main() {" +
-	    "  gl_Position = uMVPMatrix * vPosition;" +
-	    "}";
+			"uniform mat4 uMVPMatrix;" +
+					"attribute vec4 vPosition;" +
+					"attribute vec4 vColor;" +
+					"varying vec4 _vColor;" +
+					"void main() {" +
+					"  _vColor = vColor;" +
+					"  gl_Position = uMVPMatrix * vPosition;" +
+					"}";
 	
 	public static final String fs_SolidColor =
-		"precision mediump float;" +
-	    "void main() {" +
-	    "  gl_FragColor = vec4(0.5,0,0,1);" +
-	    "}"; 
+			"precision mediump float;" +
+					"varying vec4 _vColor;" +
+					"void main() {" +
+					"  gl_FragColor = _vColor;" +
+					"}";
 	
 	/* SHADER Image
 	 * 
@@ -45,7 +50,7 @@ public class riGraphicTools {
 			"  v_texCoord = a_texCoord;" +
 			"  v_Color = a_Color;" +
 			"}";
-	
+
 	public static final String fs_Image =
 					"precision mediump float;" +
 					"varying vec2 v_texCoord;" +
@@ -56,6 +61,24 @@ public class riGraphicTools {
 					"  gl_FragColor.rgb *= v_Color.a;" +
 					"}";
 
+	public static final String vs_Color =
+			"uniform mat4 uMVPMatrix;" +
+					"attribute vec4 vPosition;" +
+					"attribute vec4 a_Color;" +
+					"varying vec4 v_Color;" +
+					"varying vec2 v_texCoord;" +
+					"void main() {" +
+					"  gl_Position = uMVPMatrix * vPosition;" +
+					"  v_Color = a_Color;" +
+					"}";
+
+	public static final String fs_Color =
+			"precision mediump float;" +
+					"varying vec4 v_Color;" +
+					"void main() {" +
+					"  gl_FragColor = v_Color;" +
+					"  gl_FragColor.rgb *= v_Color.a;" +
+					"}";
 
 
 	public static int loadShader(int type, String shaderCode){

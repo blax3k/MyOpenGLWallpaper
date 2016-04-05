@@ -40,7 +40,6 @@ public class Sprite {
     public Sprite(float[] mVertices, float[] textureColor)
     {
         vertices = mVertices;
-
         colors = textureColor;
 
         ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
@@ -94,11 +93,8 @@ public class Sprite {
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer);
 
-        int mTexCoordLoc = 0;
-        if(textureIndex >= 0)
-        {
             // Get handle to texture coordinates location
-            mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
+            int mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
 
             // Enable generic vertex attribute array
             GLES20.glEnableVertexAttribArray(mTexCoordLoc);
@@ -117,9 +113,8 @@ public class Sprite {
 
             // Set the sampler texture unit to x, where we have saved the texture.
             GLES20.glUniform1i(mSamplerLoc, textureIndex);
-        }
 
-            GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+        GLES20.glUniform4fv(mColorHandle, 1, color, 0);
 
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, m, 0);
@@ -131,7 +126,7 @@ public class Sprite {
             GLES20.glEnable(GLES20.GL_BLEND);
         }
 
-        GLES20.glClearColor(0, 0, 0, 0);
+//        GLES20.glClearColor(0, 0, 0, 0);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
@@ -142,6 +137,7 @@ public class Sprite {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(mColorHandle);
 
         if(textureIndex >= 0)
             GLES20.glDisableVertexAttribArray(mTexCoordLoc);

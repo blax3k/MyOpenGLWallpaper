@@ -11,12 +11,16 @@ import java.util.GregorianCalendar;
  */
 public class TimeTracker
 {
-    GregorianCalendar calendar;
+    Calendar calendar;
     Date currentTime;
-    public static int MORNING = 0;
-    public static int NOON = 1;
-    public static int SUNSET = 2;
-    public static int NIGHT = 3;
+    int nightBegin = 20;
+    int nightEnd = 4;
+    int dawnBegin = 5;
+    int dawnEnd = 9;
+    int dayBegin = 10;
+    int dayEnd = 18;
+    int sunsetBegin = 19;
+    int sunsetEnd = 19;
 
     public TimeTracker()
     {
@@ -26,20 +30,22 @@ public class TimeTracker
 
     public int getDayHour()
     {
+        calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         Log.d("Hour of day", "Hour of day: " + hour);
-        if((hour >= 20 && hour <= 23) || (hour >= 0 && hour <=4))
+        if((hour >= nightBegin && hour <= 24) || (hour >= 0 && hour <= nightEnd))
         {
-            return NIGHT;
+            return DataCodes.NIGHT;
         }
-        else if(hour >= 5 && hour <= 9)
+        else if(hour >= dawnBegin && hour <= dawnEnd)
         {
-            return MORNING;
+            return DataCodes.DAWN;
         }
-        else if(hour <= 10 && hour <= 19)
+        else if(hour >= dayBegin && hour <= dayEnd)
         {
-            return NOON;
+            return DataCodes.DAY;
         }
-        else return SUNSET;
+        else return DataCodes.SUNSET;
+
     }
 }

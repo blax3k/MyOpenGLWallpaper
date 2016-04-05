@@ -15,4 +15,14 @@ public class DataCodes {
     public static int BLUR_NONE  = 20;
     public static int BLUR_LOW = 21;
     public static int BLUR_HIGH = 22;
+
+    public static int AUTOMATIC = 30;
+    public static int DAWN = 31;
+    public static int DAY = 32;
+    public static int SUNSET = 33;
+    public static int NIGHT = 34;
+
+
+
+    public static int SHUFFLE;
 }
