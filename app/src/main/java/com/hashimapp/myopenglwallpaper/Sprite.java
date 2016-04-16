@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 /**
  * Created by Blake Hashimoto on 8/15/2015.
@@ -17,7 +19,7 @@ import java.nio.ShortBuffer;
 public class Sprite {
     // Geometric variables
     public static float vertices[];
-    public static short indices[] ={0, 1, 2, 0, 2, 3};
+    public short indices[];
     public static float uvs[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
@@ -37,10 +39,11 @@ public class Sprite {
     private final int mTextureCoordinateDataSize = 2;
     private int mTextureDataHandle;
 
-    public Sprite(float[] mVertices, float[] textureColor)
+    public Sprite(float[] mVertices, float[] textureColor, short[] mIndices)
     {
         vertices = mVertices;
         colors = textureColor;
+        indices = mIndices;
 
         ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
         cb.order(ByteOrder.nativeOrder());
@@ -75,7 +78,7 @@ public class Sprite {
 //        setupImage(context, bitmapAddress, texturenames);
     }
 
-    public void draw(float[] m, FloatBuffer uvBuffer, int textureIndex, boolean transparent ) {
+    public void draw(float[] m, FloatBuffer uvBuffer, int textureIndex ) {
         //set the program
         GLES20.glUseProgram(mProgram);
 
@@ -120,19 +123,14 @@ public class Sprite {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, m, 0);
 
         //enable transparency
-        if(transparent)
-        {
-            GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
             GLES20.glEnable(GLES20.GL_BLEND);
-        }
+            GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
 //        GLES20.glClearColor(0, 0, 0, 0);
 
         // Draw the triangle
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
-        if(transparent)
         GLES20.glDisable(GLES20.GL_BLEND);
 
         // Disable vertex array

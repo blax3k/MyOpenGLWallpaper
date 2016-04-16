@@ -3,6 +3,7 @@ package com.hashimapp.myopenglwallpaper;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -22,6 +23,7 @@ import android.util.Log;
 public class GLRenderer implements Renderer {
 
 	// Our matrices
+	private int NUMBEROFCLOUDS = 16;
 	private final float[] mtrxProjection = new float[16];
 	private final float[] mtrxView = new float[16];
 	private final float[] mMVPMatrix = new float[16],
@@ -29,12 +31,14 @@ public class GLRenderer implements Renderer {
 			scratch1 = new float[16],
 			scratch2 = new float[16],
 			scratch3 = new float[16];
+	public final float[][] cloudMVPMatrix = new float[NUMBEROFCLOUDS][16];
 	private float[] mModelMatrix = new float[16];
 	private int mMVPMatrixHandle;
 
 	// Geometric variables
-	public static float uvs[];
-	public FloatBuffer uvBuffer;
+	public float uvs[], uvs2[][];
+	public FloatBuffer uvBuffer, uvBuffer2;
+	public FloatBuffer[] cloudUVBuffer = new FloatBuffer[NUMBEROFCLOUDS];
 //	private int frameBuffer;
 	int[] texturenames;
 
@@ -59,6 +63,8 @@ public class GLRenderer implements Renderer {
 
 //	Square square, square1;
 	Sprite girl, table, room, city, building;//, sky;//, girlMid, girlFront, girlBack;
+	Sprite cloud;
+	Clouds clouds;
 	Square sky;
 	float offsetDifferenceX = 1;
 	float offsetDifferenceY = 1;
@@ -66,6 +72,11 @@ public class GLRenderer implements Renderer {
 	float xOffset, yOffset;
 	public void setEyeX(float offset)
 	{
+		Log.d("renderer setEyeX()", "offset: " + offset);
+		if(offset > 1.0f)
+			offset = 1.0f;
+		if(offset < 0.0f)
+			offset = 0.0f;
 			if(portraitOrientation)
 			{
 				xOffset = offset * offsetDifferenceX;
@@ -128,15 +139,17 @@ public class GLRenderer implements Renderer {
 //		GLES20.glGenTextures(9, textureNames, 0);
 
         //create the sprites
-		table = new Sprite(sceneSetter.getSpriteVertices(DataCodes.TABLE), sceneSetter.getSpriteColor(DataCodes.TABLE));
+		table = new Sprite(sceneSetter.getSpriteVertices(DataCodes.TABLE), sceneSetter.getSpriteColor(DataCodes.TABLE), DataHolder.indices);
 //		girlFront = new Sprite(sceneSetter.getSpriteVertices("girlFront"), sceneSetter.getSpriteColor("girlFront"));
 //		girlMid = new Sprite(sceneSetter.getSpriteVertices("girlMid"), sceneSetter.getSpriteColor("girlMid"));
 //		girlBack = new Sprite(sceneSetter.getSpriteVertices("girlBack"), sceneSetter.getSpriteColor("girlBack"));
-		girl = new Sprite(sceneSetter.getSpriteVertices(DataCodes.GIRL), sceneSetter.getSpriteColor(DataCodes.GIRL));
-		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor(DataCodes.ROOM));
-		building = new Sprite(sceneSetter.getSpriteVertices(DataCodes.BUILDING), sceneSetter.getSpriteColor(DataCodes.BUILDING));
-		city = new Sprite(sceneSetter.getSpriteVertices(DataCodes.CITY), sceneSetter.getSpriteColor(DataCodes.CITY));
-//		sky = new Sprite(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor("sky"));
+		girl = new Sprite(sceneSetter.getSpriteVertices(DataCodes.GIRL), sceneSetter.getSpriteColor(DataCodes.GIRL), DataHolder.indices);
+		room = new Sprite(sceneSetter.getSpriteVertices(DataCodes.ROOM), sceneSetter.getSpriteColor(DataCodes.ROOM), DataHolder.indices);
+		building = new Sprite(sceneSetter.getSpriteVertices(DataCodes.BUILDING), sceneSetter.getSpriteColor(DataCodes.BUILDING), DataHolder.indices);
+		city = new Sprite(sceneSetter.getSpriteVertices(DataCodes.CITY), sceneSetter.getSpriteColor(DataCodes.CITY), DataHolder.indices);
+		DataHolder datHolder = new DataHolder();
+		clouds = new Clouds(datHolder.getCloudVertices(NUMBEROFCLOUDS, 1),sceneSetter.getSpriteColor(DataCodes.CLOUDS), DataHolder.indices);
+		cloud = new Sprite(datHolder.getCloudVertices(NUMBEROFCLOUDS,1)[0], sceneSetter.getSpriteColor(DataCodes.CLOUDS), DataHolder.indices);
 		sky = new Square(sceneSetter.getSpriteVertices(DataCodes.SKY), sceneSetter.getSpriteColor(DataCodes.SKY));
 		// Set the clear color to white
 		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -399,6 +412,8 @@ public class GLRenderer implements Renderer {
 				room.setColor(sceneSetter.getSpriteColor(DataCodes.ROOM));
 				city.setColor(sceneSetter.getSpriteColor(DataCodes.CITY));
 				sky.setColor(sceneSetter.getSpriteColor(DataCodes.SKY));
+				clouds.setColor(sceneSetter.getSpriteColor(DataCodes.CLOUDS));
+				cloud.setColor(sceneSetter.getSpriteColor(DataCodes.CLOUDS));
 				building.setColor(sceneSetter.getSpriteColor(DataCodes.BUILDING));
 			}
 			catch(Exception e)
@@ -422,7 +437,11 @@ public class GLRenderer implements Renderer {
 			room.setColor(sceneSetter.getSpriteColor(DataCodes.ROOM));
 		}else if(sprite == DataCodes.CITY)
 		{
-			room.setColor(sceneSetter.getSpriteColor(DataCodes.ROOM));
+			city.setColor(sceneSetter.getSpriteColor(DataCodes.CITY));
+		}else if(sprite == DataCodes.CLOUDS)
+		{
+			clouds.setColor(sceneSetter.getSpriteColor(DataCodes.CLOUDS));
+			cloud.setColor(sceneSetter.getSpriteColor(DataCodes.CLOUDS));
 		}
 	}
 
@@ -528,6 +547,34 @@ public class GLRenderer implements Renderer {
 		uvBuffer.put(uvs);
 		uvBuffer.position(0);
 
+		//cloud texture buffer
+		Random rnd = new Random();
+
+		// 30 imageobjects times 4 vertices times (u and v)
+		uvs2 = new float[NUMBEROFCLOUDS][4*2];
+
+		// We will make 30 randomly textures objects
+		for(int i=0; i < uvs2.length; i++)
+		{
+			int random_u_offset = rnd.nextInt(2);
+			int random_v_offset = rnd.nextInt(2);
+
+			// Adding the UV's using the offsets
+			uvs2[i][0] = random_u_offset * 0.5f;
+			uvs2[i][1] = random_v_offset * 0.5f;
+			uvs2[i][2] = random_u_offset * 0.5f;
+			uvs2[i][3] = (random_v_offset+1) * 0.5f;
+			uvs2[i][4] = (random_u_offset+1) * 0.5f;
+			uvs2[i][5] = (random_v_offset+1) * 0.5f;
+			uvs2[i][6] = (random_u_offset+1) * 0.5f;
+			uvs2[i][7] = random_v_offset * 0.5f;
+
+			ByteBuffer bb2 = ByteBuffer.allocateDirect(uvs2.length * 4);
+			bb2.order(ByteOrder.nativeOrder());
+			cloudUVBuffer[i] = bb2.asFloatBuffer();
+			cloudUVBuffer[i].put(uvs2[i]);
+			cloudUVBuffer[i].position(0);
+		}
 
 		// Generate Textures, if more needed, alter these numbers.
 		texturenames = new int[20];
@@ -581,7 +628,7 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-
+		//blurred city
 		bmp = BlurBuilder.blur(mContext, bmp, 10.5f, 0.4f);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE13);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[13]);
@@ -624,6 +671,24 @@ public class GLRenderer implements Renderer {
 		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
+		//Texture 8 Clouds
+		bmp = sceneSetter.getTexture(DataCodes.CLOUDS);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE8);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[8]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+		bmp = BlurBuilder.blur(mContext, bmp, 10.5f, 0.4f);
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE18);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[18]);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+
 		bmp.recycle();
 	}
 
@@ -660,7 +725,6 @@ public class GLRenderer implements Renderer {
 //		Log.d("onDrawFrame", "eyeX: " + eyeX);
 //		Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
-
 		GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
 
 		// Calculate the projection and view
@@ -672,32 +736,36 @@ public class GLRenderer implements Renderer {
 //		GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
 ////		sky.draw(scratch0, uvBuffer, -1, false);
 		sky.draw(scratch0);
-
+		//change the program being used
 		GLES20.glUseProgram(riGraphicTools.sp_Image);
 
+		//draw the clouds
+//		Matrix.setIdentityM(mModelMatrix, 0);
+//		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, yOffset * 0.1f, 1.0f);
+//		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
+//		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
+		clouds.draw(cloudMVPMatrix, cloudUVBuffer, sceneSetter.getTextureIndex(DataCodes.CLOUDS), mModelMatrix,
+				mtrxView, mtrxProjection, xOffset, yOffset);
 		//Draw the City
 		Matrix.setIdentityM(mModelMatrix, 0);
-//		Matrix.translateM(mModelMatrix, 0, eyeX * 0.7f, 0.0f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.1f, yOffset * 0.1f, 1.0f);
 		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-		city.draw(scratch1, uvBuffer, sceneSetter.getTextureIndex(DataCodes.CITY), true);
+		city.draw(scratch1, uvBuffer, sceneSetter.getTextureIndex(DataCodes.CITY));
 		//draw the building
 		Matrix.setIdentityM(mModelMatrix, 0);
-//		Matrix.translateM(mModelMatrix, 0, 0.0f, 0.3f, 1.0f);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.3f, yOffset * 0.3f, 1.0f);
 		Matrix.multiplyMM(scratch2, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(scratch2, 0, mtrxProjection, 0, scratch2, 0);
-		building.draw(scratch2, uvBuffer, sceneSetter.getTextureIndex(DataCodes.BUILDING), true);
+		building.draw(scratch2, uvBuffer, sceneSetter.getTextureIndex(DataCodes.BUILDING));
 		//draw the room
 		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.translateM(mModelMatrix, 0, xOffset * 0.95f, yOffset * 0.95f, 1.0f);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
-		room.draw(mMVPMatrix, uvBuffer, 0, true);
+		room.draw(mMVPMatrix, uvBuffer, 0);
+
 		//draw the girl
-
-
 		float girlOfffsetX = xOffset * sceneSetter.getGirlOffset();
 		float girlOffsetY = yOffset * sceneSetter.getGirlOffset();
 		if(!portraitOrientation && sceneSetter.getGirlOffset() == 1.0f)
@@ -715,7 +783,7 @@ public class GLRenderer implements Renderer {
 		if(sceneSetter.getGirlRender() == 0)
 		{            //don't render
 		}else
-			girl.draw(scratch3, uvBuffer, 1, true);
+			girl.draw(scratch3, uvBuffer, 1);
 //		}else if(sceneSetter.getGirlRender() == 1)
 //		{	girlFront.draw(scratch3, uvBuffer, 1);
 //		}else if(sceneSetter.getGirlRender() == 2)
@@ -732,7 +800,7 @@ public class GLRenderer implements Renderer {
 		Matrix.translateM(mModelMatrix, 0, tableOffset, yOffset + 0.3f, 1.0f);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxView, 0, mModelMatrix, 0);
 		Matrix.multiplyMM(this.scratch3, 0, mtrxProjection, 0, this.scratch3, 0);
-		table.draw(this.scratch3, uvBuffer, sceneSetter.getTextureIndex(DataCodes.TABLE), true);
+		table.draw(this.scratch3, uvBuffer, sceneSetter.getTextureIndex(DataCodes.TABLE));
 	}
 
 

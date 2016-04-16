@@ -1,5 +1,7 @@
 package com.hashimapp.myopenglwallpaper;
 
+import java.util.Random;
+
 /**
  * Created by Blake on 8/19/2015.
  */
@@ -56,6 +58,65 @@ public class DataHolder
                         0.929f, 0.586f, 0.551f, opacity,
                         0.929f, 0.586f, 0.551f, opacity
                 };
+    }
+
+    public static short indices[] = {0, 1, 2, 0, 2, 3};
+
+    public short[] getCloudIndices()
+    {
+        short[] mIndices = new short[30 * 6];
+        int last = 0;
+        for (int i = 0; i < 30; i++)
+        {
+            // We need to set the new indices for the new quad
+            mIndices[(i * 6) + 0] = (short) (last + 0);
+            mIndices[(i * 6) + 1] = (short) (last + 1);
+            mIndices[(i * 6) + 2] = (short) (last + 2);
+            mIndices[(i * 6) + 3] = (short) (last + 0);
+            mIndices[(i * 6) + 4] = (short) (last + 2);
+            mIndices[(i * 6) + 5] = (short) (last + 3);
+
+            // Our indices are connected to the vertices so we need to keep them
+            // in the correct order.
+            // normal quad = 0,1,2,0,2,3 so the next one will be 4,5,6,4,6,7
+            last = last + 4;
+        }
+        return mIndices;
+    }
+
+    public float[][] getCloudVertices(int number, int size)
+    {
+        Random rnd = new Random();
+
+        // Our collection of vertices
+        float[][] vertices = new float[number][12];
+        int swp;
+        int shp;
+        // Create the vertex data
+        for (int i = 0; i < number; i++)
+        {
+            float minX = -5.0f;
+            float maxX = 1.8f;
+            float minY = -1.3f;
+            float maxY = 3.4f;
+            float offset_x = 0.0f;//rnd.nextFloat() * (maxX - minX) + minX;
+            float offset_y = rnd.nextFloat() * (maxY - minY) + minY;
+
+            // Create the 2D parts of our 3D vertices, others are default 0.0f
+            vertices[i][0] = offset_x;
+            vertices[i][1] = offset_y + 1.0f;
+            vertices[i][2] = 2.0f;
+            vertices[i][3] = offset_x;
+            vertices[i][4] = offset_y;
+            vertices[i][5] = 2.0f;
+            vertices[i][6] = offset_x + 1.0f;
+            vertices[i][7] = offset_y;
+            vertices[i][8] = 2.0f;
+            vertices[i][9] = offset_x + 1.0f;
+            vertices[i][10] = offset_y + 1.0f;
+            vertices[i][11] = 2.0f;
+        }
+        return vertices;
     }
 
     //Sprite posisitions
@@ -219,6 +280,16 @@ public class DataHolder
             skyColorNormal,
             skyColorSunset,
             skyColorNight};
+
+
+    public float[] getCloudColors()
+    {
+        float[] colors = new float[30 * 4 * 4];
+        for (int i = 0; i < colors.length ; i++)
+        {
+            colors[i] = 1.0f;
+        }
+        return colors;
+    }
+
 }
-
-

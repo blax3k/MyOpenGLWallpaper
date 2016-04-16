@@ -78,7 +78,6 @@ public class SceneSetter
                     return dataHolder.girlBackSitting;
             }
         }
-
         else if(sprite == DataCodes.BUILDING)
         {
             return dataHolder.buildingVertices;
@@ -91,6 +90,10 @@ public class SceneSetter
         {
             return dataHolder.skyVertices;
         }
+//        else if(sprite == DataCodes.CLOUDS)
+//        {
+//            return dataHolder.getCloudVertices();
+//        }
         else //it's the room
         {
             return dataHolder.roomVertices;
@@ -143,6 +146,10 @@ public class SceneSetter
                 return dataHolder.skyColorDawn;
 
             return dataHolder.skyColorNormal;
+        }
+        else if(sprite == DataCodes.CLOUDS)
+        {
+            return dataHolder.getCloudColors();
         }
 //        else if(sprite == DataCodes.ROOM)
 //        {
@@ -360,6 +367,10 @@ public class SceneSetter
 //                    bmp = BlurBuilder.blur(context, bmp, 15.5f, 0.4f);
 //            }
         }
+        else if(sprite == DataCodes.CLOUDS)
+        {
+            bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.clouds);
+        }
 
         return bmp;
     }
@@ -396,6 +407,15 @@ public class SceneSetter
                 return 2;
             }
             return 12;
+        }
+        else if(texture == DataCodes.CLOUDS)
+        {
+            if(preferences.getString("camera_blur", "none").equals("none"))
+            {
+                return 8;
+            }
+            return 18;
+
         }
         return 0;
     }

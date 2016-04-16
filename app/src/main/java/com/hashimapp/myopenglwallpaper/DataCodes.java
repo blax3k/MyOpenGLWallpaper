@@ -11,6 +11,7 @@ public class DataCodes {
     public static int GIRL = 004;
     public static int TABLE = 005;
     public static int CAT = 006;
+    public static int CLOUDS = 007;
 
     public static int BLUR_NONE  = 20;
     public static int BLUR_LOW = 21;
