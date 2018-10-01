@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_key_sim_scroll"
+        android:summary="@string/sim_scrolling_summary"
+        android:title="@string/sim_scrolling" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/listArray"
+        android:entryValues="@array/listValues"
+        android:key="texture_model"
+        android:title="@string/texture_choice" />
+
+    <ListPreference
+        android:defaultValue="none"
+        android:entries="@array/blurArray"
+        android:entryValues="@array/blurValues"
+        android:key="camera_blur"
+        android:title="Camera Blur" />
+
+    <ListPreference
+        android:defaultValue="30"
+        android:entries="@array/timeArray"
+        android:entryValues="@array/timeValues"
+        android:key="set_time"
+        android:title="@string/set_time_title" />
+
+    <Preference
+        android:key="view_artist"
+        android:title="Go to artists's website">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.soundlesswind.com/" />
+    </Preference>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="remove_layer"
+        android:summary="@string/remove_layer_summary"
+        android:title="@string/remove_layer" />
+
+</PreferenceScreen>

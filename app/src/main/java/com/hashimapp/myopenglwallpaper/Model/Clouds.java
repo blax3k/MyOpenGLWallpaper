@@ -1,11 +1,7 @@
-package com.hashimapp.myopenglwallpaper;
+package com.hashimapp.myopenglwallpaper.Model;
 
-import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.Random;
@@ -41,7 +37,7 @@ public class Clouds
         clouds = new Sprite[mVerticesArray.length];
         for(int i = 0; i < mVerticesArray.length; i++)
         {
-            clouds[i] = new Sprite(mVerticesArray[i], textureColor, mIndices);
+            clouds[i] = new Sprite(mVerticesArray[i], textureColor, mIndices, 1);
             offsets[i] = rnd.nextFloat() * (maxX - minX) + minX;
         }
     }
@@ -62,7 +58,7 @@ public class Clouds
             Matrix.translateM(mModelMatrix, 0, newOffset, yOffset * 0.1f, 1.0f);
             Matrix.multiplyMM(m[i], 0, mtrxView, 0, mModelMatrix, 0);
             Matrix.multiplyMM(m[i], 0, mtrxProjection, 0, m[i], 0);
-            clouds[i].draw(m[i], uvBuffer[i],textureIndex);
+//            clouds[i].draw(m[i], uvBuffer[i],textureIndex, 1);
         }
     }
 

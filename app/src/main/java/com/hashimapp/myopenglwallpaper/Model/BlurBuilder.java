@@ -1,4 +1,4 @@
-package com.hashimapp.myopenglwallpaper;
+package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -37,6 +37,6 @@ public class BlurBuilder
         }
         outputBitmap = Bitmap.createScaledBitmap(outputBitmap, image.getWidth(), image.getHeight(), false);
 
-        return outputBitmap;
+        return outputBitmap.copy(Bitmap.Config.ARGB_4444, true);
     }
 }

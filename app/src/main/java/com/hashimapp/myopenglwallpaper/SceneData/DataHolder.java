@@ -1,4 +1,4 @@
-package com.hashimapp.myopenglwallpaper;
+package com.hashimapp.myopenglwallpaper.SceneData;
 
 import java.util.Random;
 
@@ -119,65 +119,36 @@ public class DataHolder
         return vertices;
     }
 
-    //Sprite posisitions
-    public float[] tableVertices = new float[]{
-            -4.5f, -0.8f, -2.0f,   // top left
-            -4.5f, -1.3f, -2.0f,   // bottom left
-            0.7f, -1.3f, -2.0f,   // bottom right
-            0.7f, -0.8f, -2.0f}; // top right
+    //Sprite vertices
+    public float[] bld0Vertices = new float[]{
+            -3.0f, 0.5f, 0.0f,   // top left
+            -3.0f, -2.5f, 0.0f,   // bottom left
+            3.0f, -2.5f, 0.0f,   // bottom right
+            3.0f, 0.5f, 0.0f}; // top right
 
-    public float[] roomVertices = new float[]{
-//    -5.7f,  3.2f, 2.0f,   // top left
-//            -5.7f, -2.0f, 2.0f,   // bottom left
-//            2.1f, -2.0f, 2.0f,   // bottom right
-//            2.1f,  3.2f, 2.0f }; // top right
+    public float[] bld1Vertices = new float[]{
+            2.3f, 3.1f, -0.2f,   // top left
+            2.3f, -3.0f, -0.2f,   // bottom left
+            -2.8f, -3.0f, -0.2f,   // bottom right
+            -2.8f, 3.1f, -0.2f}; // top right
 
-            3.2f, 3.1f, 2.0f, //top right
-            3.2f, -2.0f, 2.0f,   //bottom right
-            -7.0f, -2.0f, 2.0f,   // bottom left
-            -7.0f, 3.1f, 2.0f};   // top left
+    public float[] bld2Vertices = new float[]{
+            2.3f, 3.1f, -0.6f,   // top left
+            2.3f, -3.0f, -0.6f,   // bottom left
+            -2.8f, -3.0f, -0.6f,   // bottom right
+            -2.8f, 3.1f, -0.6f}; // top right
 
-    public float[] buildingVertices = new float[]{
-            4.3f, 4.7f, 4.0f,   // top left
-            4.3f, -2.0f, 4.0f,   // bottom left
-            0.0f, -2.0f, 4.0f,   // bottom right
-            0.0f, 4.7f, 4.0f}; // top right
-
-    public float[] girlMidStanding = new float[]{
-            -1.04f, 1.1f, 0.0f,   // top left
-            -1.04f, -1.2f, 0.0f,   // bottom left
-            0.37f, -1.2f, 0.0f,   // bottom right
-            0.37f, 1.1f, 0.0f}; // top right
-
-    public float[] girlBackSitting = new float[]{
-            -1.24f, 2.3f, 1.9999f,   // top left
-            -1.24f, -0.75f, 1.9999f,   // bottom left
-            0.87f, -0.75f, 1.9999f,   // bottom right
-            0.87f, 2.3f, 1.9999f}; // top right
-
-    public float[] girlFrontReading = new float[]{
-            0.32f, 0.8f, -2.0f,   // top right
-            0.32f, -1.0f, -2.0f,   // bottom right
-            -0.85f, -1.0f, -2.0f,   // bottom left
-            -0.85f, 0.8f, -2.0f}; // top left
-
-    public float[] girlSwordVertices = new float[]{
-            -0.435f, 0.0f, 0.0f,   // top left
-            -0.435f, -1.435f, 0.0f,   // bottom left
-            0.435f, -1.435f, 0.0f,   // bottom right
-            0.435f, 0.0f, 0.0f}; // top right
-
-    public float[] cityVertices = new float[]{
-            -3.0f, 2.4f, 2.0f,   // top left
-            -3.0f, -2.3f, 2.0f,   // bottom left
-            1.8f, -2.3f, 2.0f,   // bottom right
-            1.8f, 2.4f, 2.0f}; // top right
+    public float[] bld3Vertices = new float[]{
+            3.1f, 0.9f, -0.8f,   // top left
+            3.1f, -3.0f, -0.8f,   // bottom left
+            -3.3f, -3.0f, -0.8f,   // bottom right
+            -3.3f, 0.9f, -0.8f}; // top right
 
     public float[] skyVertices = new float[]{
-            -5.0f, 3.4f, 2.0f,   // top left
-            -5.0f, -1.3f, 2.0f,   // bottom left
-            1.8f, -1.3f, 2.0f,   // bottom right
-            1.8f, 3.4f, 2.0f}; // top right
+            -5.0f, 7.0f, -1.0f,   // top left
+            -5.0f, -3.0f, -1.0f,   // bottom left
+            5.2f, -3.0f, -1.0f,   // bottom right
+            5.2f, 7.0f, -1.0f}; // top right
 
 
     /*
@@ -282,12 +253,24 @@ public class DataHolder
             skyColorNight};
 
 
-    public float[] getCloudColors()
+    public float[] getCloudColorsDay()
     {
         float[] colors = new float[30 * 4 * 4];
         for (int i = 0; i < colors.length ; i++)
         {
             colors[i] = 1.0f;
+        }
+        return colors;
+    }
+    public float[] getCloudColorNight()
+    {
+        float[] colors = new float[30 * 4 * 4];
+        for(int i = 0; i < 30 * 4; i++)
+        {
+            colors[(i * 4) + 0] = 0.37f;
+            colors[(i * 4) + 1] = 0.47f;
+            colors[(i * 4) + 2] = 0.83921568627f;
+            colors[(i * 4) + 3] = 1.0f;
         }
         return colors;
     }

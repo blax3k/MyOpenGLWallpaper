@@ -1,6 +1,8 @@
-package com.hashimapp.myopenglwallpaper;
+package com.hashimapp.myopenglwallpaper.Model;
 
 import android.util.Log;
+
+import com.hashimapp.myopenglwallpaper.Model.SceneSetter;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -35,17 +37,17 @@ public class TimeTracker
         Log.d("Hour of day", "Hour of day: " + hour);
         if((hour >= nightBegin && hour <= 24) || (hour >= 0 && hour <= nightEnd))
         {
-            return DataCodes.NIGHT;
+            return SceneSetter.NIGHT;
         }
         else if(hour >= dawnBegin && hour <= dawnEnd)
         {
-            return DataCodes.DAWN;
+            return SceneSetter.DAWN;
         }
         else if(hour >= dayBegin && hour <= dayEnd)
         {
-            return DataCodes.DAY;
+            return SceneSetter.DAY;
         }
-        else return DataCodes.SUNSET;
+        else return SceneSetter.SUNSET;
 
     }
 }

@@ -1,4 +1,4 @@
-package com.hashimapp.myopenglwallpaper;
+package com.hashimapp.myopenglwallpaper.Model;
 
 import android.opengl.GLES20;
 
