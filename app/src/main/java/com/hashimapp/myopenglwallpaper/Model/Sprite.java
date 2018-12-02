@@ -1,11 +1,11 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-
-import com.hashimapp.myopenglwallpaper.Model.riGraphicTools;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,57 +22,36 @@ public class Sprite {
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
     public FloatBuffer colorBuffer;
-    private final int mProgram;
-    float color[] = {0.63671875f, 0.76953125f, 0.22265625f, 1.0f};
+//    private final int mProgram;
     public static float colors[];
     private float[] scratch;
     private int textureIndex;
+    ISpriteData spriteData;
+    float xScrollOffset = 0;
+    float xAccelOffset = 0;
+    float yAccelOffset = 0;
+    float landscapeOffset;
 
 
-    public Sprite(float[] mVertices, float[] textureColor, short[] mIndices, int textureIndex) {
-        vertices = mVertices;
-        colors = textureColor;
-        indices = mIndices;
+
+    public Sprite(ISpriteData mSpriteData) {
+        spriteData = mSpriteData;
         scratch = new float[16];
-        this.textureIndex = textureIndex;
+        vertices = spriteData.getVertices();
+        colors = spriteData.getColor();
+        indices = spriteData.getIndices();
+        textureIndex = spriteData.getTextureIndex();
 
-        ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
-        cb.order(ByteOrder.nativeOrder());
-        colorBuffer = cb.asFloatBuffer();
-        colorBuffer.put(colors);
-        colorBuffer.position(0);
-
-        // The vertex buffer.
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
-
-        // initialize byte buffer for the draw list
-        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(indices);
-        drawListBuffer.position(0);
-
-        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
-                riGraphicTools.vs_Image);
-        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
-                riGraphicTools.fs_Image);
-
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
-
-//        setupImage(context, bitmapAddress, texturenames);
+        setColor(colors);
+        setVertices(vertices);
+        setIndices(indices);
     }
 
 
 
-    public void SetTexture(Bitmap bmp, int activeTexture){
-        GLES20.glActiveTexture(activeTexture);
+    public void SetTexture(Context context){
+        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), spriteData.getBitmapID());
+        GLES20.glActiveTexture(spriteData.getGLImageID());
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIndex);
         // Set filtering
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -80,10 +59,9 @@ public class Sprite {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
-
     }
 
-    public void setColor(float[] textureColor) {
+    private void setColor(float[] textureColor) {
         ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
         cb.order(ByteOrder.nativeOrder());
         colorBuffer = cb.asFloatBuffer();
@@ -91,17 +69,51 @@ public class Sprite {
         colorBuffer.position(0);
     }
 
-    public void setVertices(float[] vertices) {
-        this.vertices = vertices;
-        vertexBuffer.put(this.vertices);
+    private void setVertices(float[] vertices) {
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(vertices);
         vertexBuffer.position(0);
     }
 
-    public void draw(FloatBuffer uvBuffer, float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix) {
-        //set the program
-        GLES20.glUseProgram(mProgram);
-        GLES20.glFlush();
+    private void setIndices(short[] indices){
+        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
+        dlb.order(ByteOrder.nativeOrder());
+        drawListBuffer = dlb.asShortBuffer();
+        drawListBuffer.put(indices);
+        drawListBuffer.position(0);
 
+    }
+
+    public void OffsetChanged(float xOffset, boolean PortraitOrientation){
+        float offsetMultiplier = (spriteData.getZVertices() + 2.0f)/2;
+        if(PortraitOrientation){
+            this.xScrollOffset = -1 * xOffset * offsetMultiplier + (1.05f * offsetMultiplier);
+        }
+        else{
+            this.xScrollOffset = -1 *( (xOffset * offsetMultiplier) +  (-0.15f * offsetMultiplier));
+        }
+    }
+
+    public void SensorChanged(float xOffset, float yOffset){
+        float offsetMultiplier = (spriteData.getZVertices() - 2.0f)/2; // z will be a vertice between 0.0 and 2.0f
+        xAccelOffset = -1 * xOffset * offsetMultiplier;
+        yAccelOffset = -1 * yOffset * offsetMultiplier;
+
+
+    }
+
+    public void SetOrientation(boolean portrait){
+        spriteData.setOrientation(portrait);
+        setVertices(spriteData.getVertices());
+    }
+
+
+    public void draw(FloatBuffer uvBuffer, float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix) {
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
         Matrix.multiplyMM(scratch, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(scratch, 0, mtrxProjection, 0, scratch, 0);
 
