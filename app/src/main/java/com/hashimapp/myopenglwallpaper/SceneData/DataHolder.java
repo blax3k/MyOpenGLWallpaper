@@ -76,7 +76,7 @@ public class DataHolder
             mIndices[(i * 6) + 4] = (short) (last + 2);
             mIndices[(i * 6) + 5] = (short) (last + 3);
 
-            // Our indices are connected to the portraitVertices so we need to keep them
+            // Our indices are connected to the vertices so we need to keep them
             // in the correct order.
             // normal quad = 0,1,2,0,2,3 so the next one will be 4,5,6,4,6,7
             last = last + 4;
@@ -88,7 +88,7 @@ public class DataHolder
     {
         Random rnd = new Random();
 
-        // Our collection of portraitVertices
+        // Our collection of vertices
         float[][] vertices = new float[number][12];
         int swp;
         int shp;
@@ -102,7 +102,7 @@ public class DataHolder
             float offset_x = 0.0f;//rnd.nextFloat() * (maxX - minX) + minX;
             float offset_y = rnd.nextFloat() * (maxY - minY) + minY;
 
-            // Create the 2D parts of our 3D portraitVertices, others are default 0.0f
+            // Create the 2D parts of our 3D vertices, others are default 0.0f
             vertices[i][0] = offset_x;
             vertices[i][1] = offset_y + 1.0f;
             vertices[i][2] = 2.0f;
@@ -119,7 +119,7 @@ public class DataHolder
         return vertices;
     }
 
-    //Sprite portraitVertices
+    //Sprite vertices
     public float[] bld0Vertices = new float[]{
             -3.0f, 0.5f, 0.0f,   // top left
             -3.0f, -2.5f, 0.0f,   // bottom left

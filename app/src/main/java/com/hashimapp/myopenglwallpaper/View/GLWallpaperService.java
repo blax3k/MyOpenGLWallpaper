@@ -12,7 +12,7 @@ import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 public abstract class GLWallpaperService extends WallpaperService {
 
     protected SensorManager sensorManager;
-    protected Sensor sensor;
+    protected Sensor accelerometer;
     boolean rendererSet;
 
     public class GLEngine extends Engine {
@@ -49,7 +49,7 @@ public abstract class GLWallpaperService extends WallpaperService {
             if (rendererSet) {
                 if (visible)//resume
                 {
-//                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+//                    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
                     glSurfaceView.onResume();
                 } else //pause
                 {
