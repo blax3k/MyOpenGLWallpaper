@@ -2,5 +2,5 @@
 <wallpaper
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:thumbnail="@drawable/wp2_bld0"
-    android:settingsActivity="com.hashimapp.myopenglwallpaper.MyPreferencesActivity" />
+    android:settingsActivity="com.hashimapp.myopenglwallpaper.View.SettingsActivity" />
 
