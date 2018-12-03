@@ -10,8 +10,6 @@ import android.view.animation.LinearInterpolator;
 public class GLCamera {
     float[] mtrxProjection;
     float[] mtrxView;
-    float oldOffset;
-    private static float fovy;
 
     private static float X_OFFSET_STEP_PORTRAIT = 2.1F;
     private static float X_OFFSET_STEP_LANDSCAPE = 0.3F;
@@ -31,21 +29,14 @@ public class GLCamera {
     private float upY = 1.0f;
     private float upZ = 0.0f;
 
-    private float prevAccelValues[];
-    private float[] sensorData;
 
     private boolean portraitOrientation;
-
-    private LinearInterpolator interpolator;
 
     private float offsetDifferenceX;
 
     public GLCamera() {
         mtrxProjection = new float[16];
         mtrxView = new float[16];
-        prevAccelValues = new float[3];
-        sensorData = new float[2];
-        interpolator = new LinearInterpolator();
     }
 
     public void OnSurfaceChanged(int width, int height) {
@@ -98,10 +89,7 @@ public class GLCamera {
         }
     }
 
-    private static final float NS2S = 1.0f / 1000000000.0f;
-    private final float[] deltaRotationVector = new float[4];
     private float timestamp;
-    private final float EPSILON = 1.01f;
     float[] finalValues = new float[3];
 
     /*

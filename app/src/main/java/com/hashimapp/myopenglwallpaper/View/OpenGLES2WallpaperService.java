@@ -18,9 +18,6 @@ import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
-import com.hashimapp.myopenglwallpaper.R;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by Blake Hashimoto on 8/14/2015.
@@ -58,6 +55,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
+            Log.d("wall_startup", "tried launching OpenGLES2WallpaperService");
             super.onCreate(surfaceHolder);
             //check for GLES2 support
             final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
