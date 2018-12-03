@@ -8,8 +8,8 @@ import android.view.Surface;
 import android.view.animation.LinearInterpolator;
 
 public class GLCamera {
-    private float[] mtrxProjection;
-    private float[] mtrxView;
+    float[] mtrxProjection;
+    float[] mtrxView;
     float oldOffset;
     private static float fovy;
 
