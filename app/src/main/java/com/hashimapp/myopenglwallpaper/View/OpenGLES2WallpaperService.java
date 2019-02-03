@@ -49,6 +49,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
 
     class OpenGLES2Engine extends GLWallpaperService.GLEngine implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener{
+
         OpenGLES2Engine() {
             super();
         }
@@ -64,6 +65,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
             initSensor();
             initScreenEvent();
+            prefs.registerOnSharedPreferenceChangeListener(this);
 
             if (supportsEs2) {
                 setEGLContextClientVersion(2);
@@ -72,27 +74,20 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
             } else {
                 return;
             }
+
+            initRendererFromPrefs();
         }
 
-        private void initScreenEvent() {
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-            intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-            registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                        renderer.ResetMotionOffset();
-                    } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                    }
-                }
-            }, intentFilter);
 
+        private void initRendererFromPrefs(){
+            renderer.SetMotionOffsetStrength(prefs.getInt("motion_parallax_strength", 6));
         }
 
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
                                      float yStep, int xPixels, int yPixels) {
             renderer.OnOffsetChanged(xOffset, yOffset);
+            glSurfaceView.requestRender();
         }
 
 
@@ -100,6 +95,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 renderer.OnSensorChanged(event, display.getRotation());
+                glSurfaceView.requestRender();
             }
         }
 
@@ -108,6 +104,8 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
         }
 
+
+
         @Override
         public void onVisibilityChanged(boolean visible) {
             if (rendererSet) {
@@ -115,6 +113,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
                 if (visible && motionParallaxEnabled) {
                     sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+                    glSurfaceView.requestRender();
                 } else{
                     sensorManager.unregisterListener(this);
                     renderer.ResetMotionOffset();
@@ -125,6 +124,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d("prefsChange", "preferences changed");
             switch(key){
                 case "motion_parallax":
                     if(sharedPreferences.getBoolean("motion_parallax", true)){
@@ -133,6 +133,9 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
                         sensorManager.unregisterListener(this);
                         renderer.ResetMotionOffset();
                     }
+                    break;
+                case "motion_parallax_strength":
+                    renderer.SetMotionOffsetStrength(sharedPreferences.getInt("motion_parallax_strength", 6));
                     break;
             }
         }
@@ -149,6 +152,21 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 //            super.onSurfaceRedrawNeeded(holder);
 //        }
 
+
+        private void initScreenEvent() {
+            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+            intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                        renderer.ResetMotionOffset();
+                    } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    }
+                }
+            }, intentFilter);
+
+        }
 
         private void initSensor() {
             sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);

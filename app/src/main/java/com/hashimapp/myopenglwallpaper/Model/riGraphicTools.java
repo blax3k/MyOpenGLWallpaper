@@ -52,13 +52,11 @@ public class riGraphicTools {
 			"}";
 
 	public static final String fs_Image =
-					"precision mediump float;" +
 					"varying vec2 v_texCoord;" +
 					"varying vec4 v_Color;" +
 					"uniform sampler2D s_texture;" +
 					"void main() {" +
 					"  gl_FragColor = texture2D( s_texture, v_texCoord ) * v_Color;" +
-					"  gl_FragColor.rgb *= v_Color.a;" +
 					"}";
 
 	public static final String vs_Color =

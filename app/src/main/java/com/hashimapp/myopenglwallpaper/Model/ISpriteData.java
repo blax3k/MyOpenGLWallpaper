@@ -3,10 +3,9 @@ package com.hashimapp.myopenglwallpaper.Model;
 interface ISpriteData {
 
     int getTextureIndex();
-    float[] getColor();
-    float[] getVertices();
-    int getBitmapID();
-    int getGLImageID();
+    float[] getColor(int time);
+    float[] getShapeVertices();
+    float[] getTextureVertices();
     short[] getIndices();
     float getZVertices();
     void setOrientation(boolean portrait);

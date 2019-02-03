@@ -5,11 +5,16 @@ public class SpriteData implements ISpriteData {
 
     protected float[] portraitVertices;
     protected float[] landscapeVertices;
+    protected float[] textureVertices;
     protected int textureIndex;
-    protected int glImageID;
-    protected int bitmapID;
+    //    protected int glImageID;
+//    protected int bitmapID;
     protected short[] indices;
     protected float[] defaultColor;
+    protected float[] dawnColor;
+    protected float[] dayColor;
+    protected float[] sunsetColor;
+    protected float[] nightColor;
     protected float zVertice;
     protected boolean portrait = true;
 
@@ -19,30 +24,35 @@ public class SpriteData implements ISpriteData {
     }
 
     @Override
-    public float[] getColor() {
+    public float[] getColor(int timeOfDay) {
+        switch (timeOfDay) {
+            case TimeTracker.DAWN:
+                return dawnColor;
+            case TimeTracker.DAY:
+                return dayColor;
+            case TimeTracker.SUNSET:
+                return sunsetColor;
+            case TimeTracker.NIGHT:
+                return nightColor;
+        }
         return defaultColor;
     }
 
     @Override
-    public float[] getVertices() {
-        if(portrait){
+    public float[] getShapeVertices() {
+        if (portrait) {
             return portraitVertices;
-        }else
+        } else
             return landscapeVertices;
     }
 
     @Override
-    public int getBitmapID() {
-        return bitmapID;
+    public float[] getTextureVertices() {
+        return textureVertices;
     }
 
     @Override
-    public int getGLImageID() {
-        return glImageID;
-    }
-
-    @Override
-    public short[] getIndices(){
+    public short[] getIndices() {
         return indices;
     }
 
@@ -52,7 +62,7 @@ public class SpriteData implements ISpriteData {
     }
 
     @Override
-    public void setOrientation(boolean portrait){
+    public void setOrientation(boolean portrait) {
         this.portrait = portrait;
     }
 

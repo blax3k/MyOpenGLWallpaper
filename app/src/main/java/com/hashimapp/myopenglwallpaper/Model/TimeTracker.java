@@ -13,6 +13,12 @@ import java.util.GregorianCalendar;
  */
 public class TimeTracker
 {
+    public static final int DAWN = 1;
+    public static final int DAY = 2;
+    public static final int SUNSET = 3;
+    public static final int NIGHT = 4;
+
+
     Calendar calendar;
     Date currentTime;
     int nightBegin = 20;

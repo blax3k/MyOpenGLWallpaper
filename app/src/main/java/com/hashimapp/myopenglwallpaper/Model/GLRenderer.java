@@ -1,45 +1,37 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Date;
-import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.app.usage.UsageEvents;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
-import android.opengl.Matrix;
-
-import com.hashimapp.myopenglwallpaper.SceneData.TestImage;
-import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
+import android.os.SystemClock;
 
 public class GLRenderer implements Renderer {
 
     // Geometric variables
-    public float uvs[], uvs2[][];
-    public FloatBuffer uvBuffer;
+    public static final int COLOR_HANDLE = 1;
+    public static final int POSITION_HANDLE = 2;
+    public static final int TEXTURE_COORD_LOCATION = 3;
+    public static final int MATRIX_HANDLE = 4;
+    public static final int SAMPLER_LOCATION = 5;
+
     int[] texturenames;
     SceneSetter sceneSetter;
     // Our screen resolution
     float mScreenWidth = 1280;
     float mScreenHeight = 768;
-//    Sprite sky, template;
+    //    Sprite sky, template;
     Date dateCreated;
 
     // Our matrices
     private int NUMBEROFCLOUDS = 16;
     public final float[][] cloudMVPMatrix = new float[NUMBEROFCLOUDS][16];
     public FloatBuffer[] cloudUVBuffer = new FloatBuffer[NUMBEROFCLOUDS];
-    private float[] mModelMatrix = new float[16];
-    private int mProgram;
 
     public GLCamera camera;
 
@@ -54,14 +46,19 @@ public class GLRenderer implements Renderer {
         sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
     }
 
+    float[] prevSensorValues = new float[3];
+
     public void OnSensorChanged(SensorEvent event, int rotation) {
         float[] newSensorValues = camera.SensorChanged(event, rotation);
+        prevSensorValues[0] = newSensorValues[0];
+        prevSensorValues[1] = newSensorValues[1];
         sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
     }
 
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        startTime = System.currentTimeMillis();
         sceneSetter = new SceneSetter();
         // Set the clear color to white
         GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
@@ -88,46 +85,57 @@ public class GLRenderer implements Renderer {
 
         // Set our shader program
         GLES20.glUseProgram(riGraphicTools.sp_Image);
+        GLES20.glDepthMask(false);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         //load the images
         loadTextures();
 
     }
 
-    public void ResetMotionOffset(){
+    public void ResetMotionOffset() {
         camera.ResetSensorOffset();
         sceneSetter.SensorChanged(0, 0);
     }
 
+    public void SetMotionOffsetStrength(int offsetStrength) {
+        camera.setMotionOffsetStrength(offsetStrength);
+    }
+
+
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT );
+        GLES20.glFlush();
+
         // We need to know the current width and height.
-            mScreenWidth = width;
-            mScreenHeight = height;
-            GLES20.glViewport(0, 0, width, height);
+        mScreenWidth = width;
+        mScreenHeight = height;
+        GLES20.glViewport(0, 0, width, height);
 
 //            String temp = preferences.getString("camera_blur", "none");
 //            sceneSetter.setBlur(temp);
 
-            camera.OnSurfaceChanged(width, height);
-            sceneSetter.SetOrientation(camera.IsPortrait());
+        camera.OnSurfaceChanged(width, height);
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition());
     }
 
 
     private void loadTextures() {
         // Create our UV coordinates.
-        uvs = new float[]{
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
-        };
-
-        // The texture buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        uvBuffer = bb.asFloatBuffer();
-        uvBuffer.put(uvs);
-        uvBuffer.position(0);
+//        textureCoordinates = new float[]{
+//                0.0f, 0.0f,
+//                0.0f, 1.0f,
+//                2.0f, 1.0f,
+//                1.0f, 0.0f
+//        };
+//
+//        // The texture buffer
+//        ByteBuffer bb = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
+//        bb.order(ByteOrder.nativeOrder());
+//        textureCoordinateBuffer = bb.asFloatBuffer();
+//        textureCoordinateBuffer.put(textureCoordinates);
+//        textureCoordinateBuffer.position(0);
 
         //cloud texture buffer
 //        Random rnd = new Random();
@@ -165,10 +173,23 @@ public class GLRenderer implements Renderer {
         // Temporary create a bitmap
     }
 
+    private int mFPS = 0;         // the value to show
+    private int mFPSCounter = 0;  // the value to count
+    private long mFPSTime = 0;     // last update time
+
+    long lastFrameTime;
+    long endTime, deltaTime, startTime;
+
     @Override
     public void onDrawFrame(GL10 unused) {
+        if (SystemClock.uptimeMillis() - mFPSTime > 1000) {
+            mFPSTime = SystemClock.uptimeMillis();
+            mFPS = mFPSCounter;
+            mFPSCounter = 0;
+        } else {
+            mFPSCounter++;
+        }
 
-        GLES20.glFlush();
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 //        // Enable alpha blending.
 //        GLES20.glEnable(GLES20.GL_BLEND);
@@ -185,12 +206,13 @@ public class GLRenderer implements Renderer {
 //		GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
 
 
-        GLES20.glUseProgram(riGraphicTools.sp_Image);
         // Calculate the projection and view
 
-        sceneSetter.DrawSprites(uvBuffer, camera.mtrxView, camera.mtrxProjection, mModelMatrix);
+        synchronized (this){
+            sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix);
+        }
 
-//        sky.draw(uvBuffer, camera.mtrxView, camera.mtrxProjection, mModelMatrix);
+//        sky.draw(textureVerticeBuffer, camera.mtrxView, camera.mtrxProjection, mModelMatrix);
         //change the program being used
 
         //draw the clouds
@@ -200,6 +222,10 @@ public class GLRenderer implements Renderer {
 //		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
 //		clouds.draw(cloudMVPMatrix, cloudUVBuffer, sceneSetter.getTextureIndex(SceneModel.CLOUDS), mModelMatrix,
 //				mtrxView, mtrxProjection, xScrollOffset, yOffset);
+
+        GLES20.glUseProgram(riGraphicTools.sp_Image);
+
+//        }
 
     }
 

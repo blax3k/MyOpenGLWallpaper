@@ -10,7 +10,11 @@
             android:title="@string/motion_parallax_setting_title"
             android:defaultValue="@string/motion_parallax_default"/>
 
-
+        <SeekBarPreference
+            android:key="motion_parallax_strength"
+            android:title="@string/motion_parallax_strength_setting_title"
+            android:max="6"
+            android:defaultValue="3"/>
     </PreferenceCategory>
 
 

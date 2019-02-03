@@ -2,15 +2,14 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.hashimapp.myopenglwallpaper.SceneData.DataHolder;
-import com.hashimapp.myopenglwallpaper.SceneData.SpriteOne;
-import com.hashimapp.myopenglwallpaper.SceneData.TestImage;
+import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.TemplateSprite;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 
 import java.nio.FloatBuffer;
@@ -31,15 +30,20 @@ public class SceneSetter
     public final static int NIGHT = 34;
     public final static int FOUR_EIGHTY_P = 34;
 
-    private int blurSetting;
+    Textures textures;
     Random randomGenerator;
     private int girlTextureChoice;
-
 
     SharedPreferences preferences;
     Context context;
     TimeTracker timeTracker;
     List<Sprite> spriteList;
+    ;
+    private int mColorHandle;
+    private int mPositionHandle;
+    private int mTexCoordLoc;
+    private int mtrxHandle;
+    private int mSamplerLoc;
 
 
     public SceneSetter()
@@ -47,25 +51,37 @@ public class SceneSetter
         context = OpenGLES2WallpaperService.getAppContext();
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
         randomGenerator = new Random();
-        shuffleScene();
         timeTracker = new TimeTracker();
         spriteList = new ArrayList<>();
+        textures = new Textures(this.context);
+        textures.InitTextures();
         initSprites();
     }
 
-    public void initSprites(){
-        spriteList.add(new Sprite(new SpriteOne()));
-        spriteList.add(new Sprite(new TestImage()));
 
-        for(Sprite sprite : spriteList){
-            sprite.SetTexture(context);
-        }
+    public void initSprites(){
+        int timeOfDay = timeTracker.getDayHour();
+        spriteList.add(new Sprite(new BackgroundSprite(), timeOfDay));
+        spriteList.add(new Sprite(new GirlSprite(), timeOfDay));
+        spriteList.add(new Sprite(new TemplateSprite(), timeOfDay));
+        //enable transparency
+//
+//        for(Sprite sprite : spriteList){
+//            sprite.SetTexture(context);
+//        }
 
     }
 
-    public void DrawSprites(FloatBuffer uvBuffer, float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix){
+    float[] scratch = new float[16];
+
+    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix){
+//        GLES20.glEnable(GLES20.GL_BLEND);
+//        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+
         for(Sprite sprite : spriteList){
-            sprite.draw(uvBuffer, mtrxView, mtrxProjection, mModelMatrix);
+            sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mColorHandle,
+                        mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch);
         }
     }
 
@@ -81,37 +97,26 @@ public class SceneSetter
         }
     }
 
-    public void SetOrientation(boolean portrait){
+    public void SurfaceChanged(boolean portrait, float spriteXPosOffset){
+        GetMembers();
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
         for(Sprite sprite : spriteList){
-            sprite.SetOrientation(portrait);
+            sprite.SetOrientation(portrait, spriteXPosOffset);
         }
     }
+    private void GetMembers() {
+        // get handle to vertex shader's vPosition member
+        mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
+        // get handle to vertex shader's vPosition member
+        mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
+        mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
+        // Get handle to shape's transformation matrix and apply it
+        mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
+        // Get handle to textures locations
+        mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
 
-
-    public boolean shuffleScene()
-    {
-        String choice = preferences.getString("texture_model", "3");
-        if (choice.equals("0"))
-        {
-            shuffleGirl();
-            return true;
-        }
-        return false;
     }
 
-
-    private void shuffleGirl()
-    {
-        Log.d("Scene Setter", "girl was shuffled. chose: " + girlTextureChoice);
-        int choice = randomGenerator.nextInt(5);
-        if (choice == girlTextureChoice)
-        {
-            if (choice == 5)
-                choice = 5 - randomGenerator.nextInt(3) + 1;
-            else
-                choice++;
-        }
-        girlTextureChoice = choice;
-        Log.d("Scene Setter", "girl was shuffled. chose: " + girlTextureChoice);
-    }
 }

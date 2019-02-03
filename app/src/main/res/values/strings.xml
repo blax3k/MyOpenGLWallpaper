@@ -44,6 +44,8 @@
     <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
     <string name="motion_parallax_default">true</string>
 
+    <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
+
 
 
 </resources>

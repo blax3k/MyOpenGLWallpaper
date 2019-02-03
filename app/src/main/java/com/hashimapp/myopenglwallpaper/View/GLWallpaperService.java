@@ -51,6 +51,7 @@ public abstract class GLWallpaperService extends WallpaperService {
                 {
 //                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                     glSurfaceView.onResume();
+                    glSurfaceView.requestRender();
                 } else //pause
                 {
 //                    sensorManager.unregisterListener(this);
@@ -75,6 +76,7 @@ public abstract class GLWallpaperService extends WallpaperService {
             this.renderer = (GLRenderer)newRenderer;
             glSurfaceView.setRenderer(newRenderer);
             rendererSet = true;
+            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         }
 
 
