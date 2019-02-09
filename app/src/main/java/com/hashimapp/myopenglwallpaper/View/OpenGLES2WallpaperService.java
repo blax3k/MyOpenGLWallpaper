@@ -81,6 +81,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
         private void initRendererFromPrefs(){
             renderer.SetMotionOffsetStrength(prefs.getInt("motion_parallax_strength", 6));
+            renderer.SetMotionOffset(prefs.getBoolean("motion_parallax", true));
         }
 
         @Override
@@ -129,8 +130,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
                 case "motion_parallax":
                     if(sharedPreferences.getBoolean("motion_parallax", true)){
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+                        renderer.SetMotionOffset(true);
                     }else{
                         sensorManager.unregisterListener(this);
+                        renderer.SetMotionOffset(false);
                         renderer.ResetMotionOffset();
                     }
                     break;

@@ -42,14 +42,14 @@ public class Sprite {
         textureIndex = spriteData.getTextureIndex();
 
         setColor(colors);
-        setVertices(spriteData.getShapeVertices());
+        setVertices(spriteData.getShapeVertices(true, false));
         setTextureVertices(spriteData.getTextureVertices());
         setIndices(indices);
     }
 
     public void OffsetChanged(float xOffset, boolean PortraitOrientation){
         //parallax motion determined by how "far" the sprite is from the camera
-        float offsetMultiplier = (spriteData.getZVertices() + 2.0f)/2;
+        float offsetMultiplier = (spriteData.getZVertices() + 1.0f);
         if(PortraitOrientation){
             this.xScrollOffset = -1 //reverse movement
                     * xOffset * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
@@ -62,47 +62,45 @@ public class Sprite {
 
 
     public void SensorChanged(float xOffset, float yOffset){
-        float offsetMultiplier = (spriteData.getZVertices() - 0.4f); // z will be a vertice between 0.0 and 2.0f
+        float offsetMultiplier = (spriteData.getZVertices()) * 2.0f + 0.2f; // z will be a vertice between 0.0 and -1.0f
         xAccelOffset = -1 * xOffset * offsetMultiplier;
         yAccelOffset = -1 * yOffset * offsetMultiplier;
-
-
     }
 
-    public void SetOrientation(boolean portrait, float spriteXPosOffset){
+    public void SetOrientation(boolean portrait, boolean motionOffset, float spriteXPosOffset){
         spriteData.setOrientation(portrait);
-        float offsetMultiplier = (spriteData.getZVertices() + 2.0f)/2;
+        float offsetMultiplier = (spriteData.getZVertices() + 1.0f);
         this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
-        setVertices(spriteData.getShapeVertices());
+        setVertices(spriteData.getShapeVertices(portrait, motionOffset));
     }
 
         boolean test = true;
     public void draw( float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, int mColorHandle, int mPositionHandle, int mTexCoordLoc
     , int mtrxHandle, int mSamplerLoc, float[] mMVPMatrix) {
 
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
-        Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
-        Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
+            Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
+            Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 
-//        GLES20.glEnableVertexAttribArray(mColorHandle);
-        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+            GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
 
-//        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer);
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer);
 
-        // Get handle to texture coordinates location
-//        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
-        GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT, false, 0, textureVerticeBuffer);
+            // Get handle to texture coordinates location
+        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
+            GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT, false, 0, textureVerticeBuffer);
 
-        GLES20.glUniformMatrix4fv(mtrxHandle, 1, false, mMVPMatrix, 0);
+            GLES20.glUniformMatrix4fv(mtrxHandle, 1, false, mMVPMatrix, 0);
 
-        // Set the sampler texture unit to x, where we have saved the texture.
-        GLES20.glUniform1i(mSamplerLoc, textureIndex);
+            // Set the sampler texture unit to x, where we have saved the texture.
+            GLES20.glUniform1i(mSamplerLoc, textureIndex);
 //        GLES20.glUniform4fv(mColorHandle, 1, colors, 0);
 
-        // Draw the triangle
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+            // Draw the triangle
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
 //        // Disable vertex array
 //        GLES20.glDisableVertexAttribArray(mPositionHandle);

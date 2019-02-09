@@ -4,7 +4,9 @@ package com.hashimapp.myopenglwallpaper.Model;
 public class SpriteData implements ISpriteData {
 
     protected float[] portraitVertices;
+    protected float[] portraitVerticesMotion;
     protected float[] landscapeVertices;
+    protected float[] landscapeVerticesMotion;
     protected float[] textureVertices;
     protected int textureIndex;
     //    protected int glImageID;
@@ -39,11 +41,22 @@ public class SpriteData implements ISpriteData {
     }
 
     @Override
-    public float[] getShapeVertices() {
-        if (portrait) {
+    public float[] getShapeVertices(boolean portrait, boolean motionOffset) {
+        if (portrait)
+        {
+            if(motionOffset)
+            {
+                return portraitVerticesMotion;
+            }
             return portraitVertices;
         } else
+        {
+            if(motionOffset)
+            {
+                return landscapeVerticesMotion;
+            }
             return landscapeVertices;
+        }
     }
 
     @Override
@@ -65,5 +78,6 @@ public class SpriteData implements ISpriteData {
     public void setOrientation(boolean portrait) {
         this.portrait = portrait;
     }
+
 
 }

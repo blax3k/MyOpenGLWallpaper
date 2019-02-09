@@ -21,9 +21,9 @@ public class Textures {
     }
 
     public void InitTextures(){
-        setTexture(R.drawable.bgs,          GLES20.GL_TEXTURE0, BACKGROUND_TEXTURE_INDEX);
-        setTexture(R.drawable.wp_templates, GLES20.GL_TEXTURE1, TEMPLATE_TEXTURE_INDEX);
-        setTexture(R.drawable.girl,         GLES20.GL_TEXTURE2, GIRL_TEXTURE_INDEX);
+        setTexture(R.drawable.layer2,          GLES20.GL_TEXTURE0, BACKGROUND_TEXTURE_INDEX);
+        setTexture(R.drawable.layer0,          GLES20.GL_TEXTURE1, TEMPLATE_TEXTURE_INDEX);
+        setTexture(R.drawable.layer1,          GLES20.GL_TEXTURE2, GIRL_TEXTURE_INDEX);
     }
 
     private void setTexture(int bitmapId, int GLImageID, int textureIndex){

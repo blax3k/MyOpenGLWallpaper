@@ -1,7 +1,10 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Date;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -93,6 +96,10 @@ public class GLRenderer implements Renderer {
 
     }
 
+    public void SetMotionOffset(boolean motionOffsetOn){
+        camera.SetMotionOffset(motionOffsetOn);
+    }
+
     public void ResetMotionOffset() {
         camera.ResetSensorOffset();
         sceneSetter.SensorChanged(0, 0);
@@ -117,31 +124,31 @@ public class GLRenderer implements Renderer {
 //            sceneSetter.setBlur(temp);
 
         camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition());
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetMotionOffsetOn(), camera.GetXOffsetPosition());
     }
 
 
     private void loadTextures() {
-        // Create our UV coordinates.
-//        textureCoordinates = new float[]{
+//        // Create our UV coordinates.
+//        float[] textureCoordinates = new float[]{
 //                0.0f, 0.0f,
 //                0.0f, 1.0f,
 //                2.0f, 1.0f,
 //                1.0f, 0.0f
 //        };
-//
+////
 //        // The texture buffer
 //        ByteBuffer bb = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
 //        bb.order(ByteOrder.nativeOrder());
 //        textureCoordinateBuffer = bb.asFloatBuffer();
 //        textureCoordinateBuffer.put(textureCoordinates);
 //        textureCoordinateBuffer.position(0);
-
-        //cloud texture buffer
+//
+////        cloud texture buffer
 //        Random rnd = new Random();
 //
 //        // 30 image objects times 4 portraitVertices times (u and v)
-//        uvs2 = new float[NUMBEROFCLOUDS][4 * 2];
+//        float[][] uvs2 = new float[NUMBEROFCLOUDS][4 * 2];
 //
 //        // We will make 30 randomly textures objects
 //        for (int i = 0; i < uvs2.length; i++) {

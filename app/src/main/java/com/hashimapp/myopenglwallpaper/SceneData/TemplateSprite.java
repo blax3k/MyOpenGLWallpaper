@@ -8,24 +8,37 @@ import com.hashimapp.myopenglwallpaper.R;
 
 public class TemplateSprite extends SpriteData {
 
-    public TemplateSprite(){
-        zVertice =  0.0f;
+    public TemplateSprite() {
+        zVertice = -0.0f;
         portraitVertices = new float[]{
-                -2.4f,  2.4f, 0.0f,   // top left
+                -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
-                 2.4f, -2.4f, 0.0f,   // bottom right
-                 2.4f,  2.4f, 0.0f }; // top right
+                2.4f, -2.4f, 0.0f,   // bottom right
+                2.4f, 2.4f, 0.0f}; // top right
+
+        portraitVerticesMotion = new float[]{
+                -2.4f, 2.4f, 0.0f,   // top left
+                -2.4f, -2.4f, 0.0f,   // bottom left
+                2.4f, -2.4f, 0.0f,   // bottom right
+                2.4f, 2.4f, 0.0f}; // top right
 
         landscapeVertices = new float[]{
-                -2.6f,  2.6f, 0.0f,   // top left
-                -2.6f, -2.6f, 0.0f,   // bottom left
-                2.6f, -2.6f, 0.0f,   // bottom right
-                2.6f,  2.6f, 0.0f }; // top right
+                -2.4f, 2.4f, 0.0f,   // top left
+                -2.4f, -2.4f, 0.0f,   // bottom left
+                2.4f, -2.4f, 0.0f,   // bottom right
+                2.4f, 2.4f, 0.0f}; // top right
+
+        landscapeVerticesMotion = new float[]{
+                -2.4f, 2.4f, 0.0f,   // top left
+                -2.4f, -2.4f, 0.0f,   // bottom left
+                2.4f, -2.4f, 0.0f,   // bottom right
+                2.4f, 2.4f, 0.0f}; // top right
+
 
         textureIndex = Textures.TEMPLATE_TEXTURE_INDEX;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
-                       {1f, 1f, 1f, 1f,
+                {1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};

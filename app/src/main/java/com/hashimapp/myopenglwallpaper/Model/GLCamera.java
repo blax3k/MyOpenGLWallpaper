@@ -26,7 +26,7 @@ public class GLCamera {
 
 
     private static float FOV_PORTRAIT = 100.0f;
-    private static float FOV_LANDSCAPE = 68.0f;
+    private static float FOV_LANDSCAPE = 100.0f;
     // Position the eye in front of the origin.
     private float eyeX = 0.0f;
     private float eyeY = 0.0f;
@@ -43,7 +43,7 @@ public class GLCamera {
     private float motionOffsetLimit;
     private float motionOffsetStrength;
     private boolean portraitOrientation;
-    private float offsetDifferenceX;
+    private boolean motionOffsetOn;
 
     private int screenWidth = 1;
     private int screenHeight = 1;
@@ -62,21 +62,17 @@ public class GLCamera {
         float fov;
         if (height > width) //portrait
         {
-            eyeX = 0.0f;
-//            eyeZ = 3.0f;
             fov = FOV_PORTRAIT;
             portraitOrientation = true;
-            offsetDifferenceX = X_OFFSET_STEP_PORTRAIT;
         } else //landscape
         {
-            eyeX = 0.0f;
-//            eyeZ = 2.0f;
-            fov = FOV_LANDSCAPE;
+            float fovWidth = ((TEXTURE_WIDTH * screenWidth) / screenHeight)/2;
+            float depth = fovWidth/(float)Math.tan(Math.toRadians(FOV_PORTRAIT/2));
+            fov = (float) Math.toDegrees(Math.atan((TEXTURE_WIDTH/2)/depth)) * 2;
             portraitOrientation = false;
-            offsetDifferenceX = X_OFFSET_STEP_LANDSCAPE;
         }
         lookX = eyeX;
-        Matrix.perspectiveM(mtrxProjection, 0, fov, ratio, 1, 12);
+        Matrix.perspectiveM(mtrxProjection, 0, fov, ratio, 0, 12);
         Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
     }
 
@@ -93,9 +89,12 @@ public class GLCamera {
         } else if (xOffset < 0.0f) {
             return 0.0f;
 
-        } else {
-            return xOffset * offsetDifferenceX;
-//            return interpolator.getInterpolation(xScrollOffset * offsetDifferenceX);
+        } else if(portraitOrientation) {
+            float relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
+            float screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
+            return xOffset * screenWidthDiff;
+        }else{
+            return xOffset * X_OFFSET_STEP_LANDSCAPE;
         }
     }
 
@@ -166,6 +165,14 @@ public class GLCamera {
         // User code should concatenate the delta rotation we computed with the current rotation
         // in order to get the updated rotation.
         // rotationCurrent = rotationCurrent * deltaRotationMatrix;
+    }
+
+    public void SetMotionOffset(boolean motionOffsetOn){
+        this.motionOffsetOn = motionOffsetOn;
+    }
+
+    public boolean GetMotionOffsetOn(){
+        return motionOffsetOn;
     }
 
     public void ResetSensorOffset(){

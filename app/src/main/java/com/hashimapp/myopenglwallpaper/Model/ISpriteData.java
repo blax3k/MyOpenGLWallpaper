@@ -4,7 +4,7 @@ interface ISpriteData {
 
     int getTextureIndex();
     float[] getColor(int time);
-    float[] getShapeVertices();
+    float[] getShapeVertices(boolean portrait, boolean motionOffset);
     float[] getTextureVertices();
     short[] getIndices();
     float getZVertices();

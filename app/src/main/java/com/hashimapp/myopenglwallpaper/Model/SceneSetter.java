@@ -97,13 +97,13 @@ public class SceneSetter
         }
     }
 
-    public void SurfaceChanged(boolean portrait, float spriteXPosOffset){
+    public void SurfaceChanged(boolean portrait, boolean motionOffset, float spriteXPosOffset){
         GetMembers();
-        GLES20.glEnableVertexAttribArray(mColorHandle);
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
+//        GLES20.glEnableVertexAttribArray(mColorHandle);
+//        GLES20.glEnableVertexAttribArray(mPositionHandle);
+//        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
         for(Sprite sprite : spriteList){
-            sprite.SetOrientation(portrait, spriteXPosOffset);
+            sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset);
         }
     }
     private void GetMembers() {
