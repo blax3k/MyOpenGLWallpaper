@@ -6,17 +6,24 @@
         android:title="@string/setting_movement_section">
 
         <SwitchPreference
-            android:key="motion_parallax"
+            android:key="@string/motion_parallax_key"
             android:title="@string/motion_parallax_setting_title"
             android:defaultValue="@string/motion_parallax_default"/>
 
         <SeekBarPreference
-            android:key="motion_parallax_strength"
+            android:key="@string/motion_parallax_strength_key"
             android:title="@string/motion_parallax_strength_setting_title"
             android:max="6"
             android:defaultValue="3"/>
     </PreferenceCategory>
 
+
+    <ListPreference
+        android:key="@string/set_time_key"
+        android:defaultValue="@integer/int_time_automatic"
+        android:entries="@array/timeArray"
+        android:entryValues="@array/timeArray"
+        android:title="@string/set_time_title" />
 
     <ListPreference
         android:defaultValue="0"
@@ -32,12 +39,6 @@
         android:key="camera_blur"
         android:title="Camera Blur" />
 
-    <ListPreference
-        android:defaultValue="30"
-        android:entries="@array/timeArray"
-        android:entryValues="@array/timeValues"
-        android:key="set_time"
-        android:title="@string/set_time_title" />
 
     <Preference
         android:key="view_artist"

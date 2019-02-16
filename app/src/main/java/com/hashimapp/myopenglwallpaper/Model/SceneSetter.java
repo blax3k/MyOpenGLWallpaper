@@ -2,17 +2,18 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
+import android.opengl.GLUtils;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.TemplateSprite;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,14 +23,6 @@ import java.util.Random;
  */
 public class SceneSetter
 {
-
-    public final static int AUTOMATIC = 30;
-    public final static int DAWN = 31;
-    public final static int DAY = 32;
-    public final static int SUNSET = 33;
-    public final static int NIGHT = 34;
-    public final static int FOUR_EIGHTY_P = 34;
-
     Textures textures;
     Random randomGenerator;
     private int girlTextureChoice;
@@ -45,6 +38,8 @@ public class SceneSetter
     private int mtrxHandle;
     private int mSamplerLoc;
 
+    boolean swapTextures = false;
+
 
     public SceneSetter()
     {
@@ -56,6 +51,11 @@ public class SceneSetter
         textures = new Textures(this.context);
         textures.InitTextures();
         initSprites();
+    }
+
+    public void swapTextures(){
+        swapTextures = true;
+//        textures.SwapTextures();
     }
 
 
@@ -75,14 +75,29 @@ public class SceneSetter
     float[] scratch = new float[16];
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix){
-//        GLES20.glEnable(GLES20.GL_BLEND);
-//        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
+        if(swapTextures){
+            textures.SwapTextures();
+            swapTextures = false;
+        }
 
         for(Sprite sprite : spriteList){
             sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mColorHandle,
-                        mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch);
+                        mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch, textures.textureNames);
         }
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(mColorHandle);
+        GLES20.glDisableVertexAttribArray(mTexCoordLoc);
+    }
+
+    public void SetTimeOfDay(int time){
+        for(Sprite sprite : spriteList){
+            sprite.SetTime(time);
+        }
+
     }
 
     public void OffsetChanged(float xOffset, boolean portraitOrientation){

@@ -33,6 +33,10 @@
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_high">Heavy camera blur</string>
 
+    <string name="motion_parallax_key">motion_parallax</string>
+    <string name="motion_parallax_strength_key">motion_parallax_strength</string>
+
+    <string name="set_time_key">set_time</string>
     <string name="time_automatic">Automatic</string>
     <string name="time_dawn">Dawn</string>
     <string name="time_day">Day</string>

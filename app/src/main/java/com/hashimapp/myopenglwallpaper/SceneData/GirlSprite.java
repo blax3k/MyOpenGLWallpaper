@@ -1,5 +1,7 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
+import android.opengl.GLES20;
+
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
 
@@ -32,12 +34,36 @@ public class GirlSprite extends SpriteData {
                 2.5f, 2.5f, 0.0f}; // top right
 
         textureIndex = Textures.GIRL_TEXTURE_INDEX;
+        TexIndex = GLES20.GL_TEXTURE1;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
+
+        dawnColor = new float[]
+                        {0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,};
+
+        dayColor = new float[]
+                {1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f};
+
+        sunsetColor = new float[]{0.92f, 0.45f, 0.098f, 1f,
+                                  0.92f, 0.45f, 0.098f, 1f,
+                                  0.92f, 0.45f, 0.098f, 1f,
+                                  0.92f, 0.45f, 0.098f, 1f,};
+
+        nightColor = new float[]
+                {0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,
+                        0f, 0.17f, 0.27f, 1f,};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,

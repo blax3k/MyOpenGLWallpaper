@@ -19,10 +19,16 @@ public class SpriteData implements ISpriteData {
     protected float[] nightColor;
     protected float zVertice;
     protected boolean portrait = true;
+    protected int TexIndex;
 
     @Override
     public int getTextureIndex() {
         return textureIndex;
+    }
+
+    @Override
+    public int getTexIndex() {
+        return TexIndex;
     }
 
     @Override
@@ -78,6 +84,5 @@ public class SpriteData implements ISpriteData {
     public void setOrientation(boolean portrait) {
         this.portrait = portrait;
     }
-
 
 }

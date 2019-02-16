@@ -35,11 +35,11 @@
         <item>@string/time_sunset</item>
         <item>@string/time_night</item>
     </string-array>
-    <string-array name="timeValues">
-        <item>30</item>
-        <item>31</item>
-        <item>32</item>
-        <item>33</item>
-        <item>34</item>
-    </string-array>
+    <integer-array name="timeValues">
+        <item>@integer/int_time_automatic</item>
+        <item>@integer/int_time_dawn</item>
+        <item>@integer/int_time_day</item>
+        <item>@integer/int_time_sunset</item>
+        <item>@integer/int_time_night</item>
+    </integer-array>
 </resources>

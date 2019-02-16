@@ -1,40 +1,37 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.Date;
-import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.SystemClock;
 
+import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
+
+
 public class GLRenderer implements Renderer {
 
-    // Geometric variables
-    public static final int COLOR_HANDLE = 1;
-    public static final int POSITION_HANDLE = 2;
-    public static final int TEXTURE_COORD_LOCATION = 3;
-    public static final int MATRIX_HANDLE = 4;
-    public static final int SAMPLER_LOCATION = 5;
-
-    int[] texturenames;
     SceneSetter sceneSetter;
     // Our screen resolution
     float mScreenWidth = 1280;
     float mScreenHeight = 768;
     //    Sprite sky, template;
     Date dateCreated;
+    Location location;
+    Context context = OpenGLES2WallpaperService.getAppContext();
+    Resources resources = context.getResources();
+    TimeTracker timeTracker;
 
-    // Our matrices
-    private int NUMBEROFCLOUDS = 16;
-    public final float[][] cloudMVPMatrix = new float[NUMBEROFCLOUDS][16];
-    public FloatBuffer[] cloudUVBuffer = new FloatBuffer[NUMBEROFCLOUDS];
+
 
     public GLCamera camera;
 
@@ -42,6 +39,8 @@ public class GLRenderer implements Renderer {
         dateCreated = new Date();
         camera = new GLCamera();
         sceneSetter = new SceneSetter();
+        location = new Location(47.760012, -122.307209);
+        timeTracker = new TimeTracker();
     }
 
     public void OnOffsetChanged(float xOffset, float yOffset) {
@@ -56,6 +55,10 @@ public class GLRenderer implements Renderer {
         prevSensorValues[0] = newSensorValues[0];
         prevSensorValues[1] = newSensorValues[1];
         sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
+    }
+
+    public void SwapTextures(){
+        sceneSetter.swapTextures();
     }
 
 
@@ -91,8 +94,6 @@ public class GLRenderer implements Renderer {
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        //load the images
-        loadTextures();
 
     }
 
@@ -107,6 +108,26 @@ public class GLRenderer implements Renderer {
 
     public void SetMotionOffsetStrength(int offsetStrength) {
         camera.setMotionOffsetStrength(offsetStrength);
+    }
+
+    public void SetTimeSetting(String timeSetting){
+        int timeOfDay = TimeTracker.DAY;
+        if(timeSetting.equals(resources.getString(R.string.time_automatic))){
+            timeOfDay = timeTracker.getDayHour();
+        }
+        else if(timeSetting.equals(resources.getString(R.string.time_dawn))){
+            timeOfDay = TimeTracker.DAWN;
+        }
+        else if(timeSetting.equals(resources.getString(R.string.time_day))){
+            timeOfDay = TimeTracker.DAY;
+        }
+        else if(timeSetting.equals(resources.getString(R.string.time_sunset))){
+            timeOfDay = TimeTracker.SUNSET;
+        }
+        else if(timeSetting.equals(resources.getString(R.string.time_night))){
+            timeOfDay = TimeTracker.NIGHT;
+        }
+        sceneSetter.SetTimeOfDay(timeOfDay);
     }
 
 
@@ -127,58 +148,6 @@ public class GLRenderer implements Renderer {
         sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetMotionOffsetOn(), camera.GetXOffsetPosition());
     }
 
-
-    private void loadTextures() {
-//        // Create our UV coordinates.
-//        float[] textureCoordinates = new float[]{
-//                0.0f, 0.0f,
-//                0.0f, 1.0f,
-//                2.0f, 1.0f,
-//                1.0f, 0.0f
-//        };
-////
-//        // The texture buffer
-//        ByteBuffer bb = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
-//        bb.order(ByteOrder.nativeOrder());
-//        textureCoordinateBuffer = bb.asFloatBuffer();
-//        textureCoordinateBuffer.put(textureCoordinates);
-//        textureCoordinateBuffer.position(0);
-//
-////        cloud texture buffer
-//        Random rnd = new Random();
-//
-//        // 30 image objects times 4 portraitVertices times (u and v)
-//        float[][] uvs2 = new float[NUMBEROFCLOUDS][4 * 2];
-//
-//        // We will make 30 randomly textures objects
-//        for (int i = 0; i < uvs2.length; i++) {
-//            int random_u_offset = rnd.nextInt(2);
-//            int random_v_offset = rnd.nextInt(2);
-//
-//            // Adding the UV's using the offsets
-//            uvs2[i][0] = random_u_offset * 0.5f;
-//            uvs2[i][1] = random_v_offset * 0.5f;
-//            uvs2[i][2] = random_u_offset * 0.5f;
-//            uvs2[i][3] = (random_v_offset + 1) * 0.5f;
-//            uvs2[i][4] = (random_u_offset + 1) * 0.5f;
-//            uvs2[i][5] = (random_v_offset + 1) * 0.5f;
-//            uvs2[i][6] = (random_u_offset + 1) * 0.5f;
-//            uvs2[i][7] = random_v_offset * 0.5f;
-//
-//            ByteBuffer bb2 = ByteBuffer.allocateDirect(uvs2.length * 4);
-//            bb2.order(ByteOrder.nativeOrder());
-//            cloudUVBuffer[i] = bb2.asFloatBuffer();
-//            cloudUVBuffer[i].put(uvs2[i]);
-//            cloudUVBuffer[i].position(0);
-//        }
-
-        // Generate Textures, if more needed, alter these numbers.
-        texturenames = new int[20];
-        GLES20.glGenTextures(20, texturenames, 0);
-
-        //texture 0
-        // Temporary create a bitmap
-    }
 
     private int mFPS = 0;         // the value to show
     private int mFPSCounter = 0;  // the value to count

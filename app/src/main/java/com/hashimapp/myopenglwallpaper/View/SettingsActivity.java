@@ -2,6 +2,7 @@ package com.hashimapp.myopenglwallpaper.View;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -13,11 +14,9 @@ import com.hashimapp.myopenglwallpaper.R;
 /**
  * Created by Blake on 8/18/2015.
  */
-public class SettingsActivity extends PreferenceActivity
-{
+public class SettingsActivity extends PreferenceActivity {
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         getFragmentManager().beginTransaction().replace(android.R.id.content,
@@ -26,13 +25,12 @@ public class SettingsActivity extends PreferenceActivity
     }
 
 
-
-    public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener
-    {
+    public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+        Resources resources = OpenGLES2WallpaperService.getAppContext().getResources();
         SharedPreferences prefs;
+
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
+        public void onCreate(final Bundle savedInstanceState) {
             Log.d("Live Wallpaper Chooser", "onCreate reached");
             super.onCreate(savedInstanceState);
             //set the preference file
@@ -56,25 +54,26 @@ public class SettingsActivity extends PreferenceActivity
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-            switch(key){
-                case "motion_parallax":
-                    if(sharedPreferences.getBoolean("motion_parallax", true)){
-                        getPreferenceScreen().findPreference("motion_parallax_strength").setEnabled(true);
-                    }else{
-                        getPreferenceScreen().findPreference("motion_parallax_strength").setEnabled(false);
-                    }
-                    break;
+            if (key.equals(resources.getString(R.string.motion_parallax_key))) {
+                SetMotionParallaxStrengthEnabled(sharedPreferences);
             }
         }
 
-        private void initPreferences(){
-            if(prefs.getBoolean("motion_parallax", true)){
-                getPreferenceScreen().findPreference("motion_parallax_strength").setEnabled(true);
-            }else{
-                getPreferenceScreen().findPreference("motion_parallax_strength").setEnabled(false);
+        private void initPreferences() {
+            SetMotionParallaxStrengthEnabled(prefs);
+
+        }
+
+        private void SetMotionParallaxStrengthEnabled(SharedPreferences prefs) {
+
+            String motionParallaxStrengthKey = resources.getString(R.string.motion_parallax_strength_key);
+            if (prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true)) {
+                getPreferenceScreen().findPreference(motionParallaxStrengthKey).setEnabled(true);
+            } else {
+                getPreferenceScreen().findPreference(motionParallaxStrengthKey).setEnabled(false);
             }
         }
     }
-
 }
+
+
