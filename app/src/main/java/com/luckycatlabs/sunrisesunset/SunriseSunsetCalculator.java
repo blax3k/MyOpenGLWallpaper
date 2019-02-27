@@ -237,6 +237,17 @@ public class SunriseSunsetCalculator {
         return calculator.computeSunsetCalendar(Zenith.OFFICIAL, date);
     }
 
+
+    public Calendar getPreOfficialSunsetCalendarForDate(Calendar date) {
+        return calculator.computeSunsetCalendar(Zenith.PRE, date);
+    }
+
+
+    public Calendar getPreOfficialSunriseCalendarForDate(Calendar date) {
+        return calculator.computeSunriseCalendar(Zenith.PRE, date);
+    }
+
+
     /**
      * Computes the sunrise for an arbitrary declination.
      * 

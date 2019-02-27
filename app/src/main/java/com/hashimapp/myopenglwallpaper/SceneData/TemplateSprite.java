@@ -56,10 +56,10 @@ public class TemplateSprite extends SpriteData {
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        sunsetColor = new float[]{0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,};
+        sunsetColor = new float[]{0.92f, 0.69f, 0.44f, 1f,
+                0.92f, 0.69f, 0.44f, 1f,
+                0.92f, 0.69f, 0.44f, 1f,
+                0.92f, 0.69f, 0.44f, 1f,};
 
         nightColor = new float[]
                 {0f, 0.17f, 0.27f, 1f,

@@ -37,34 +37,35 @@ public class BackgroundSprite extends SpriteData {
         textureIndex = Textures.BACKGROUND_TEXTURE_INDEX;
         TexIndex = GLES20.GL_TEXTURE2;
         indices = new short[]{0, 1, 2, 0, 2, 3};
-        defaultColor = new float[]
-                {1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f};
+        defaultColor = new float[]{
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f};
 
-        dawnColor = new float[]
-                {0.4f, 0.57f, 0.77f, 1f,
-                        0.4f, 0.57f, 0.77f, 1f,
-                        0.4f, 0.57f, 0.77f, 1f,
-                        0.4f, 0.57f, 0.77f, 1f,};
+        dawnColor = new float[]{
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,};
 
-        dayColor = new float[]
-                {1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f,
-                        1f, 1f, 1f, 1f};
+        dayColor = new float[]{
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f};
 
-        sunsetColor = new float[]{0.92f, 0.45f, 0.098f, 1f,
+        sunsetColor = new float[]{
+                1f, 1f, 1f, 1f,
+                0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,};
+                0.92f, 0.69f, 0.44f, 1f,};
 
-        nightColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        nightColor = new float[]{
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,

@@ -1,6 +1,10 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
 
+import android.util.Log;
+
+import java.util.Arrays;
+
 public class SpriteData implements ISpriteData {
 
     protected float[] portraitVertices;
@@ -9,8 +13,7 @@ public class SpriteData implements ISpriteData {
     protected float[] landscapeVerticesMotion;
     protected float[] textureVertices;
     protected int textureIndex;
-    //    protected int glImageID;
-//    protected int bitmapID;
+
     protected short[] indices;
     protected float[] defaultColor;
     protected float[] dawnColor;
@@ -32,18 +35,38 @@ public class SpriteData implements ISpriteData {
     }
 
     @Override
-    public float[] getColor(int timeOfDay) {
+    public float[] getColor(int timeOfDay, int phasePercentage) {
         switch (timeOfDay) {
-            case TimeTracker.DAWN:
-                return dawnColor;
             case TimeTracker.DAY:
                 return dayColor;
-            case TimeTracker.SUNSET:
-                return sunsetColor;
             case TimeTracker.NIGHT:
                 return nightColor;
+            case TimeTracker.DAWN:
+                return MultiplyColors(phasePercentage, nightColor, dawnColor);
+            case TimeTracker.SUNRISE:
+                return MultiplyColors(phasePercentage, dawnColor, dayColor);
+            case TimeTracker.SUNSET:
+                return MultiplyColors(phasePercentage, dayColor, sunsetColor);
+            case TimeTracker.DUSK:
+                return MultiplyColors(phasePercentage, sunsetColor, nightColor);
         }
         return defaultColor;
+    }
+
+    private float[] MultiplyColors(int phasePercent, float[] current, float[] next){
+        float[] result = new float[current.length];
+        for(int i = 0; i < current.length; i++){
+            if(i +1 % 4 == 0){
+                //don't mess with the alpha channels
+            }else{
+                //get the current difference between the current phase and the next phase
+                //and add it to the current phase
+                float percent = ((float)phasePercent)/100f;
+                result[i] = current[i] + ((next[i] - current[i]) * percent);
+            }
+        }
+        Log.d("Debug", Arrays.toString(result));
+        return result;
     }
 
     @Override

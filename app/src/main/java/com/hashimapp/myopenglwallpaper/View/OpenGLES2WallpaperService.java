@@ -18,11 +18,9 @@ import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
-import com.hashimapp.myopenglwallpaper.Model.TimeTracker;
 import com.hashimapp.myopenglwallpaper.R;
 
 /**
@@ -39,7 +37,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
     @Override
     public void onCreate() {
         super.onCreate();
-        context = getApplicationContext();
+        context = this.getApplicationContext();
         resources = context.getResources();
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -91,8 +89,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
         private void SetRendererPrefs() {
             renderer.SetMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
-            String result = prefs.getString(resources.getString(R.string.set_time_key), resources.getString(R.string.time_dawn));
-            renderer.SetTimeSetting(result);
+            renderer.SetTimeSetting(prefs.getInt(resources.getString(R.string.set_time_key), 0));
         }
 
         @Override
@@ -122,10 +119,15 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
             if (rendererSet) {
                 boolean motionParallaxEnabled = prefs.getBoolean("motion_parallax", false);
 
-                if (visible && motionParallaxEnabled) {
-                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+                if (visible) {
+                    if(motionParallaxEnabled){
+                        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+                    }
+                    renderer.UpdateTime();
+
                     glSurfaceView.requestRender();
                 } else {
+                    //not visible
                     sensorManager.unregisterListener(this);
                     renderer.ResetMotionOffset();
                 }
@@ -148,7 +150,8 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
             } else if (key.equals(resources.getString(R.string.motion_parallax_strength_key))) {
                 renderer.SetMotionOffsetStrength(sharedPreferences.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             } else if (key.equals(resources.getString(R.string.set_time_key))) {
-                renderer.SetTimeSetting(prefs.getString(resources.getString(R.string.set_time_key), resources.getString(R.string.time_dawn)));
+                renderer.SetTimeSetting(prefs.getInt(resources.getString(R.string.set_time_key), 0));
+                renderer.UpdateTime();
             }
         }
 
@@ -214,6 +217,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 //                glSurfaceView.requestRender();
                 return super.onDoubleTap(e);
             }
+
         }
 
     }

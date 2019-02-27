@@ -24,6 +24,17 @@
             android:exported="true">
         </activity>
 
+        <activity
+            android:name=".View.SettingsActivityTest"
+            android:label="@string/settings_activity_title"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog"
+            android:exported="true">
+                <intent-filter>
+                    <action android:name="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest"/>
+                    <category android:name="android.intent.category.DEFAULT"/>
+                </intent-filter>
+        </activity>
+
         <service
             android:name=".View.OpenGLES2WallpaperService"
             android:label="@string/label"

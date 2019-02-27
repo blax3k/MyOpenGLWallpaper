@@ -34,6 +34,9 @@ public class Zenith {
     /** Official sunrise/set is when the sun is 50' below the horizon. */
     public static final Zenith OFFICIAL = new Zenith(90.8333);
 
+    /** Unoffficial sunrise/set is when the sun is 6 degrees above the horizon. */
+    public static final Zenith PRE = new Zenith(84);
+
     private final BigDecimal degrees;
 
     public Zenith(double degrees) {

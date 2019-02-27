@@ -33,8 +33,16 @@
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_high">Heavy camera blur</string>
 
+    <string name="setting_movement_section">Movement Settings</string>
+
     <string name="motion_parallax_key">motion_parallax</string>
+    <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
+    <string name="motion_parallax_default">true</string>
+
+
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
+    <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
+
 
     <string name="set_time_key">set_time</string>
     <string name="time_automatic">Automatic</string>
@@ -43,12 +51,11 @@
     <string name="time_sunset">Sunset</string>
     <string name="time_night">Night</string>
 
-    <string name="setting_movement_section">Movement Settings</string>
 
-    <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
-    <string name="motion_parallax_default">true</string>
-
-    <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
+    <string name="setting_color_section">Color Settings</string>
+    <string name="auto_time_setting_key">auto_time_key</string>
+    <string name="auto_time_setting_title">Automatic Time</string>
+    <string name="auto_time_setting_default">true</string>
 
 
 

@@ -1,6 +1,7 @@
 package com.hashimapp.myopenglwallpaper.View;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -21,12 +22,11 @@ public class SettingsActivity extends PreferenceActivity {
 
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 new MyPreferenceFragment()).commit();
-
     }
 
 
     public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-        Resources resources = OpenGLES2WallpaperService.getAppContext().getResources();
+        Resources resources;
         SharedPreferences prefs;
 
         @Override
@@ -34,8 +34,9 @@ public class SettingsActivity extends PreferenceActivity {
             Log.d("Live Wallpaper Chooser", "onCreate reached");
             super.onCreate(savedInstanceState);
             //set the preference file
+            resources = this.getResources();
             addPreferencesFromResource(R.xml.settings);
-            prefs = PreferenceManager.getDefaultSharedPreferences(OpenGLES2WallpaperService.getAppContext());
+            prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
             initPreferences();
         }
 
@@ -43,7 +44,6 @@ public class SettingsActivity extends PreferenceActivity {
         public void onResume() {
             super.onResume();
             getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-
         }
 
         @Override
@@ -61,7 +61,6 @@ public class SettingsActivity extends PreferenceActivity {
 
         private void initPreferences() {
             SetMotionParallaxStrengthEnabled(prefs);
-
         }
 
         private void SetMotionParallaxStrengthEnabled(SharedPreferences prefs) {

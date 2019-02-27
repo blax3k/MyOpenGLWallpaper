@@ -1,5 +1,6 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -11,10 +12,10 @@ import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 
@@ -30,7 +31,8 @@ public class GLRenderer implements Renderer {
     Context context = OpenGLES2WallpaperService.getAppContext();
     Resources resources = context.getResources();
     TimeTracker timeTracker;
-
+    int manualTimeOfDay = 0;
+    private boolean manualTime;
 
 
     public GLCamera camera;
@@ -41,11 +43,32 @@ public class GLRenderer implements Renderer {
         sceneSetter = new SceneSetter();
         location = new Location(47.760012, -122.307209);
         timeTracker = new TimeTracker();
+        manualTime = false;
     }
 
     public void OnOffsetChanged(float xOffset, float yOffset) {
         float newXOffset = camera.getxOffsetStepPortrait(xOffset);
         sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
+
+
+        Calendar calendar = Calendar.getInstance();
+        int timeOfDay, percentage;
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            int minutes = (int)(xOffset * 100f * 1440)/100;
+            Log.d("Debug", "minutes: " + minutes);
+        Log.d("Debug", "xOffset: " + xOffset);
+            calendar.add(Calendar.MINUTE, minutes);
+        int[] timeInfo = timeTracker.GetTimePhase(calendar);
+        timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
+        percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
+
+        Log.d("Debug", "timeOfDay: " + calendar.getTime().toString());
+        Log.d("Debug", "percentage: " + percentage);
+
+        sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
 
     float[] prevSensorValues = new float[3];
@@ -57,7 +80,7 @@ public class GLRenderer implements Renderer {
         sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
     }
 
-    public void SwapTextures(){
+    public void SwapTextures() {
         sceneSetter.swapTextures();
     }
 
@@ -97,7 +120,7 @@ public class GLRenderer implements Renderer {
 
     }
 
-    public void SetMotionOffset(boolean motionOffsetOn){
+    public void SetMotionOffset(boolean motionOffsetOn) {
         camera.SetMotionOffset(motionOffsetOn);
     }
 
@@ -110,30 +133,38 @@ public class GLRenderer implements Renderer {
         camera.setMotionOffsetStrength(offsetStrength);
     }
 
-    public void SetTimeSetting(String timeSetting){
-        int timeOfDay = TimeTracker.DAY;
-        if(timeSetting.equals(resources.getString(R.string.time_automatic))){
-            timeOfDay = timeTracker.getDayHour();
+    public void SetTimeSetting(int minuteOfDay) {
+        if (minuteOfDay == 0) {
+            manualTime = false;
+        } else {
+            manualTime = true;
+            manualTimeOfDay = minuteOfDay;
         }
-        else if(timeSetting.equals(resources.getString(R.string.time_dawn))){
-            timeOfDay = TimeTracker.DAWN;
-        }
-        else if(timeSetting.equals(resources.getString(R.string.time_day))){
-            timeOfDay = TimeTracker.DAY;
-        }
-        else if(timeSetting.equals(resources.getString(R.string.time_sunset))){
-            timeOfDay = TimeTracker.SUNSET;
-        }
-        else if(timeSetting.equals(resources.getString(R.string.time_night))){
-            timeOfDay = TimeTracker.NIGHT;
-        }
-        sceneSetter.SetTimeOfDay(timeOfDay);
+    }
+
+    public void UpdateTime() {
+        Calendar calendar = Calendar.getInstance();
+        int timeOfDay, percentage;
+//        if (!manualTime) {
+//
+//        } else {
+//            calendar.set(Calendar.HOUR_OF_DAY, 0);
+//            calendar.set(Calendar.MINUTE, 0);
+//            calendar.set(Calendar.SECOND, 0);
+//            calendar.set(Calendar.MILLISECOND, 0);
+//            calendar.add(Calendar.MINUTE, manualTimeOfDay);
+//        }
+        int[] timeInfo = timeTracker.GetTimePhase(calendar);
+        timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
+        percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
+
+        sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
 
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT );
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glFlush();
 
         // We need to know the current width and height.
@@ -184,7 +215,7 @@ public class GLRenderer implements Renderer {
 
         // Calculate the projection and view
 
-        synchronized (this){
+        synchronized (this) {
             sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix);
         }
 

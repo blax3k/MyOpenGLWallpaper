@@ -2,13 +2,9 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.preference.PreferenceManager;
 
-import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.TemplateSprite;
@@ -60,10 +56,9 @@ public class SceneSetter
 
 
     public void initSprites(){
-        int timeOfDay = timeTracker.getDayHour();
-        spriteList.add(new Sprite(new BackgroundSprite(), timeOfDay));
-        spriteList.add(new Sprite(new GirlSprite(), timeOfDay));
-        spriteList.add(new Sprite(new TemplateSprite(), timeOfDay));
+        spriteList.add(new Sprite(new BackgroundSprite()));
+        spriteList.add(new Sprite(new GirlSprite()));
+        spriteList.add(new Sprite(new TemplateSprite()));
         //enable transparency
 //
 //        for(Sprite sprite : spriteList){
@@ -85,7 +80,7 @@ public class SceneSetter
 
         for(Sprite sprite : spriteList){
             sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mColorHandle,
-                        mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch, textures.textureNames);
+                    mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch, textures.textureNames);
         }
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
@@ -93,9 +88,9 @@ public class SceneSetter
         GLES20.glDisableVertexAttribArray(mTexCoordLoc);
     }
 
-    public void SetTimeOfDay(int time){
+    public void SetTimeOfDay(int time, int percentage){
         for(Sprite sprite : spriteList){
-            sprite.SetTime(time);
+            sprite.SetTime(time, percentage);
         }
 
     }

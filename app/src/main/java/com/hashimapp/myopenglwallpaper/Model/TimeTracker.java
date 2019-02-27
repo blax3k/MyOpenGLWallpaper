@@ -1,17 +1,11 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.hashimapp.myopenglwallpaper.Model.SceneSetter;
-import com.hashimapp.myopenglwallpaper.R;
-import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 /**
@@ -19,76 +13,136 @@ import java.util.TimeZone;
  */
 public class TimeTracker
 {
-    public static final int DAWN = 1;
+    public static final int DAWN = 0;
+    public static final int SUNRISE = 1;
     public static final int DAY = 2;
     public static final int SUNSET = 3;
-    public static final int NIGHT = 4;
+    public static final int DUSK = 4;
+    public static final int NIGHT = 5;
 
     public static final double DEFAULT_LATITTUDE = 47.8734952;
     public static final double DEFAULT_LONGITUDE = -122.2495432;
 
+    public static final int TIME_PHASE_INDEX = 0;
+    public static final int TIME_PHASE_PROGRESSION_INDEX = 1;
+
     Calendar NauticalSunrise, NauticalSunset, AstronomicalSunrise, AstronomicalSunset,
-            CivilSunrise, CivilSunset, OfficialSunrise, OfficialSunset;
+            CivilSunrise, CivilSunset, OfficialSunrise, OfficialSunset,
+            PreOfficialSunset, PostOfficialSunrise;
+
     SunriseSunsetCalculator calculator;
-    Calendar calendar;
     Location location;
     TimeZone timeZone;
-    int nightBegin = 20;
-    int nightEnd = 4;
-    int dawnBegin = 5;
-    int dawnEnd = 9;
-    int dayBegin = 10;
-    int dayEnd = 18;
 
     public TimeTracker()
     {
         location = new Location(DEFAULT_LATITTUDE, DEFAULT_LONGITUDE);
-        calendar = Calendar.getInstance();
-        calendar.getTime();
-        timeZone = calendar.getTimeZone();
+        timeZone = Calendar.getInstance().getTimeZone();
         calculator = new SunriseSunsetCalculator(location, timeZone);
-        UpdateSunriseSunsetTimes(calendar);
     }
 
-    public void setLocation(double latitude, double longitude){
+    public void SetLocation(double latitude, double longitude){
         location.setLocation(latitude, longitude);
     }
 
-    public int getDayHour()
+    public int[] GetTimePhase(Calendar calendar)
     {
-        calendar.getTime();
+        int[] timeInfo = new int[2];
         UpdateSunriseSunsetTimes(calendar);
+        int percentage = 100;
+        int CurrentTimePhase = DAY;
 
         long currentTimeMillis = calendar.getTimeInMillis();
-        if(currentTimeMillis < AstronomicalSunrise.getTimeInMillis() || currentTimeMillis > AstronomicalSunset.getTimeInMillis()){
-            return NIGHT;
-        }else if(currentTimeMillis > CivilSunrise.getTimeInMillis() && currentTimeMillis < CivilSunset.getTimeInMillis()){
-            return DAY;
-        }else if(currentTimeMillis > AstronomicalSunrise.getTimeInMillis() && currentTimeMillis < CivilSunrise.getTimeInMillis()){
-            return DAWN;
-        }else if(currentTimeMillis > AstronomicalSunset.getTimeInMillis() && currentTimeMillis < CivilSunset.getTimeInMillis()){
-            return SUNSET;
+        if(currentTimeMillis <= AstronomicalSunrise.getTimeInMillis() || currentTimeMillis >= AstronomicalSunset.getTimeInMillis()){
+            CurrentTimePhase = NIGHT;
+        }
+        else if(currentTimeMillis >= PostOfficialSunrise.getTimeInMillis() && currentTimeMillis <= PreOfficialSunset.getTimeInMillis()){
+            CurrentTimePhase = DAY;
+        }
+        else if(currentTimeMillis >= AstronomicalSunrise.getTimeInMillis() && currentTimeMillis < CivilSunrise.getTimeInMillis()){
+            CurrentTimePhase = DAWN;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), AstronomicalSunrise.getTimeInMillis(), CivilSunrise.getTimeInMillis());
+        }
+        else if(currentTimeMillis >= CivilSunrise.getTimeInMillis() && currentTimeMillis < PostOfficialSunrise.getTimeInMillis()){
+            CurrentTimePhase = SUNRISE;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), CivilSunrise.getTimeInMillis(), PostOfficialSunrise.getTimeInMillis());
+        }
+        else if(currentTimeMillis >= PreOfficialSunset.getTimeInMillis() && currentTimeMillis < OfficialSunset.getTimeInMillis()){
+            CurrentTimePhase = SUNSET;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), PreOfficialSunset.getTimeInMillis(), OfficialSunset.getTimeInMillis());
+        }
+        else if(currentTimeMillis >= OfficialSunset.getTimeInMillis() && currentTimeMillis < AstronomicalSunset.getTimeInMillis()){
+            CurrentTimePhase = DUSK;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), OfficialSunset.getTimeInMillis(), AstronomicalSunset.getTimeInMillis());
         }
 
-        return DAWN;
+        timeInfo[TIME_PHASE_INDEX] = CurrentTimePhase;
+        timeInfo[TIME_PHASE_PROGRESSION_INDEX] = percentage;
 
-
+        return timeInfo;
     }
 
-    public void UpdateLocation(){
-        //ToDo: set location here
+    private int CalculateCurrentProgress(long currentTime, long currentPhase, long nextPhase){
 
+        double currentProgress = (Math.abs(currentTime - currentPhase));
+        double endPhase = Math.abs(currentPhase - nextPhase);
+        double result = currentProgress/endPhase;
 
+        int returnValue = (int)(result * 100);
+        return returnValue;
     }
 
-    private void UpdateSunriseSunsetTimes(Calendar rightNow){
+//    public int GetTimePhaseProgress(Calendar calendar, int timePhase){
+//
+//        UpdateSunriseSunsetTimes(calendar);
+//
+//        switch(timePhase){
+//            case DAWN:
+//                break;
+//            case SUNRISE:
+//                break;
+//            case DAY:
+//                break;
+//            case SUNSET:
+//                break;
+//            case DUSK:
+//                break;
+//            case NIGHT:
+//                break;
+//        }
+//
+//        return 0;
+//    }
+
+    private int GetProgress(long phaseStart, long phaseEnd, long currentTime){
+        return 0;
+    }
+
+    public void UpdateSunriseSunsetTimes(Calendar rightNow){
         NauticalSunrise = calculator.getNauticalSunriseCalendarForDate(rightNow);
         NauticalSunset = calculator.getNauticalSunsetCalendarForDate(rightNow);
-        AstronomicalSunrise = calculator.getNauticalSunriseCalendarForDate(rightNow);
-        AstronomicalSunset = calculator.getNauticalSunsetCalendarForDate(rightNow);
-        CivilSunrise = calculator.getNauticalSunriseCalendarForDate(rightNow);
-        CivilSunset = calculator.getNauticalSunsetCalendarForDate(rightNow);
-        OfficialSunrise = calculator.getNauticalSunriseCalendarForDate(rightNow);
-        OfficialSunset = calculator.getNauticalSunsetCalendarForDate(rightNow);
+        AstronomicalSunrise = calculator.getAstronomicalSunriseCalendarForDate(rightNow);
+        AstronomicalSunset = calculator.getAstronomicalSunsetCalendarForDate(rightNow);
+        CivilSunrise = calculator.getCivilSunriseCalendarForDate(rightNow);
+        CivilSunset = calculator.getCivilSunsetCalendarForDate(rightNow);
+        OfficialSunrise = calculator.getOfficialSunriseCalendarForDate(rightNow);
+        OfficialSunset = calculator.getOfficialSunsetCalendarForDate(rightNow);
+        PostOfficialSunrise = calculator.getPreOfficialSunriseCalendarForDate(rightNow);
+        PreOfficialSunset = calculator.getPreOfficialSunsetCalendarForDate(rightNow);
+
+        Log.d("timeTracker", "right now: " + rightNow.getTime());
+        Log.d("timeTracker",
+                "\n aRise: " + AstronomicalSunrise.getTime() +
+                        "\n nRise: " + NauticalSunrise.getTime() +
+                        "\n cRise: " + CivilSunrise.getTime() +
+                        "\n oRise: " + OfficialSunrise.getTime()+
+                        "\n pRise: " + PostOfficialSunrise.getTime() +
+                        "\n pSet: " + PreOfficialSunset.getTime() +
+                        "\n oSet: " + OfficialSunset.getTime()+
+                        "\n cSet: " + CivilSunset.getTime() +
+                        "\n nSet: " + NauticalSunset.getTime() +
+                        "\n aSet: " + AstronomicalSunset.getTime()
+        );
+
     }
 }

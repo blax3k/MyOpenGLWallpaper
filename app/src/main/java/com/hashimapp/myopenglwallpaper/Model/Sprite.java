@@ -33,11 +33,11 @@ public class Sprite {
     float yAccelOffset = 0;
 
 
-    public Sprite(ISpriteData mSpriteData, int dayHour) {
+    public Sprite(ISpriteData mSpriteData) {
         this.timeTracker = timeTracker;
         spriteData = mSpriteData;
 //        scratch = new float[16];
-        colors = spriteData.getColor(dayHour);
+        colors = spriteData.getColor(TimeTracker.DAY, 100);
         indices = spriteData.getIndices();
         textureIndex = spriteData.getTextureIndex();
 
@@ -73,8 +73,8 @@ public class Sprite {
         setVertices(spriteData.getShapeVertices(portrait, motionOffset));
     }
 
-    public void SetTime(int time) {
-        float[] newColor = spriteData.getColor(time);
+    public void SetTime(int time, int phasePercentage) {
+        float[] newColor = spriteData.getColor(time, phasePercentage);
         setColor(newColor);
     }
 
