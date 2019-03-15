@@ -27,7 +27,7 @@
         <activity
             android:name=".View.SettingsActivityTest"
             android:label="@string/settings_activity_title"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog"
+            android:theme="@android:style/Theme.DeviceDefault"
             android:exported="true">
                 <intent-filter>
                     <action android:name="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest"/>

@@ -59,6 +59,12 @@ public class GirlSprite extends SpriteData {
                 0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,};
 
+        twilightColor = new float[]{
+                0f, 0.12f, 0.20f, 1f,
+                0f, 0.12f, 0.20f, 1f,
+                0f, 0.12f, 0.20f, 1f,
+                0f, 0.12f, 0.20f, 1f,};
+
         nightColor = new float[]
                 {0f, 0.17f, 0.27f, 1f,
                         0f, 0.17f, 0.27f, 1f,

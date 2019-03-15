@@ -43,6 +43,7 @@
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
     <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
 
+    <string name="max_volume_pref">Max volume</string>
 
     <string name="set_time_key">set_time</string>
     <string name="time_automatic">Automatic</string>

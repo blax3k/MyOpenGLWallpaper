@@ -13,12 +13,13 @@ import java.util.TimeZone;
  */
 public class TimeTracker
 {
-    public static final int DAWN = 0;
-    public static final int SUNRISE = 1;
+    public static final int NIGHT_TO_DAWN = 0;
+    public static final int DAWN_TO_DAY = 1;
     public static final int DAY = 2;
-    public static final int SUNSET = 3;
-    public static final int DUSK = 4;
-    public static final int NIGHT = 5;
+    public static final int DAY_TO_SUNSET = 3;
+    public static final int SUNSET_TO_TWILIGHT = 4;
+    public static final int TWILIGHT_TO_NIGHT = 5;
+    public static final int NIGHT = 6;
 
     public static final double DEFAULT_LATITTUDE = 47.8734952;
     public static final double DEFAULT_LONGITUDE = -122.2495432;
@@ -26,9 +27,16 @@ public class TimeTracker
     public static final int TIME_PHASE_INDEX = 0;
     public static final int TIME_PHASE_PROGRESSION_INDEX = 1;
 
-    Calendar NauticalSunrise, NauticalSunset, AstronomicalSunrise, AstronomicalSunset,
-            CivilSunrise, CivilSunset, OfficialSunrise, OfficialSunset,
-            PreOfficialSunset, PostOfficialSunrise;
+    Calendar AstronomicalSunrise,
+             NauticalSunrise,
+             CivilSunrise,
+             OfficialSunrise,
+             PostOfficialSunrise,
+             PreOfficialSunset,
+             OfficialSunset,
+             CivilSunset,
+             NauticalSunset,
+             AstronomicalSunset;
 
     SunriseSunsetCalculator calculator;
     Location location;
@@ -60,20 +68,24 @@ public class TimeTracker
             CurrentTimePhase = DAY;
         }
         else if(currentTimeMillis >= AstronomicalSunrise.getTimeInMillis() && currentTimeMillis < CivilSunrise.getTimeInMillis()){
-            CurrentTimePhase = DAWN;
+            CurrentTimePhase = NIGHT_TO_DAWN;
             percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), AstronomicalSunrise.getTimeInMillis(), CivilSunrise.getTimeInMillis());
         }
         else if(currentTimeMillis >= CivilSunrise.getTimeInMillis() && currentTimeMillis < PostOfficialSunrise.getTimeInMillis()){
-            CurrentTimePhase = SUNRISE;
+            CurrentTimePhase = DAWN_TO_DAY;
             percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), CivilSunrise.getTimeInMillis(), PostOfficialSunrise.getTimeInMillis());
         }
         else if(currentTimeMillis >= PreOfficialSunset.getTimeInMillis() && currentTimeMillis < OfficialSunset.getTimeInMillis()){
-            CurrentTimePhase = SUNSET;
+            CurrentTimePhase = DAY_TO_SUNSET;
             percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), PreOfficialSunset.getTimeInMillis(), OfficialSunset.getTimeInMillis());
         }
-        else if(currentTimeMillis >= OfficialSunset.getTimeInMillis() && currentTimeMillis < AstronomicalSunset.getTimeInMillis()){
-            CurrentTimePhase = DUSK;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), OfficialSunset.getTimeInMillis(), AstronomicalSunset.getTimeInMillis());
+        else if(currentTimeMillis >= OfficialSunset.getTimeInMillis() && currentTimeMillis < CivilSunset.getTimeInMillis()){
+            CurrentTimePhase = SUNSET_TO_TWILIGHT;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), OfficialSunset.getTimeInMillis(), CivilSunset.getTimeInMillis());
+        }
+        else if(currentTimeMillis >= CivilSunset.getTimeInMillis() && currentTimeMillis < AstronomicalSunset.getTimeInMillis()){
+            CurrentTimePhase = TWILIGHT_TO_NIGHT;
+            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), CivilSunset.getTimeInMillis(), AstronomicalSunset.getTimeInMillis());
         }
 
         timeInfo[TIME_PHASE_INDEX] = CurrentTimePhase;
@@ -97,15 +109,15 @@ public class TimeTracker
 //        UpdateSunriseSunsetTimes(calendar);
 //
 //        switch(timePhase){
-//            case DAWN:
+//            case NIGHT_TO_DAWN:
 //                break;
-//            case SUNRISE:
+//            case DAWN_TO_DAY:
 //                break;
 //            case DAY:
 //                break;
-//            case SUNSET:
+//            case DAY_TO_SUNSET:
 //                break;
-//            case DUSK:
+//            case SUNSET_TO_TWILIGHT:
 //                break;
 //            case NIGHT:
 //                break;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/widget_frame"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@android:id/title"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"/>
+
+    <TextView
+        android:id="@android:id/summary"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Summary" />
+
+    <TextView
+        android:id="@+id/textView"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Summary" />
+
+    <TextView
+        android:id="@+id/textView2"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Summary" />
+
+    <TextView
+        android:id="@+id/textView3"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Summary" />
+
+    <TextView
+        android:id="@+id/textView4"
+        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Summary" />
+
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

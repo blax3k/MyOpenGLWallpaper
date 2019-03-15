@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -61,6 +62,8 @@ public class SettingsActivity extends PreferenceActivity {
 
         private void initPreferences() {
             SetMotionParallaxStrengthEnabled(prefs);
+            Preference seekbar = getPreferenceScreen().findPreference("pref_max_volume");
+            seekbar.setTitle("hello there");
         }
 
         private void SetMotionParallaxStrengthEnabled(SharedPreferences prefs) {

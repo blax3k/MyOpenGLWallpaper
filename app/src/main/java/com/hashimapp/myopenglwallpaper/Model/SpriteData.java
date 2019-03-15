@@ -19,6 +19,7 @@ public class SpriteData implements ISpriteData {
     protected float[] dawnColor;
     protected float[] dayColor;
     protected float[] sunsetColor;
+    protected float[] twilightColor;
     protected float[] nightColor;
     protected float zVertice;
     protected boolean portrait = true;
@@ -41,14 +42,17 @@ public class SpriteData implements ISpriteData {
                 return dayColor;
             case TimeTracker.NIGHT:
                 return nightColor;
-            case TimeTracker.DAWN:
+            case TimeTracker.NIGHT_TO_DAWN:
                 return MultiplyColors(phasePercentage, nightColor, dawnColor);
-            case TimeTracker.SUNRISE:
+            case TimeTracker.DAWN_TO_DAY:
                 return MultiplyColors(phasePercentage, dawnColor, dayColor);
-            case TimeTracker.SUNSET:
+            case TimeTracker.DAY_TO_SUNSET:
                 return MultiplyColors(phasePercentage, dayColor, sunsetColor);
-            case TimeTracker.DUSK:
-                return MultiplyColors(phasePercentage, sunsetColor, nightColor);
+            case TimeTracker.SUNSET_TO_TWILIGHT:
+                return MultiplyColors(phasePercentage, sunsetColor, twilightColor);
+            case TimeTracker.TWILIGHT_TO_NIGHT:
+                return MultiplyColors(phasePercentage, twilightColor, nightColor);
+
         }
         return defaultColor;
     }

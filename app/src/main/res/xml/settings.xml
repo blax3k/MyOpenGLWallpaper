@@ -46,6 +46,12 @@
         android:key="camera_blur"
         android:title="Camera Blur" />
 
+    <com.hashimapp.myopenglwallpaper.View.SeekbarPreference
+        android:key="pref_max_volume"
+        android:title="@string/max_volume_pref"
+        android:summary="hoo haa"/>
+
+
     <Preference
         android:key="view_artist"
         android:title="Go to artists's website">
