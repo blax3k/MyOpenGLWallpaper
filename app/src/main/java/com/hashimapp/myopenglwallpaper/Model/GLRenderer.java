@@ -51,24 +51,24 @@ public class GLRenderer implements Renderer {
         sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
 
 
-        Calendar calendar = Calendar.getInstance();
-        int timeOfDay, percentage;
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            int minutes = (int)(xOffset * 100f * 1440)/100;
-            Log.d("Debug", "minutes: " + minutes);
-        Log.d("Debug", "xOffset: " + xOffset);
-            calendar.add(Calendar.MINUTE, minutes);
-        int[] timeInfo = timeTracker.GetTimePhase(calendar);
-        timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
-        percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
-
-        Log.d("Debug", "timeOfDay: " + calendar.getTime().toString());
-        Log.d("Debug", "percentage: " + percentage);
-
-        sceneSetter.SetTimeOfDay(timeOfDay, percentage);
+//        Calendar calendar = Calendar.getInstance();
+//        int timeOfDay, percentage;
+//            calendar.set(Calendar.HOUR_OF_DAY, 0);
+//            calendar.set(Calendar.MINUTE, 0);
+//            calendar.set(Calendar.SECOND, 0);
+//            calendar.set(Calendar.MILLISECOND, 0);
+//            int minutes = (int)(xOffset * 100f * 1440)/100;
+//            Log.d("Debug", "minutes: " + minutes);
+//        Log.d("Debug", "xOffset: " + xOffset);
+//            calendar.add(Calendar.MINUTE, minutes);
+//        int[] timeInfo = timeTracker.GetTimePhase(calendar);
+//        timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
+//        percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
+//
+//        Log.d("Debug", "timeOfDay: " + calendar.getTime().toString());
+//        Log.d("Debug", "percentage: " + percentage);
+//
+//        sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
 
     float[] prevSensorValues = new float[3];

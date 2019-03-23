@@ -67,4 +67,15 @@ public class Textures {
 
     }
 
+    private void GenerateMipMaps(Bitmap bitmap, int GLImageID, int textureName){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int level = 1;
+
+        while(width > 0 && height > 0){
+            Bitmap blurred = BlurBuilder.blur(context, bitmap, )
+        }
+    }
+
 }

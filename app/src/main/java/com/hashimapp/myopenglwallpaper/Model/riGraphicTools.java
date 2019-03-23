@@ -55,8 +55,9 @@ public class riGraphicTools {
 					"varying vec2 v_texCoord;" +
 					"varying vec4 v_Color;" +
 					"uniform sampler2D s_texture;" +
+					"uniform float bias;"+
 					"void main() {" +
-					"  gl_FragColor = texture2D( s_texture, v_texCoord ) * v_Color;" +
+					"  gl_FragColor = texture2D( s_texture, v_texCoord, bias ) * v_Color;" +
 					"}";
 
 	public static final String vs_Color =
