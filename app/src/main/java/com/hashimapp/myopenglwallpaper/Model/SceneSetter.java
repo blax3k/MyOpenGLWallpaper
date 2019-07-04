@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.opengl.GLES20;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
@@ -27,13 +28,20 @@ public class SceneSetter
     Context context;
     TimeTracker timeTracker;
     List<Sprite> spriteList;
-    ;
+
     private int mColorHandle;
     private int mPositionHandle;
     private int mTexCoordLoc;
     private int mtrxHandle;
     private int mSamplerLoc;
+    private int biasHandle;
 
+    private long FocalPointResetTime;
+    private long FocalPointTargetTime;
+
+    private float focalPoint;
+    private float focalPointStartingPoint;
+    private float focalPointEndingPoint;
     boolean swapTextures = false;
 
 
@@ -45,8 +53,8 @@ public class SceneSetter
         timeTracker = new TimeTracker();
         spriteList = new ArrayList<>();
         textures = new Textures(this.context);
-        textures.InitTextures();
-        initSprites();
+        focalPointStartingPoint = -1.0f;
+        focalPointEndingPoint = 0.0f;
     }
 
     public void swapTextures(){
@@ -55,7 +63,8 @@ public class SceneSetter
     }
 
 
-    public void initSprites(){
+    public void InitSprites(){
+        textures.InitTextures();
         spriteList.add(new Sprite(new BackgroundSprite()));
         spriteList.add(new Sprite(new GirlSprite()));
         spriteList.add(new Sprite(new TemplateSprite()));
@@ -80,7 +89,7 @@ public class SceneSetter
 
         for(Sprite sprite : spriteList){
             sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mColorHandle,
-                    mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, scratch, textures.textureNames);
+                    mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, scratch, textures.textureNames);
         }
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
@@ -92,7 +101,6 @@ public class SceneSetter
         for(Sprite sprite : spriteList){
             sprite.SetTime(time, percentage);
         }
-
     }
 
     public void OffsetChanged(float xOffset, boolean portraitOrientation){
@@ -116,6 +124,32 @@ public class SceneSetter
             sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset);
         }
     }
+
+    public void UpdateFocalPoint(){
+        long currentTime = System.currentTimeMillis();
+        float focalPointProgression = (float)(currentTime - FocalPointResetTime)/(FocalPointTargetTime - FocalPointResetTime);
+
+        focalPoint = focalPointProgression * Math.abs(focalPointStartingPoint - focalPointEndingPoint) + focalPointStartingPoint;
+
+        for(Sprite sprite : spriteList){
+            sprite.SetFocalPoint(focalPoint);
+        }
+    }
+
+    public boolean FocalPointReached(){
+        return focalPoint >= focalPointEndingPoint;
+    }
+
+    public void ResetFocalPoint(){
+        FocalPointResetTime = System.currentTimeMillis();
+        FocalPointTargetTime = FocalPointResetTime + 1500;
+        focalPoint = focalPointStartingPoint;
+        for(Sprite sprite : spriteList) {
+            sprite.SetFocalPoint(focalPointEndingPoint);
+        }
+
+    }
+
     private void GetMembers() {
         // get handle to vertex shader's vPosition member
         mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
@@ -126,6 +160,9 @@ public class SceneSetter
         mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
         // Get handle to textures locations
         mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
+        biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
+        Log.d("blur", "bias handle: " + biasHandle);
+
 
     }
 

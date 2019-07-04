@@ -20,37 +20,11 @@
         android:layout_height="wrap_content"
         android:text="Summary" />
 
-    <TextView
-        android:id="@+id/textView"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Summary" />
-
-    <TextView
-        android:id="@+id/textView2"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Summary" />
-
-    <TextView
-        android:id="@+id/textView3"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Summary" />
-
-    <TextView
-        android:id="@+id/textView4"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Summary" />
-
     <SeekBar
         android:id="@+id/seekbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:max="6"
+        android:defaultValue="3" />
 
 </LinearLayout>

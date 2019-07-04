@@ -2,6 +2,7 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,9 +33,10 @@ public class Sprite {
     float xAccelOffset = 0;
     float yAccelOffset = 0;
 
+    private float bias = 0.0f;
+
 
     public Sprite(ISpriteData mSpriteData) {
-        this.timeTracker = timeTracker;
         spriteData = mSpriteData;
 //        scratch = new float[16];
         colors = spriteData.getColor(TimeTracker.DAY, 100);
@@ -78,10 +80,17 @@ public class Sprite {
         setColor(newColor);
     }
 
+    public void SetFocalPoint(float currentFocalPoint){
+        //get character distance from the 'in focus' camera depth
+        float distanceFromFocalPoint = Math.abs(currentFocalPoint - spriteData.getZVertices());
+        //translate that depth to the bias
+        bias = (distanceFromFocalPoint * 4 -1.0f);
+    }
+
 
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, int mColorHandle, int mPositionHandle, int mTexCoordLoc
-            , int mtrxHandle, int textureUniformHandle, float[] mMVPMatrix, int[] textureNames) {
-
+            , int mtrxHandle, int textureUniformHandle, int biasHandle, float[] mMVPMatrix, int[] textureNames)
+    {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
@@ -103,7 +112,8 @@ public class Sprite {
         GLES20.glActiveTexture(spriteData.getTexIndex());
         GLES20.glBindTexture(spriteData.getTexIndex(), textureNames[spriteData.getTextureIndex()]);
         GLES20.glUniform1i(textureUniformHandle, textureIndex);
-//        GLES20.glUniform4fv(mColorHandle, 1, colors, 0);
+
+        GLES20.glUniform1f(biasHandle, bias);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);

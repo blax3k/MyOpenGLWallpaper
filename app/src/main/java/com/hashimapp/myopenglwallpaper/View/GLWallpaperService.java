@@ -76,7 +76,7 @@ public abstract class GLWallpaperService extends WallpaperService {
             this.renderer = (GLRenderer)newRenderer;
             glSurfaceView.setRenderer(newRenderer);
             rendererSet = true;
-            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         }
 
 

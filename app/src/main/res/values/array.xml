@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listArray">
+    <string-array name="girlArray">
         <item>@string/girl_automatic</item>
         <item>@string/girl_front_1</item>
         <item>@string/girl_front_2</item>
@@ -29,7 +29,6 @@
         <item>high</item>
     </string-array>
     <string-array name="timeArray">
-        <item>@string/time_automatic</item>
         <item>@string/time_dawn</item>
         <item>@string/time_day</item>
         <item>@string/time_sunset</item>

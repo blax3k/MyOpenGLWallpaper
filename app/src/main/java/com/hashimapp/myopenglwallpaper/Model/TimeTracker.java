@@ -6,6 +6,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -53,15 +54,15 @@ public class TimeTracker
         location.setLocation(latitude, longitude);
     }
 
-    public int[] GetTimePhase(Calendar calendar)
+    public int[] GetTimePhase(Date date)
     {
         int[] timeInfo = new int[2];
-        UpdateSunriseSunsetTimes(calendar);
+        UpdateSunriseSunsetTimes(date);
         int percentage = 100;
         int CurrentTimePhase = DAY;
 
-        long currentTimeMillis = calendar.getTimeInMillis();
-        if(currentTimeMillis <= AstronomicalSunrise.getTimeInMillis() || currentTimeMillis >= AstronomicalSunset.getTimeInMillis()){
+        long currentTimeMillis = date.getTime();
+        if(date.before(AstronomicalSunrise.getTime()) ){
             CurrentTimePhase = NIGHT;
         }
         else if(currentTimeMillis >= PostOfficialSunrise.getTimeInMillis() && currentTimeMillis <= PreOfficialSunset.getTimeInMillis()){
@@ -69,23 +70,25 @@ public class TimeTracker
         }
         else if(currentTimeMillis >= AstronomicalSunrise.getTimeInMillis() && currentTimeMillis < CivilSunrise.getTimeInMillis()){
             CurrentTimePhase = NIGHT_TO_DAWN;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), AstronomicalSunrise.getTimeInMillis(), CivilSunrise.getTimeInMillis());
+            percentage = CalculateCurrentProgress(date.getTime(), AstronomicalSunrise.getTimeInMillis(), CivilSunrise.getTimeInMillis());
         }
         else if(currentTimeMillis >= CivilSunrise.getTimeInMillis() && currentTimeMillis < PostOfficialSunrise.getTimeInMillis()){
             CurrentTimePhase = DAWN_TO_DAY;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), CivilSunrise.getTimeInMillis(), PostOfficialSunrise.getTimeInMillis());
+            percentage = CalculateCurrentProgress(date.getTime(), CivilSunrise.getTimeInMillis(), PostOfficialSunrise.getTimeInMillis());
         }
         else if(currentTimeMillis >= PreOfficialSunset.getTimeInMillis() && currentTimeMillis < OfficialSunset.getTimeInMillis()){
             CurrentTimePhase = DAY_TO_SUNSET;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), PreOfficialSunset.getTimeInMillis(), OfficialSunset.getTimeInMillis());
+            percentage = CalculateCurrentProgress(date.getTime(), PreOfficialSunset.getTimeInMillis(), OfficialSunset.getTimeInMillis());
         }
         else if(currentTimeMillis >= OfficialSunset.getTimeInMillis() && currentTimeMillis < CivilSunset.getTimeInMillis()){
             CurrentTimePhase = SUNSET_TO_TWILIGHT;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), OfficialSunset.getTimeInMillis(), CivilSunset.getTimeInMillis());
+            percentage = CalculateCurrentProgress(date.getTime(), OfficialSunset.getTimeInMillis(), CivilSunset.getTimeInMillis());
         }
         else if(currentTimeMillis >= CivilSunset.getTimeInMillis() && currentTimeMillis < AstronomicalSunset.getTimeInMillis()){
             CurrentTimePhase = TWILIGHT_TO_NIGHT;
-            percentage = CalculateCurrentProgress(calendar.getTimeInMillis(), CivilSunset.getTimeInMillis(), AstronomicalSunset.getTimeInMillis());
+            percentage = CalculateCurrentProgress(date.getTime(), CivilSunset.getTimeInMillis(), AstronomicalSunset.getTimeInMillis());
+        }else if(currentTimeMillis >= AstronomicalSunset.getTimeInMillis()){
+            CurrentTimePhase = NIGHT;
         }
 
         timeInfo[TIME_PHASE_INDEX] = CurrentTimePhase;
@@ -130,7 +133,9 @@ public class TimeTracker
         return 0;
     }
 
-    public void UpdateSunriseSunsetTimes(Calendar rightNow){
+    public void UpdateSunriseSunsetTimes(Date date){
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTime(date);
         NauticalSunrise = calculator.getNauticalSunriseCalendarForDate(rightNow);
         NauticalSunset = calculator.getNauticalSunsetCalendarForDate(rightNow);
         AstronomicalSunrise = calculator.getAstronomicalSunriseCalendarForDate(rightNow);

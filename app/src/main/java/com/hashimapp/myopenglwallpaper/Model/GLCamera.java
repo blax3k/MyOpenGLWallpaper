@@ -1,11 +1,9 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
 import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
-import android.view.animation.LinearInterpolator;
 
 public class GLCamera {
     float[] mModelMatrix;
@@ -43,10 +41,16 @@ public class GLCamera {
     private float motionOffsetLimit;
     private float motionOffsetStrength;
     private boolean portraitOrientation;
-    private boolean motionOffsetOn;
+    private boolean motionOffsetEnabled;
+    private boolean touchOffsetEnabled;
+
+    private float focalPoint;
+    private float targetFocalPoint = 0.0f;
 
     private int screenWidth = 1;
     private int screenHeight = 1;
+    float relativeScreenWidth = 0;
+    float screenWidthDiff = 0;
 
     public GLCamera() {
         mModelMatrix = new float[16];
@@ -71,6 +75,8 @@ public class GLCamera {
             fov = (float) Math.toDegrees(Math.atan((TEXTURE_WIDTH/2)/depth)) * 2;
             portraitOrientation = false;
         }
+        relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
+        screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
         lookX = eyeX;
         Matrix.perspectiveM(mtrxProjection, 0, fov, ratio, 0, 12);
         Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
@@ -90,8 +96,6 @@ public class GLCamera {
             return 0.0f;
 
         } else if(portraitOrientation) {
-            float relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
-            float screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
             return xOffset * screenWidthDiff;
         }else{
             return xOffset * X_OFFSET_STEP_LANDSCAPE;
@@ -109,7 +113,6 @@ public class GLCamera {
         return screenWidthDiff/2;
     }
 
-    private float timestamp;
     float[] finalValues = new float[3];
 
     /*
@@ -159,7 +162,6 @@ public class GLCamera {
             } else if (finalValues[1] < -motionOffsetLimit) {
                 finalValues[1] = -motionOffsetLimit;
             }
-        timestamp = event.timestamp;
 
         return finalValues;
         // User code should concatenate the delta rotation we computed with the current rotation
@@ -167,18 +169,31 @@ public class GLCamera {
         // rotationCurrent = rotationCurrent * deltaRotationMatrix;
     }
 
-    public void SetMotionOffset(boolean motionOffsetOn){
-        this.motionOffsetOn = motionOffsetOn;
+    public void EnableMotionOffset(boolean enabled){
+        this.motionOffsetEnabled = enabled;
     }
 
-    public boolean GetMotionOffsetOn(){
-        return motionOffsetOn;
+    public boolean MotionOffsetEnabled(){
+        return motionOffsetEnabled;
     }
+
+    public void EnableTouchOffset(boolean enabled){
+        this.touchOffsetEnabled = enabled;
+    }
+
+    public boolean TouchOffsetEnabled(){
+        return touchOffsetEnabled;
+    }
+
 
     public void ResetSensorOffset(){
         finalValues[0] = 0;
         finalValues[1] = 0;
         finalValues[2] = 0;
+
+    }
+
+    public void SetTargetFocalPoint(float targetFocalPoint){
 
     }
 

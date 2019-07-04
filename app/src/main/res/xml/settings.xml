@@ -15,6 +15,12 @@
             android:title="@string/motion_parallax_strength_setting_title"
             android:max="6"
             android:defaultValue="3"/>
+
+        <SwitchPreference
+            android:key="@string/touch_offset_setting_key"
+            android:title="@string/touch_offset_setting_title"
+            android:defaultValue="@string/touch_offset_setting_default"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -25,31 +31,32 @@
             android:title="@string/auto_time_setting_title"
             android:defaultValue="@string/motion_parallax_default"/>
 
-        <SeekBarPreference
+        <ListPreference
             android:key="@string/set_time_key"
             android:title="@string/set_time_title"
-            android:max ="144"
-            android:defaultValue="0" />
+            android:entries="@array/timeArray"
+            android:entryValues="@array/timeArray"
+            android:defaultValue="@string/time_automatic"/>
     </PreferenceCategory>
 
-    <ListPreference
-        android:defaultValue="0"
-        android:entries="@array/listArray"
-        android:entryValues="@array/listValues"
-        android:key="texture_model"
-        android:title="@string/texture_choice" />
+    <!--<ListPreference-->
+        <!--android:defaultValue="0"-->
+        <!--android:entries="@array/girlArray"-->
+        <!--android:entryValues="@array/listValues"-->
+        <!--android:key="texture_model"-->
+        <!--android:title="@string/texture_choice" />-->
 
-    <ListPreference
-        android:defaultValue="none"
-        android:entries="@array/blurArray"
-        android:entryValues="@array/blurValues"
-        android:key="camera_blur"
-        android:title="Camera Blur" />
+    <!--<ListPreference-->
+        <!--android:defaultValue="none"-->
+        <!--android:entries="@array/blurArray"-->
+        <!--android:entryValues="@array/blurValues"-->
+        <!--android:key="camera_blur"-->
+        <!--android:title="Camera Blur" />-->
 
-    <com.hashimapp.myopenglwallpaper.View.SeekbarPreference
-        android:key="pref_max_volume"
-        android:title="@string/max_volume_pref"
-        android:summary="hoo haa"/>
+    <!--<com.hashimapp.myopenglwallpaper.View.SeekbarPreference-->
+        <!--android:key="pref_max_volume"-->
+        <!--android:title="@string/max_volume_pref"-->
+        <!--android:summary="hoo haa"/>-->
 
 
     <Preference

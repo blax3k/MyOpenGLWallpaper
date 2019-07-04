@@ -87,16 +87,18 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
 
 
         private void SetRendererPrefs() {
-            renderer.SetMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
+            renderer.EnableMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
-            renderer.SetTimeSetting(prefs.getInt(resources.getString(R.string.set_time_key), 0));
+            renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
+//            renderer.SetTimeSetting(prefs.getInt(resources.getString(R.string.set_time_key), 0));
         }
 
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
                                      float yStep, int xPixels, int yPixels) {
-            renderer.OnOffsetChanged(xOffset, yOffset);
-            glSurfaceView.requestRender();
+            if(renderer.OnOffsetChanged(xOffset, yOffset)){
+                glSurfaceView.requestRender();
+            }
         }
 
 
@@ -141,10 +143,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
             if (key.equals(resources.getString(R.string.motion_parallax_key))) {
                 if (sharedPreferences.getBoolean(resources.getString(R.string.motion_parallax_key), true)) {
                     sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-                    renderer.SetMotionOffset(true);
+                    renderer.EnableMotionOffset(true);
                 } else {
                     sensorManager.unregisterListener(this);
-                    renderer.SetMotionOffset(false);
+                    renderer.EnableMotionOffset(false);
                     renderer.ResetMotionOffset();
                 }
             } else if (key.equals(resources.getString(R.string.motion_parallax_strength_key))) {
@@ -152,6 +154,12 @@ public class OpenGLES2WallpaperService extends GLWallpaperService {
             } else if (key.equals(resources.getString(R.string.set_time_key))) {
                 renderer.SetTimeSetting(prefs.getInt(resources.getString(R.string.set_time_key), 0));
                 renderer.UpdateTime();
+            }else if(key.equals(resources.getString(R.string.touch_offset_setting_key))){
+                boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
+                renderer.SetTouchOffset(touchOffsetEnabled);
+                if(!touchOffsetEnabled){
+                    renderer.ResetTouchOffset();
+                }
             }
         }
 

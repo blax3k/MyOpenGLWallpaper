@@ -39,6 +39,10 @@
     <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
     <string name="motion_parallax_default">true</string>
 
+    <string name="touch_offset_setting_key">touch_offset</string>
+    <string name="touch_offset_setting_title">Home Scroll Parallax Enabled</string>
+    <string name="touch_offset_setting_default">true</string>
+
 
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
     <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
@@ -57,7 +61,6 @@
     <string name="auto_time_setting_key">auto_time_key</string>
     <string name="auto_time_setting_title">Automatic Time</string>
     <string name="auto_time_setting_default">true</string>
-
 
 
 </resources>

@@ -12,9 +12,7 @@ import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.SystemClock;
-import android.util.Log;
 
-import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
@@ -46,9 +44,14 @@ public class GLRenderer implements Renderer {
         manualTime = false;
     }
 
-    public void OnOffsetChanged(float xOffset, float yOffset) {
-        float newXOffset = camera.getxOffsetStepPortrait(xOffset);
-        sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
+    public boolean OnOffsetChanged(float xOffset, float yOffset) {
+
+        if(camera.TouchOffsetEnabled()){
+            float newXOffset = camera.getxOffsetStepPortrait(xOffset);
+            sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
+            return true;
+        }
+        return false;
 
 
 //        Calendar calendar = Calendar.getInstance();
@@ -74,10 +77,12 @@ public class GLRenderer implements Renderer {
     float[] prevSensorValues = new float[3];
 
     public void OnSensorChanged(SensorEvent event, int rotation) {
-        float[] newSensorValues = camera.SensorChanged(event, rotation);
-        prevSensorValues[0] = newSensorValues[0];
-        prevSensorValues[1] = newSensorValues[1];
-        sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
+        if(camera.MotionOffsetEnabled()){
+            float[] newSensorValues = camera.SensorChanged(event, rotation);
+            prevSensorValues[0] = newSensorValues[0];
+            prevSensorValues[1] = newSensorValues[1];
+            sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
+        }
     }
 
     public void SwapTextures() {
@@ -88,7 +93,10 @@ public class GLRenderer implements Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         startTime = System.currentTimeMillis();
-        sceneSetter = new SceneSetter();
+        if(sceneSetter == null){
+            sceneSetter = new SceneSetter();
+        }
+        sceneSetter.InitSprites();
         // Set the clear color to white
         GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
 
@@ -120,8 +128,8 @@ public class GLRenderer implements Renderer {
 
     }
 
-    public void SetMotionOffset(boolean motionOffsetOn) {
-        camera.SetMotionOffset(motionOffsetOn);
+    public void EnableMotionOffset(boolean motionOffsetOn) {
+        camera.EnableMotionOffset(motionOffsetOn);
     }
 
     public void ResetMotionOffset() {
@@ -131,6 +139,15 @@ public class GLRenderer implements Renderer {
 
     public void SetMotionOffsetStrength(int offsetStrength) {
         camera.setMotionOffsetStrength(offsetStrength);
+    }
+
+    public void SetTouchOffset(boolean touchOffsetOn){
+        camera.EnableTouchOffset(touchOffsetOn);
+    }
+
+    public void ResetTouchOffset(){
+        float xOffset = 0.5f; //halfway between 0 and 1.0
+        OnOffsetChanged(xOffset, 0.0f);
     }
 
     public void SetTimeSetting(int minuteOfDay) {
@@ -143,7 +160,7 @@ public class GLRenderer implements Renderer {
     }
 
     public void UpdateTime() {
-        Calendar calendar = Calendar.getInstance();
+        Date date =  Calendar.getInstance().getTime();
         int timeOfDay, percentage;
 //        if (!manualTime) {
 //
@@ -153,14 +170,13 @@ public class GLRenderer implements Renderer {
 //            calendar.set(Calendar.SECOND, 0);
 //            calendar.set(Calendar.MILLISECOND, 0);
 //            calendar.add(Calendar.MINUTE, manualTimeOfDay);
-//        }
-        int[] timeInfo = timeTracker.GetTimePhase(calendar);
+//        }e();
+        int[] timeInfo = timeTracker.GetTimePhase(date);
         timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
         percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
 
         sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
-
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -176,7 +192,8 @@ public class GLRenderer implements Renderer {
 //            sceneSetter.setBlur(temp);
 
         camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetMotionOffsetOn(), camera.GetXOffsetPosition());
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(), camera.GetXOffsetPosition());
+        sceneSetter.ResetFocalPoint();
     }
 
 
@@ -187,6 +204,11 @@ public class GLRenderer implements Renderer {
     long lastFrameTime;
     long endTime, deltaTime, startTime;
 
+    //checks if there are animated elements in the scene that need to be drawn
+    public boolean ContinueDrawing(){
+        return sceneSetter.FocalPointReached();
+    }
+
     @Override
     public void onDrawFrame(GL10 unused) {
         if (SystemClock.uptimeMillis() - mFPSTime > 1000) {
@@ -195,6 +217,10 @@ public class GLRenderer implements Renderer {
             mFPSCounter = 0;
         } else {
             mFPSCounter++;
+        }
+
+        if(!sceneSetter.FocalPointReached()){
+            sceneSetter.UpdateFocalPoint();
         }
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);

@@ -55,6 +55,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d("pref change", "key: " + key);
             if (key.equals(resources.getString(R.string.motion_parallax_key))) {
                 SetMotionParallaxStrengthEnabled(sharedPreferences);
             }
@@ -62,8 +63,8 @@ public class SettingsActivity extends PreferenceActivity {
 
         private void initPreferences() {
             SetMotionParallaxStrengthEnabled(prefs);
-            Preference seekbar = getPreferenceScreen().findPreference("pref_max_volume");
-            seekbar.setTitle("hello there");
+//            Preference seekbar = getPreferenceScreen().findPreference("pref_max_volume");
+//            seekbar.setTitle("hello there");
         }
 
         private void SetMotionParallaxStrengthEnabled(SharedPreferences prefs) {
