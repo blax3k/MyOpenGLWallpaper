@@ -34,8 +34,7 @@ public class BackgroundSprite extends SpriteData {
                 2.7f, -2.7f, 0.0f,   // bottom right
                 2.7f, 2.7f, 0.0f}; // top right
 
-        textureIndex = Textures.BACKGROUND_TEXTURE_INDEX;
-        TexIndex = GLES20.GL_TEXTURE2;
+        textureNameIndex = Textures.BACKGROUND_TEXTURE_INDEX;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]{
                 1f, 1f, 1f, 1f,
@@ -43,7 +42,13 @@ public class BackgroundSprite extends SpriteData {
                 1f, 1f, 1f, 1f,
                 1f, 1f, 1f, 1f};
 
-        dawnColor = new float[]{
+        earlyDawnColor = new float[]{
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,
+                0.4f, 0.57f, 0.77f, 1f,};
+
+        midDawnColor = new float[]{
                 0.4f, 0.57f, 0.77f, 1f,
                 0.4f, 0.57f, 0.77f, 1f,
                 0.4f, 0.57f, 0.77f, 1f,
@@ -55,13 +60,13 @@ public class BackgroundSprite extends SpriteData {
                 1f, 1f, 1f, 1f,
                 1f, 1f, 1f, 1f};
 
-        sunsetColor = new float[]{
+        earlyDuskColor = new float[]{
                 1f, 1f, 1f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.45f, 0.098f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,};
 
-        twilightColor = new float[]{
+        midDuskColor = new float[]{
                 0.62f, 0.39f, 0.24f, 1f,
                 0.12f, 0.19f, 0.14f, 1f,
                 0.12f, 0.19f, 0.14f, 1f,
@@ -80,6 +85,13 @@ public class BackgroundSprite extends SpriteData {
                 1.0f, 1.0f,
                 1.0f, 0.0f
         };
+
+
+    }
+
+    @Override
+    public int GetBitmapID(){
+        return R.drawable.layer2;
     }
 
 }

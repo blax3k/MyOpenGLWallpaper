@@ -4,6 +4,7 @@ package com.hashimapp.myopenglwallpaper.Model;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class SpriteData implements ISpriteData {
 
@@ -12,28 +13,19 @@ public class SpriteData implements ISpriteData {
     protected float[] landscapeVertices;
     protected float[] landscapeVerticesMotion;
     protected float[] textureVertices;
-    protected int textureIndex;
+    protected int textureNameIndex;
 
     protected short[] indices;
     protected float[] defaultColor;
-    protected float[] dawnColor;
+    protected float[] earlyDawnColor;
+    protected float[] midDawnColor;
     protected float[] dayColor;
-    protected float[] sunsetColor;
-    protected float[] twilightColor;
+    protected float[] earlyDuskColor;
+    protected float[] midDuskColor;
     protected float[] nightColor;
     protected float zVertice;
     protected boolean portrait = true;
-    protected int TexIndex;
 
-    @Override
-    public int getTextureIndex() {
-        return textureIndex;
-    }
-
-    @Override
-    public int getTexIndex() {
-        return TexIndex;
-    }
 
     @Override
     public float[] getColor(int timeOfDay, int phasePercentage) {
@@ -42,20 +34,23 @@ public class SpriteData implements ISpriteData {
                 return dayColor;
             case TimeTracker.NIGHT:
                 return nightColor;
-            case TimeTracker.NIGHT_TO_DAWN:
-                return MultiplyColors(phasePercentage, nightColor, dawnColor);
-            case TimeTracker.DAWN_TO_DAY:
-                return MultiplyColors(phasePercentage, dawnColor, dayColor);
-            case TimeTracker.DAY_TO_SUNSET:
-                return MultiplyColors(phasePercentage, dayColor, sunsetColor);
-            case TimeTracker.SUNSET_TO_TWILIGHT:
-                return MultiplyColors(phasePercentage, sunsetColor, twilightColor);
-            case TimeTracker.TWILIGHT_TO_NIGHT:
-                return MultiplyColors(phasePercentage, twilightColor, nightColor);
-
+            case TimeTracker.EARLY_DAWN:
+                return MultiplyColors(phasePercentage, nightColor, earlyDawnColor);
+            case TimeTracker.MID_DAWN:
+                return MultiplyColors(phasePercentage, earlyDawnColor, midDawnColor);
+            case TimeTracker.LATE_DAWN:
+                return MultiplyColors(phasePercentage, midDawnColor, dayColor);
+            case TimeTracker.EARLY_DUSK:
+                return MultiplyColors(phasePercentage, dayColor, earlyDuskColor);
+            case TimeTracker.MID_DUSK:
+                return MultiplyColors(phasePercentage, earlyDuskColor, midDuskColor);
+            case TimeTracker.LATE_DUSK:
+                return MultiplyColors(phasePercentage, midDuskColor, nightColor);
         }
         return defaultColor;
     }
+
+
 
     private float[] MultiplyColors(int phasePercent, float[] current, float[] next){
         float[] result = new float[current.length];
@@ -110,6 +105,11 @@ public class SpriteData implements ISpriteData {
     @Override
     public void setOrientation(boolean portrait) {
         this.portrait = portrait;
+    }
+
+    @Override
+    public int GetBitmapID(){
+        return 0;
     }
 
 }

@@ -2,7 +2,6 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -20,6 +19,7 @@ public class Sprite {
     public ShortBuffer drawListBuffer;
     public FloatBuffer colorBuffer;
     public FloatBuffer textureVerticeBuffer;
+    private int GLTextureIndex;
     private TimeTracker timeTracker;
     //    private final int mProgram;
     public static float colors[];
@@ -27,26 +27,33 @@ public class Sprite {
 
     private float spriteXPosOffset;
 
-    private int textureIndex;
-    ISpriteData spriteData;
+    private boolean textureSwapRequired;
+
+    private int textureName;
+    private int textureNameIndex;
+    private int currentBitmapID;
+    public ISpriteData spriteData;
     float xScrollOffset = 0;
     float xAccelOffset = 0;
     float yAccelOffset = 0;
 
+    private int spriteKey;
+
     private float bias = 0.0f;
 
 
-    public Sprite(ISpriteData mSpriteData) {
+    public Sprite(ISpriteData mSpriteData, int spriteKey) {
         spriteData = mSpriteData;
 //        scratch = new float[16];
         colors = spriteData.getColor(TimeTracker.DAY, 100);
         indices = spriteData.getIndices();
-        textureIndex = spriteData.getTextureIndex();
+        currentBitmapID = spriteData.GetBitmapID();
 
         setColor(colors);
         setVertices(spriteData.getShapeVertices(true, false));
         setTextureVertices(spriteData.getTextureVertices());
         setIndices(indices);
+        this.spriteKey = spriteKey;
     }
 
     public void OffsetChanged(float xOffset, boolean PortraitOrientation) {
@@ -76,8 +83,8 @@ public class Sprite {
     }
 
     public void SetTime(int time, int phasePercentage) {
-        float[] newColor = spriteData.getColor(time, phasePercentage);
-        setColor(newColor);
+        colors = spriteData.getColor(time, phasePercentage);
+        setColor(colors);
     }
 
     public void SetFocalPoint(float currentFocalPoint){
@@ -87,9 +94,59 @@ public class Sprite {
         bias = (distanceFromFocalPoint * 4 -1.0f);
     }
 
+    public void SetAlpha(float alpha){
+        int length = colors.length;
+        for(int i = 3; i < length; i+= 4)
+        {
+            colors[i] = alpha;
+        }
+        setColor(colors);
+    }
+
+
+    public int GetNextBitmapID(){
+        int newBitmapID = spriteData.GetBitmapID();
+        if(newBitmapID != currentBitmapID){
+            currentBitmapID = newBitmapID;
+            return currentBitmapID;
+        }
+        return -1;
+    }
+
+    public int getCurrentBitmapID(){
+        return currentBitmapID;
+    }
+
+
+
+    public void SetTextureData(TextureData textureData){
+        GLTextureIndex = textureData.GLTextureIndex;
+        textureName = textureData.textureName;
+        textureNameIndex = textureData.textureNameIndex;
+    }
+
+
+    public int getGLTextureIndex(){
+        return GLTextureIndex;
+    }
+    public int getTextureName(){
+        return textureName;
+    }
+    public int getTextureNameIndex(){
+        return textureNameIndex;
+    }
+
+    public boolean TextureSwapRequired(){
+        return textureSwapRequired;
+    }
+
+    public void SetTextureSwapRequired(boolean swapping){
+        textureSwapRequired = swapping;
+    }
+
 
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, int mColorHandle, int mPositionHandle, int mTexCoordLoc
-            , int mtrxHandle, int textureUniformHandle, int biasHandle, float[] mMVPMatrix, int[] textureNames)
+            , int mtrxHandle, int textureUniformHandle, int biasHandle, float[] mMVPMatrix)
     {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
@@ -109,9 +166,9 @@ public class Sprite {
         GLES20.glUniformMatrix4fv(mtrxHandle, 1, false, mMVPMatrix, 0);
 
         // Set the sampler texture unit to x, where we have saved the texture.
-        GLES20.glActiveTexture(spriteData.getTexIndex());
-        GLES20.glBindTexture(spriteData.getTexIndex(), textureNames[spriteData.getTextureIndex()]);
-        GLES20.glUniform1i(textureUniformHandle, textureIndex);
+        GLES20.glActiveTexture(GLTextureIndex);
+        GLES20.glBindTexture(GLTextureIndex, textureName);
+        GLES20.glUniform1i(textureUniformHandle, textureNameIndex);
 
         GLES20.glUniform1f(biasHandle, bias);
 
@@ -122,7 +179,7 @@ public class Sprite {
 //        GLES20.glDisableVertexAttribArray(mPositionHandle);
 //        GLES20.glDisableVertexAttribArray(mColorHandle);
 //
-//        if (textureIndex >= 0)
+//        if (textureName >= 0)
 //            GLES20.glDisableVertexAttribArray(mTexCoordLoc);
     }
 

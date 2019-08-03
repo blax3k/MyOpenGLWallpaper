@@ -5,56 +5,73 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 
-public abstract class GLWallpaperService extends WallpaperService {
+import java.util.Date;
+
+public abstract class GLWallpaperService extends WallpaperService
+{
 
     protected SensorManager sensorManager;
     protected Sensor sensor;
     boolean rendererSet;
 
-    public class GLEngine extends Engine {
-        class WallpaperGLSurfaceView extends GLSurfaceView {
+    public class GLEngine extends Engine
+    {
+
+
+        class WallpaperGLSurfaceView extends GLSurfaceView
+        {
             private static final String TAG = "WallpaperGLSurfaceView";
 
-            WallpaperGLSurfaceView(Context context) {
+            public Date startDate;
+
+            WallpaperGLSurfaceView(Context context)
+            {
                 super(context);
+                startDate = new Date();
+                Log.d("create", "wallpaperGLSurfaceView " + startDate + " created");
+
             }
 
             @Override
-            public SurfaceHolder getHolder() {
+            public SurfaceHolder getHolder()
+            {
                 return getSurfaceHolder();
             }
 
-            public void onDestroy() {
+            public void onDestroy()
+            {
                 super.onDetachedFromWindow();
             }
         }
-        public GLRenderer renderer;
 
         WallpaperGLSurfaceView glSurfaceView;
+        public GLRenderer renderer;
 
         @Override
-        public void onCreate(SurfaceHolder surfaceHolder) {
+        public void onCreate(SurfaceHolder surfaceHolder)
+        {
             super.onCreate(surfaceHolder);
             glSurfaceView = new WallpaperGLSurfaceView(GLWallpaperService.this);
         }
 
         @Override
-        public void onVisibilityChanged(boolean visible) {
+        public void onVisibilityChanged(boolean visible)
+        {
             super.onVisibilityChanged(visible);
 
-            if (rendererSet) {
+            if (rendererSet)
+            {
                 if (visible)//resume
                 {
-//                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                     glSurfaceView.onResume();
                     glSurfaceView.requestRender();
                 } else //pause
                 {
-//                    sensorManager.unregisterListener(this);
                     glSurfaceView.onPause();
                 }
             }
@@ -62,29 +79,34 @@ public abstract class GLWallpaperService extends WallpaperService {
 
 
         @Override
-        public void onDestroy() {
+        public void onDestroy()
+        {
             super.onDestroy();
             glSurfaceView.onDestroy();
         }
 
         @Override
-        public void onSurfaceDestroyed(SurfaceHolder holder) {
+        public void onSurfaceDestroyed(SurfaceHolder holder)
+        {
             super.onSurfaceDestroyed(holder);
         }
 
-        public void setRenderer(GLSurfaceView.Renderer newRenderer) {
-            this.renderer = (GLRenderer)newRenderer;
+        public void setRenderer(GLSurfaceView.Renderer newRenderer)
+        {
+            renderer = (GLRenderer) newRenderer;
             glSurfaceView.setRenderer(newRenderer);
             rendererSet = true;
             glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         }
 
 
-        protected void setPreserveEGLContextOnPause(boolean preserve) {
+        protected void setPreserveEGLContextOnPause(boolean preserve)
+        {
             glSurfaceView.setPreserveEGLContextOnPause(preserve);
         }
 
-        protected void setEGLContextClientVersion(int version) {
+        protected void setEGLContextClientVersion(int version)
+        {
             glSurfaceView.setEGLContextClientVersion(version);
         }
 

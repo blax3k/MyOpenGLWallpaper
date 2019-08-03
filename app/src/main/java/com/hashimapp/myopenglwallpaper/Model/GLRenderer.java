@@ -1,5 +1,8 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,7 +15,9 @@ import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.SystemClock;
+import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
@@ -29,19 +34,24 @@ public class GLRenderer implements Renderer {
     Context context = OpenGLES2WallpaperService.getAppContext();
     Resources resources = context.getResources();
     TimeTracker timeTracker;
-    int manualTimeOfDay = 0;
-    private boolean manualTime;
+    private boolean autoTimeEnabled;
+    private String timePhaseSelected;
+
+    public Date startDate;
 
 
     public GLCamera camera;
 
     public GLRenderer() {
+        startDate  = new Date();
+
         dateCreated = new Date();
         camera = new GLCamera();
         sceneSetter = new SceneSetter();
         location = new Location(47.760012, -122.307209);
-        timeTracker = new TimeTracker();
-        manualTime = false;
+        timeTracker = new TimeTracker(resources);
+        autoTimeEnabled = true;
+        timePhaseSelected = resources.getString(R.string.time_key_day);
     }
 
     public boolean OnOffsetChanged(float xOffset, float yOffset) {
@@ -54,24 +64,6 @@ public class GLRenderer implements Renderer {
         return false;
 
 
-//        Calendar calendar = Calendar.getInstance();
-//        int timeOfDay, percentage;
-//            calendar.set(Calendar.HOUR_OF_DAY, 0);
-//            calendar.set(Calendar.MINUTE, 0);
-//            calendar.set(Calendar.SECOND, 0);
-//            calendar.set(Calendar.MILLISECOND, 0);
-//            int minutes = (int)(xOffset * 100f * 1440)/100;
-//            Log.d("Debug", "minutes: " + minutes);
-//        Log.d("Debug", "xOffset: " + xOffset);
-//            calendar.add(Calendar.MINUTE, minutes);
-//        int[] timeInfo = timeTracker.GetTimePhase(calendar);
-//        timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
-//        percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
-//
-//        Log.d("Debug", "timeOfDay: " + calendar.getTime().toString());
-//        Log.d("Debug", "percentage: " + percentage);
-//
-//        sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
 
     float[] prevSensorValues = new float[3];
@@ -85,9 +77,6 @@ public class GLRenderer implements Renderer {
         }
     }
 
-    public void SwapTextures() {
-        sceneSetter.swapTextures();
-    }
 
 
     @Override
@@ -124,7 +113,7 @@ public class GLRenderer implements Renderer {
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
     }
 
@@ -150,32 +139,56 @@ public class GLRenderer implements Renderer {
         OnOffsetChanged(xOffset, 0.0f);
     }
 
-    public void SetTimeSetting(int minuteOfDay) {
-        if (minuteOfDay == 0) {
-            manualTime = false;
-        } else {
-            manualTime = true;
-            manualTimeOfDay = minuteOfDay;
+    public void SwapTextures() {
+        //only swap if the scene setter is not already swapping
+        Log.d("create", "swapping textures on renderer " + startDate);
+        if(sceneSetter.GetTextureSwapStatus() == SceneSetter.STATUS_DONE){
+            sceneSetter.InitTextureSwap();
+        }
+    }
+
+    public void UpdateVisibility(boolean visible){
+        if(visible){
+
+            UpdateTime();
+            if(timeTracker.SceneChangeRequired()){
+//                sceneSetter.InitTextureSwap();
+                timeTracker.SignalSceneChanged();
+            }
+        }else{
+            if(sceneSetter.GetTextureSwapStatus() != SceneSetter.STATUS_DONE){
+                sceneSetter.ResetTextureSwap();
+            }
+            ResetMotionOffset();
         }
     }
 
     public void UpdateTime() {
-        Date date =  Calendar.getInstance().getTime();
+
         int timeOfDay, percentage;
-//        if (!manualTime) {
-//
-//        } else {
-//            calendar.set(Calendar.HOUR_OF_DAY, 0);
-//            calendar.set(Calendar.MINUTE, 0);
-//            calendar.set(Calendar.SECOND, 0);
-//            calendar.set(Calendar.MILLISECOND, 0);
-//            calendar.add(Calendar.MINUTE, manualTimeOfDay);
-//        }e();
-        int[] timeInfo = timeTracker.GetTimePhase(date);
+        int[] timeInfo;
+        if (autoTimeEnabled)
+        {
+            Date date = Calendar.getInstance().getTime();
+            timeInfo = timeTracker.GetTimePhase(date);
+        } else
+        {
+            timeInfo = timeTracker.GetTimePhase(timePhaseSelected);
+        }
+
         timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
         percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];
 
         sceneSetter.SetTimeOfDay(timeOfDay, percentage);
+    }
+
+
+    public void SetTimePhase(String phaseOfDay){
+        timePhaseSelected = phaseOfDay;
+    }
+
+    public void setAutoTimeEnabled(boolean enabled){
+        autoTimeEnabled = enabled;
     }
 
     @Override
@@ -194,6 +207,8 @@ public class GLRenderer implements Renderer {
         camera.OnSurfaceChanged(width, height);
         sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(), camera.GetXOffsetPosition());
         sceneSetter.ResetFocalPoint();
+
+
     }
 
 
@@ -206,22 +221,33 @@ public class GLRenderer implements Renderer {
 
     //checks if there are animated elements in the scene that need to be drawn
     public boolean ContinueDrawing(){
-        return sceneSetter.FocalPointReached();
+        return sceneSetter.RackingFocus();
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        if (SystemClock.uptimeMillis() - mFPSTime > 1000) {
+        if (SystemClock.uptimeMillis() - mFPSTime > 3000) {
             mFPSTime = SystemClock.uptimeMillis();
             mFPS = mFPSCounter;
             mFPSCounter = 0;
+            Log.d("create", "drawing frame on renderer " + startDate);
         } else {
             mFPSCounter++;
         }
 
-        if(!sceneSetter.FocalPointReached()){
+
+        if(sceneSetter.GetTextureSwapStatus() > 0)
+        {
+            sceneSetter.UpdateFade();
+        }
+
+
+        if(sceneSetter.RackingFocus()){
             sceneSetter.UpdateFocalPoint();
         }
+
+        //check if any textures need to be swapped
+        //begin swap process in sprites
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 //        // Enable alpha blending.
@@ -241,9 +267,7 @@ public class GLRenderer implements Renderer {
 
         // Calculate the projection and view
 
-        synchronized (this) {
             sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix);
-        }
 
 //        sky.draw(textureVerticeBuffer, camera.mtrxView, camera.mtrxProjection, mModelMatrix);
         //change the program being used
@@ -253,7 +277,7 @@ public class GLRenderer implements Renderer {
 //		Matrix.translateM(mModelMatrix, 0, xScrollOffset * 0.1f, yOffset * 0.1f, 1.0f);
 //		Matrix.multiplyMM(scratch1, 0, mtrxView, 0, mModelMatrix, 0);
 //		Matrix.multiplyMM(scratch1, 0, mtrxProjection, 0, scratch1, 0);
-//		clouds.draw(cloudMVPMatrix, cloudUVBuffer, sceneSetter.getTextureIndex(SceneModel.CLOUDS), mModelMatrix,
+//		clouds.draw(cloudMVPMatrix, cloudUVBuffer, sceneSetter.getTextureNameIndex(SceneModel.CLOUDS), mModelMatrix,
 //				mtrxView, mtrxProjection, xScrollOffset, yOffset);
 
         GLES20.glUseProgram(riGraphicTools.sp_Image);

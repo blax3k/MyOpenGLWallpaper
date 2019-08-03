@@ -28,12 +28,18 @@
     //accelerometer scrolling
     <string name="sim_scrolling">3D parallax effect</string>
     <string name="sim_scrolling_summary">Control parallax effect with accelerometer</string>
+
     //camera blur
+    <string name="setting_blur_section_title">Blur Settings</string>
+    <string name="blur_enabled_key">blurEnabled</string>
+    <string name="blur_enabled_titley">Blurring Enabled</string>
+
     <string name="blur_none">No camera blur</string>
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_high">Heavy camera blur</string>
 
-    <string name="setting_movement_section">Movement Settings</string>
+    //screen and gyro movement settings
+    <string name="setting_movement_section_title">Movement Settings</string>
 
     <string name="motion_parallax_key">motion_parallax</string>
     <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
@@ -43,24 +49,36 @@
     <string name="touch_offset_setting_title">Home Scroll Parallax Enabled</string>
     <string name="touch_offset_setting_default">true</string>
 
-
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
     <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
 
     <string name="max_volume_pref">Max volume</string>
 
-    <string name="set_time_key">set_time</string>
-    <string name="time_automatic">Automatic</string>
-    <string name="time_dawn">Dawn</string>
-    <string name="time_day">Day</string>
-    <string name="time_sunset">Sunset</string>
-    <string name="time_night">Night</string>
-
-
+    //auto time settings
     <string name="setting_color_section">Color Settings</string>
     <string name="auto_time_setting_key">auto_time_key</string>
     <string name="auto_time_setting_title">Automatic Time</string>
     <string name="auto_time_setting_default">true</string>
+
+    //time phase settings
+    <string name="time_phase_key">set_time_key</string>
+    <string name="time_key_early_dawn">EarlyDawn</string>
+    <string name="time_key_mid_dawn">MidDawn</string>
+    <string name="time_key_late_dawn">LateDawn</string>
+    <string name="time_key_day">Day</string>
+    <string name="time_key_early_dusk">EarlyDusk</string>
+    <string name="time_key_mid_dusk">MidDusk</string>
+    <string name="time_key_late_dusk">LateDusk</string>
+    <string name="time_key_night">Night</string>
+
+    <string name="time_title_early_dawn">Dawn</string>
+    <string name="time_title_mid_dawn">Sunrise</string>
+    <string name="time_title_day">Day</string>
+    <string name="time_title_mid_dusk">Sunset</string>
+    <string name="time_title_late_dusk">Twilight</string>
+    <string name="time_title_night">Night</string>
+
+
 
 
 </resources>

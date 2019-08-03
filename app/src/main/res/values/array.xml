@@ -9,6 +9,7 @@
         <item>@string/girl_back_1</item>
         <item>@string/girl_back_2</item>
     </string-array>
+
     <string-array name="listValues">
         <item>0</item>
         <item>1</item>
@@ -18,27 +19,34 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+
     <string-array name="blurArray">
         <item>@string/blur_none</item>
         <item>@string/blur_low</item>
         <item>@string/blur_high</item>
     </string-array>
+
     <string-array name="blurValues">
         <item>none</item>
         <item>low</item>
         <item>high</item>
     </string-array>
-    <string-array name="timeArray">
-        <item>@string/time_dawn</item>
-        <item>@string/time_day</item>
-        <item>@string/time_sunset</item>
-        <item>@string/time_night</item>
+
+    <string-array name="setTimePrefs">
+        <item>@string/time_title_early_dawn</item>
+        <item>@string/time_title_mid_dawn</item>
+        <item>@string/time_title_day</item>
+        <item>@string/time_title_mid_dusk</item>
+        <item>@string/time_title_late_dusk</item>
+        <item>@string/time_title_night</item>
     </string-array>
-    <integer-array name="timeValues">
-        <item>@integer/int_time_automatic</item>
-        <item>@integer/int_time_dawn</item>
-        <item>@integer/int_time_day</item>
-        <item>@integer/int_time_sunset</item>
-        <item>@integer/int_time_night</item>
+
+    <integer-array name="setTimeValues">
+        <item>@string/time_key_early_dawn</item>
+        <item>@string/time_key_mid_dawn</item>
+        <item>@string/time_key_day</item>
+        <item>@string/time_key_early_dusk</item>
+        <item>@string/time_key_mid_dusk</item>
+        <item>@string/time_key_night</item>
     </integer-array>
 </resources>

@@ -2,9 +2,9 @@
 <resources>
 
     <integer name="int_time_automatic">0</integer>
-    <integer name="int_time_dawn">1</integer>
-    <integer name="int_time_day">2</integer>
-    <integer name="int_time_sunset">3</integer>
-    <integer name="int_time_night">4</integer>
+    <integer name="int_time_dawn">0</integer>
+    <integer name="int_time_day">1</integer>
+    <integer name="int_time_sunset">2</integer>
+    <integer name="int_time_night">3</integer>
 
 </resources>
