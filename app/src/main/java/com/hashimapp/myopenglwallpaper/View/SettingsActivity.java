@@ -65,14 +65,19 @@ public class SettingsActivity extends PreferenceActivity
                 SetMotionParallaxStrengthEnabled(sharedPreferences);
             } else if (key.equals(resources.getString(R.string.auto_time_setting_key)))
             {
-                SetAutomaticTimeEnabled(sharedPreferences);
+//                SetAutomaticTimeEnabled(sharedPreferences);
+            } else if (key.equals(resources.getString(R.string.blur_enabled_key)))
+            {
+                SetCameraBlurEnabled(sharedPreferences);
             }
         }
 
         private void initPreferences()
         {
             SetMotionParallaxStrengthEnabled(prefs);
-            SetAutomaticTimeEnabled(prefs);
+//            SetAutomaticTimeEnabled(prefs);
+            SetCameraBlurEnabled(prefs);
+
 //            Preference seekbar = getPreferenceScreen().findPreference("pref_max_volume");
 //            seekbar.setTitle("hello there");
         }
@@ -90,18 +95,29 @@ public class SettingsActivity extends PreferenceActivity
         }
 
 
-        private void SetAutomaticTimeEnabled(SharedPreferences prefs)
+//        private void SetAutomaticTimeEnabled(SharedPreferences prefs)
+//        {
+//            String setTimePref = resources.getString(R.string.time_phase_key);
+//            if (prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true))
+//            {
+//                getPreferenceScreen().findPreference(setTimePref).setEnabled(false);
+//            } else
+//            {
+//                getPreferenceScreen().findPreference(setTimePref).setEnabled(true);
+//            }
+//        }
+
+        private void SetCameraBlurEnabled(SharedPreferences prefs)
         {
-            String setTimePref = resources.getString(R.string.time_phase_key);
-            if (prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true))
+            String rackFocusKey = resources.getString(R.string.rack_focus_enabled_key);
+            if (prefs.getBoolean(resources.getString(R.string.blur_enabled_key), true))
             {
-                getPreferenceScreen().findPreference(setTimePref).setEnabled(false);
+                getPreferenceScreen().findPreference(rackFocusKey).setEnabled(true);
             } else
             {
-                getPreferenceScreen().findPreference(setTimePref).setEnabled(true);
+                getPreferenceScreen().findPreference(rackFocusKey).setEnabled(false);
             }
         }
-
 
 
     }

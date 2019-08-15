@@ -8,6 +8,7 @@ import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.hashimapp.myopenglwallpaper.Model.GLParticleRenderer;
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 
 import java.util.Date;
@@ -21,19 +22,11 @@ public abstract class GLWallpaperService extends WallpaperService
 
     public class GLEngine extends Engine
     {
-
-
         class WallpaperGLSurfaceView extends GLSurfaceView
         {
-            private static final String TAG = "WallpaperGLSurfaceView";
-
-            public Date startDate;
-
             WallpaperGLSurfaceView(Context context)
             {
                 super(context);
-                startDate = new Date();
-                Log.d("create", "wallpaperGLSurfaceView " + startDate + " created");
 
             }
 

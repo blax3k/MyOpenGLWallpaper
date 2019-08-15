@@ -1,27 +1,28 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import android.opengl.GLES20;
-
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;
 
-public class GirlSprite extends SpriteData {
+public class GuySprite extends SpriteData
+{
 
-    int currentBitmap = R.drawable.layer0;
-    public GirlSprite() {
-        zVertice = -0.0f;
+    int currentBitmap = R.drawable.guy;
+
+    public GuySprite()
+    {
+        zVertice = -0.1f;
         portraitVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
+                0.4f, 2.3f, 0.0f,   // top left
+                0.4f, 0.4f, 0.0f,   // bottom left
+                2.3f, 0.4f, 0.0f,   // bottom right
+                2.3f, 2.3f, 0.0f}; // top right
 
         portraitVerticesMotion = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
+                0.4f, 2.3f, 0.0f,   // top left
+                0.4f, 0.4f, 0.0f,   // bottom left
+                2.3f, 0.4f, 0.0f,   // bottom right
+                2.3f, 2.3f, 0.0f}; // top right
 
         landscapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
@@ -89,11 +90,8 @@ public class GirlSprite extends SpriteData {
 
     @Override
     public int GetBitmapID(){
-        if(currentBitmap == R.drawable.layer0){
-            currentBitmap = R.drawable.layer00;
-            return currentBitmap;
-        }
-        currentBitmap = R.drawable.layer0;
         return currentBitmap;
     }
 }
+
+

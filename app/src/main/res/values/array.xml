@@ -33,6 +33,7 @@
     </string-array>
 
     <string-array name="setTimePrefs">
+        <item>@string/time_title_automatic</item>
         <item>@string/time_title_early_dawn</item>
         <item>@string/time_title_mid_dawn</item>
         <item>@string/time_title_day</item>
@@ -42,6 +43,7 @@
     </string-array>
 
     <integer-array name="setTimeValues">
+        <item>@string/time_key_automatic</item>
         <item>@string/time_key_early_dawn</item>
         <item>@string/time_key_mid_dawn</item>
         <item>@string/time_key_day</item>

@@ -8,12 +8,12 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.GuySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.MechSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
 import com.hashimapp.myopenglwallpaper.View.OpenGLES2WallpaperService;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +30,8 @@ public class SceneSetter
     public static final int STATUS_LOADING_TEXTURES = 3;
     public static final int STATUS_FADING_IN = 4;
 
+    private static final int FADE_TRANSITION_DURATION = 500;
+    private static final int FOCAL_POINT_RESET_DURATION = 1500;
     private static float MIN_ALPHA = 0.0f;
     private static float MAX_ALPHA = 1.0f;
 
@@ -43,19 +45,20 @@ public class SceneSetter
     List<Sprite> spriteList;
     Resources resources;
 
-    private int mColorHandle;
-    private int mPositionHandle;
-    private int mTexCoordLoc;
-    private int mtrxHandle;
-    private int mSamplerLoc;
-    private int biasHandle;
-
     private long FocalPointResetTime;
     private long FocalPointTargetTime;
 
     private float focalPoint;
     private float focalPointStartingPoint;
     private float focalPointEndingPoint;
+    private boolean rackingFocus;
+
+    private long ZoomPointResetTime;
+    private long ZoomPointTargetTime;
+    private float zoomPoint;
+    private float zoomPointStartingPoint;
+    private float zoomPointEndingPoint;
+    private boolean zoomingCamera;
 
     private int textureSwapStatus;
 
@@ -69,10 +72,10 @@ public class SceneSetter
     Date startDate;
 
 
-    public SceneSetter()
+    public SceneSetter(Context context)
     {
         startDate = new Date();
-        context = OpenGLES2WallpaperService.getAppContext();
+        this.context = context;
         resources = context.getResources();
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
         randomGenerator = new Random();
@@ -81,6 +84,8 @@ public class SceneSetter
         textures = new Textures(this.context);
         focalPointStartingPoint = -1.0f;
         focalPointEndingPoint = 0.0f;
+
+        rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
     }
@@ -91,6 +96,7 @@ public class SceneSetter
         //todo: add sprite key generator
         spriteList.add(new Sprite(new BackgroundSprite(), 0));
         spriteList.add(new Sprite(new MechSprite(), 1));
+        spriteList.add(new Sprite(new GuySprite(), 3));
         spriteList.add(new Sprite(new GirlSprite(), 2));
 
         textures.InitTextures();
@@ -104,7 +110,7 @@ public class SceneSetter
 
     }
 
-    float[] scratch = new float[16];
+    float[] mvpMatrix = new float[16];
 
 
     public void SetTimeOfDay(int timePhase, int percentage)
@@ -134,7 +140,7 @@ public class SceneSetter
 
     public void SurfaceChanged(boolean portrait, boolean motionOffset, float spriteXPosOffset)
     {
-        GetMembers();
+//        GetMembers();
 //        GLES20.glEnableVertexAttribArray(mColorHandle);
 //        GLES20.glEnableVertexAttribArray(mPositionHandle);
 //        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
@@ -150,23 +156,6 @@ public class SceneSetter
     }
 
 
-    public boolean RackingFocus()
-    {
-        return focalPoint < focalPointEndingPoint;
-    }
-
-    public void UpdateFocalPoint()
-    {
-        long currentTime = System.currentTimeMillis();
-        float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
-
-        focalPoint = focalPointProgression * Math.abs(focalPointStartingPoint - focalPointEndingPoint) + focalPointStartingPoint;
-
-        for (Sprite sprite : spriteList)
-        {
-            sprite.SetFocalPoint(focalPoint);
-        }
-    }
 
     public void InitTextureSwap()
     {
@@ -201,13 +190,17 @@ public class SceneSetter
     }
 
     public void ResetTextureSwap(){
+        if(textureSwapStatus == STATUS_LOADING_TEXTURES){
+            //don't do anything if we're loading int textures
+        }
         bitmapIdTextureNameHashMap.clear();
-        textureSwapStatus = STATUS_DONE;
+        textureSwapStatus = STATUS_FADING_IN;
+        ResetFadePoint();
+
     }
 
     public int GetTextureSwapStatus()
     {
-
         return textureSwapStatus;
     }
 
@@ -256,8 +249,8 @@ public class SceneSetter
         } else if (textureSwapStatus == STATUS_READY_TO_SWAP)
         {
             new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
-            textureSwapStatus = STATUS_LOADING_TEXTURES;
-        } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
+        textureSwapStatus = STATUS_LOADING_TEXTURES;
+    } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
         {
             if (!textures.UploadComplete())
             {
@@ -268,6 +261,8 @@ public class SceneSetter
                 ResetFadePoint();
             }
         }
+
+        Log.d("fade", "fade status: " + textureSwapStatus);
     }
 
     private void ResetFadePoint()
@@ -282,57 +277,114 @@ public class SceneSetter
             fadeEndingPoint = MAX_ALPHA;
         }
         FadeResetTime = System.currentTimeMillis();
-        FadeTargetTime = FadeResetTime + 1000;
+        FadeTargetTime = FadeResetTime + FADE_TRANSITION_DURATION;
     }
 
 
-    public void ResetFocalPoint()
-    {
-        FocalPointResetTime = System.currentTimeMillis();
-        FocalPointTargetTime = FocalPointResetTime + 1500;
-        focalPoint = focalPointStartingPoint;
-        for (Sprite sprite : spriteList)
-        {
+
+
+    public void SetToTargetFocalPoint(){
+        Log.d("focal", "setting target focal point");
+        rackingFocus = false;
+        focalPoint = focalPointEndingPoint;
+        for(Sprite sprite : spriteList){
             sprite.SetFocalPoint(focalPointEndingPoint);
         }
 
     }
 
-
-    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
+    public boolean RackingFocus()
     {
-        GLES20.glEnableVertexAttribArray(mColorHandle);
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
+        return rackingFocus;
+    }
 
+    public void ResetFocalPoint()
+    {
+        FocalPointResetTime = System.currentTimeMillis();
+        FocalPointTargetTime = FocalPointResetTime + FOCAL_POINT_RESET_DURATION;
+        focalPoint = focalPointStartingPoint;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetFocalPoint(focalPoint);
+        }
+        rackingFocus = true;
+    }
+
+    public void UpdateFocalPoint()
+    {
+        long currentTime = System.currentTimeMillis();
+        float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
+        float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI /2);
+        focalPoint = sinCurveProgression * Math.abs(focalPointStartingPoint - focalPointEndingPoint) + focalPointStartingPoint;
 
         for (Sprite sprite : spriteList)
         {
-            sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mColorHandle,
-                    mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, scratch);
+            sprite.SetFocalPoint(focalPoint);
         }
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mColorHandle);
-        GLES20.glDisableVertexAttribArray(mTexCoordLoc);
+
+        if(focalPointProgression >= 1.0f){
+            rackingFocus = false;
+        }
+    }
+
+    public void SetToTargetZoomPoint(){
+        zoomingCamera = false;
+//        zoomPoint =
+    }
+
+    public boolean ZoomingCamera(){
+        return zoomingCamera;
+    }
+
+    public void ResetZoomPoint(){
+        ZoomPointResetTime = System.currentTimeMillis();
+        ZoomPointTargetTime = ZoomPointResetTime + FOCAL_POINT_RESET_DURATION;
+        zoomingCamera = true;
+
+
+    }
+
+    public void UpdateZoomPoint(){
+        long currentTime = System.currentTimeMillis();
+
+        float zoomProgressionPercent = (float) (currentTime - ZoomPointResetTime) / (ZoomPointTargetTime - ZoomPointResetTime);
+
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetZoomPoint(zoomProgressionPercent);
+        }
+
+        if(zoomProgressionPercent >= 1.0f){
+            zoomingCamera = false;
+        }
     }
 
 
-    private void GetMembers()
+    public void TurnOffBlur(){
+        FocalPointResetTime = FocalPointTargetTime = 0;
+        rackingFocus = false;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.turnOffBlur();
+        }
+    }
+
+
+    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
-        // get handle to vertex shader's vPosition member
-        mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
-        // get handle to vertex shader's vPosition member
-        mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
-        mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
-        // Get handle to shape's transformation matrix and apply it
-        mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
-        // Get handle to textures locations
-        mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
-        biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
-        Log.d("blur", "bias handle: " + biasHandle);
-
-
+        for (Sprite sprite : spriteList)
+        {
+            sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+        }
     }
+
+
+
+    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle){
+        for(Sprite sprite : spriteList){
+            sprite.SetSpriteMembers(colorHandle, positionHandle, texCoordLoc, mtrxHandle, samplerLoc, biasHandle);
+        }
+    }
+
 
 }

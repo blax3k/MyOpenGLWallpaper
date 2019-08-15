@@ -1,12 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Switch
-        android:id="@+id/motion_parallax_switch"
+    <FrameLayout
+        android:id="@+id/Frame1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/motion_parallax_setting_title"
-        android:textSize="18sp" />
-</LinearLayout>
+        android:layout_height="200dp">
+
+
+        <com.hashimapp.myopenglwallpaper.View.MyGLSurfaceView
+            android:id="@+id/GLView"
+            android:layout_width="match_parent"
+            android:layout_height="200dip" />
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/Frame1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch2"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch3"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch4"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch5"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch6"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:id="@+id/motion_parallax_switch7"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text="@string/motion_parallax_setting_title"
+                    android:textSize="18sp" />
+
+
+            </LinearLayout>
+
+        </ScrollView>
+
+
+    </FrameLayout>
+
+
+</RelativeLayout>

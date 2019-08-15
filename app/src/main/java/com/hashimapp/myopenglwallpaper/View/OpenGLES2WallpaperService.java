@@ -1,20 +1,14 @@
 package com.hashimapp.myopenglwallpaper.View;
 
 import android.app.ActivityManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ConfigurationInfo;
 import android.content.res.Resources;
-import android.gesture.Gesture;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.opengl.GLSurfaceView;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
@@ -23,11 +17,10 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import com.hashimapp.myopenglwallpaper.Model.GLParticleRenderer;
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 import com.hashimapp.myopenglwallpaper.R;
 
-import java.time.DateTimeException;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -55,26 +48,28 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
     }
 
-    public static Context getAppContext()
-    {
-        return OpenGLES2WallpaperService.context;
-    }
+//    public static Context getAppContext()
+//    {
+//        return OpenGLES2WallpaperService.context;
+//    }
 
     @Override
     public Engine onCreateEngine()
     {
-        return new OpenGLES2Engine();
+        return new OpenGLES2Engine(this);
     }
 
 
     class OpenGLES2Engine extends GLWallpaperService.GLEngine implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener
     {
         private GestureDetector gestureListener;
+        Context context;
         Date startTime;
 
-        OpenGLES2Engine()
+        OpenGLES2Engine(Context context)
         {
             super();
+            this.context = context;
         }
 
         @Override
@@ -89,7 +84,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
             initSensor();
-            initScreenEvent();
             prefs.registerOnSharedPreferenceChangeListener(this);
 
             if (supportsEs2)
@@ -98,13 +92,13 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 setPreserveEGLContextOnPause(true);
 
 
-                setRenderer(new GLRenderer());
+                setRenderer(new GLRenderer(context));
                 gestureListener = new GestureDetector(getApplicationContext(), new GestureListener(renderer));
-                Log.d("create", "OpenGLES2Engine " + startDate + " created renderer " +
-                        renderer.startDate + " in surface view " + glSurfaceView.startDate);
+//                Log.d("create", "OpenGLES2Engine " + startDate + " created renderer " +
+//                        renderer.startDate + " in surface view " + glSurfaceView.startDate);
 
 
-                SetRendererPrefs();
+                InitRendererPrefs();
                 setTouchEventsEnabled(true);
             } else
             {
@@ -114,13 +108,15 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         }
 
 
-        private void SetRendererPrefs()
+        private void InitRendererPrefs()
         {
             renderer.EnableMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
-            renderer.setAutoTimeEnabled(prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true));
-            renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_day)));
+//            renderer.setAutoTimeEnabled(prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true));
+            renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
+            renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
+            renderer.SetCameraBlurEnabled(prefs.getBoolean(resources.getString(R.string.blur_enabled_key), true));
         }
 
         @Override
@@ -165,7 +161,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                     }
                     renderer.UpdateVisibility(visible);
-
+                    renderer.SwapTextures();
                     glSurfaceView.requestRender();
                 } else
                 {
@@ -180,7 +176,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
-            Log.d("prefsChange", "preferences changed");
             if (key.equals(resources.getString(R.string.motion_parallax_key)))
             {
                 if (sharedPreferences.getBoolean(resources.getString(R.string.motion_parallax_key), true))
@@ -191,27 +186,24 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 {
                     sensorManager.unregisterListener(this);
                     renderer.EnableMotionOffset(false);
-                    renderer.ResetMotionOffset();
                 }
             } else if (key.equals(resources.getString(R.string.motion_parallax_strength_key)))
             {
                 renderer.SetMotionOffsetStrength(sharedPreferences.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             } else if (key.equals(resources.getString(R.string.time_phase_key)))
             {
-                String timePhase = prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_day));
+                String timePhase = prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic));
                 renderer.SetTimePhase(timePhase);
-            } else if (key.equals(resources.getString(R.string.auto_time_setting_key)))
-            {
-                boolean enabled = prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true);
-                renderer.setAutoTimeEnabled(enabled);
             } else if (key.equals(resources.getString(R.string.touch_offset_setting_key)))
             {
                 boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
                 renderer.SetTouchOffset(touchOffsetEnabled);
-                if (!touchOffsetEnabled)
-                {
-                    renderer.ResetTouchOffset();
-                }
+            } else if(key.equals(resources.getString(R.string.blur_enabled_key))){
+                boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
+                renderer.SetCameraBlurEnabled(motionBlurEnabled);
+            } else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
+                boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
+                renderer.SetRackFocusEnabled(rackFocusEnabled);
             }
         }
 
@@ -220,39 +212,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         {
             gestureListener.onTouchEvent(event);
         }
-//
-//        @Override
-//        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height)
-//        {
-//            super.onSurfaceChanged(holder, format, width, height);
-//        }
-//
-//        @Override
-//        public void onSurfaceRedrawNeeded(SurfaceHolder holder)
-//        {
-//            super.onSurfaceRedrawNeeded(holder);
-//        }
-
-
-        private void initScreenEvent()
-        {
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-            intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-            registerReceiver(new BroadcastReceiver()
-            {
-                @Override
-                public void onReceive(Context context, Intent intent)
-                {
-                    if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF))
-                    {
-                        renderer.ResetMotionOffset();
-                    } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON))
-                    {
-                    }
-                }
-            }, intentFilter);
-
-        }
 
         private void initSensor()
         {
@@ -260,7 +219,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
             if (sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0)
             {
-                Log.d("sensorStuff", "gyroscope registered");
                 sensorManager.registerListener(this,
                         sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
                         SensorManager.SENSOR_DELAY_GAME);
@@ -271,19 +229,16 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
         private class GestureListener extends GestureDetector.SimpleOnGestureListener
         {
-            public Date startDate;
 
             public GestureListener(GLRenderer newRenderer){
                 renderer = newRenderer;
-                startDate = new Date();
             }
 
             @Override
             public boolean onDoubleTap(MotionEvent e)
             {
-                Log.d("create", "gesture listener " + startDate + " tapped on renderer " +
-                        renderer.startDate);
-                renderer.SwapTextures();
+//                renderer.SwapTextures();
+//                renderer.ZoomCamera();
 ////                if(temp){
 ////                    renderer.SetTimeSetting(resources.getString(R.string.time_day));
 ////                    temp = false;

@@ -114,6 +114,11 @@ public class TimeTracker
 
     public int[] GetTimePhase(String timePhase)
     {
+        if(timePhase.equals(resources.getString(R.string.time_key_automatic))){
+            Date date = Calendar.getInstance().getTime();
+            return  GetTimePhase(date);
+        }
+
         int[] timeInfo = new int[2];
         int percentage = 100;
         int CurrentTimePhase = DAY;

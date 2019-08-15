@@ -2,6 +2,7 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,16 +15,23 @@ import java.nio.ShortBuffer;
 public class Sprite {
     // Geometric variables
 //    public static float vertices[];
+    private static final float DEFAULT_BIAS = -1.0f;
+    private static final float ZOOM_MAX = 1.15f;
+    private static final float ZOOM_MIN = 1.0f;
     public short indices[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
     public FloatBuffer colorBuffer;
     public FloatBuffer textureVerticeBuffer;
     private int GLTextureIndex;
-    private TimeTracker timeTracker;
-    //    private final int mProgram;
     public static float colors[];
-//    private float[] scratch;
+
+    private int mColorHandle;
+    private int mPositionHandle;
+    private int mTexCoordLoc;
+    private int mtrxHandle;
+    private int mSamplerLoc;
+    private int biasHandle;
 
     private float spriteXPosOffset;
 
@@ -37,6 +45,13 @@ public class Sprite {
     float xAccelOffset = 0;
     float yAccelOffset = 0;
 
+    float xScale = 1.0f;
+    float yScale = 1.0f;
+    float xScaleOffset = 0;
+    float yScaleOffset = 0;
+
+
+
     private int spriteKey;
 
     private float bias = 0.0f;
@@ -44,7 +59,7 @@ public class Sprite {
 
     public Sprite(ISpriteData mSpriteData, int spriteKey) {
         spriteData = mSpriteData;
-//        scratch = new float[16];
+//        mvpMatrix = new float[16];
         colors = spriteData.getColor(TimeTracker.DAY, 100);
         indices = spriteData.getIndices();
         currentBitmapID = spriteData.GetBitmapID();
@@ -67,6 +82,16 @@ public class Sprite {
             this.xScrollOffset = -1 * ((xOffset * offsetMultiplier) + (-0.15f * offsetMultiplier));
         }
     }
+
+    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle){
+        mColorHandle = colorHandle;
+        mPositionHandle = positionHandle;
+        mTexCoordLoc = texCoordLoc;
+        this.mtrxHandle = mtrxHandle;
+        mSamplerLoc = samplerLoc;
+        this.biasHandle = biasHandle;
+    }
+
 
 
     public void SensorChanged(float xOffset, float yOffset) {
@@ -91,10 +116,32 @@ public class Sprite {
         //get character distance from the 'in focus' camera depth
         float distanceFromFocalPoint = Math.abs(currentFocalPoint - spriteData.getZVertices());
         //translate that depth to the bias
-        bias = (distanceFromFocalPoint * 4 -1.0f);
+        //todo: adjust bias based on screen resolution
+        bias = (distanceFromFocalPoint * 4 + DEFAULT_BIAS);
     }
 
+    ///zoom percent is some value between 0.0 and 1.0
+    public void SetZoomPoint(float zoomPercent){
+        //figure out how much the size is going to be modified
+        Log.d("zoom", "zoomPercent: " + zoomPercent);
+
+        float newZoomPercent = (float) Math.sin((zoomPercent * Math.PI / 2));
+        float modifiedZoomMax = (1.0f + spriteData.getZVertices());
+        xScale = yScale = ZOOM_MAX - (newZoomPercent * (ZOOM_MAX - ZOOM_MIN) * modifiedZoomMax  ) ;
+        Log.d("zoom", "xscale: " + xScale);
+
+    }
+
+
+
+
+    public void turnOffBlur(){
+        bias = DEFAULT_BIAS;
+    }
+
+
     public void SetAlpha(float alpha){
+        Log.d("alpha", "alpha set to " + alpha);
         int length = colors.length;
         for(int i = 3; i < length; i+= 4)
         {
@@ -145,11 +192,11 @@ public class Sprite {
     }
 
 
-    public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, int mColorHandle, int mPositionHandle, int mTexCoordLoc
-            , int mtrxHandle, int textureUniformHandle, int biasHandle, float[] mMVPMatrix)
+    public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, float[] mMVPMatrix)
     {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, xScale, yScale, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 
@@ -168,7 +215,7 @@ public class Sprite {
         // Set the sampler texture unit to x, where we have saved the texture.
         GLES20.glActiveTexture(GLTextureIndex);
         GLES20.glBindTexture(GLTextureIndex, textureName);
-        GLES20.glUniform1i(textureUniformHandle, textureNameIndex);
+        GLES20.glUniform1i(mSamplerLoc, textureNameIndex);
 
         GLES20.glUniform1f(biasHandle, bias);
 

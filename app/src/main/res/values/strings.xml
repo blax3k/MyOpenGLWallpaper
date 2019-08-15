@@ -32,7 +32,9 @@
     //camera blur
     <string name="setting_blur_section_title">Blur Settings</string>
     <string name="blur_enabled_key">blurEnabled</string>
-    <string name="blur_enabled_titley">Blurring Enabled</string>
+    <string name="blur_enabled_title">Blurring Enabled</string>
+    <string name="rack_focus_enabled_key">rackFocusEnabled</string>
+    <string name="rack_focus_enabled_title">Rack Focus</string>
 
     <string name="blur_none">No camera blur</string>
     <string name="blur_low">Slight camera blur</string>
@@ -62,6 +64,7 @@
 
     //time phase settings
     <string name="time_phase_key">set_time_key</string>
+    <string name="time_key_automatic">AutomaticTime</string>
     <string name="time_key_early_dawn">EarlyDawn</string>
     <string name="time_key_mid_dawn">MidDawn</string>
     <string name="time_key_late_dawn">LateDawn</string>
@@ -71,6 +74,7 @@
     <string name="time_key_late_dusk">LateDusk</string>
     <string name="time_key_night">Night</string>
 
+    <string name="time_title_automatic">Automatic</string>
     <string name="time_title_early_dawn">Dawn</string>
     <string name="time_title_mid_dawn">Sunrise</string>
     <string name="time_title_day">Day</string>
