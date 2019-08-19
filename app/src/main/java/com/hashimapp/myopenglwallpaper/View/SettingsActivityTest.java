@@ -123,6 +123,9 @@ public class SettingsActivityTest extends Activity implements SensorEventListene
         } else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
             boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
             renderer.SetRackFocusEnabled(rackFocusEnabled);
+        } else if(key.equals(resources.getString(R.string.setting_zoom_camera_key))){
+            boolean zoomCameraEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
+            renderer.SetZoomCameraEnabled(zoomCameraEnabled);
         }
     }
 

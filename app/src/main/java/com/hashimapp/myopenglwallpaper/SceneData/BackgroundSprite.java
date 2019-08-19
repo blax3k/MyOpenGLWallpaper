@@ -16,25 +16,12 @@ public class BackgroundSprite extends SpriteData {
                 2.4f, -2.4f, 0.0f,   // bottom right
                 2.4f, 2.4f, 0.0f}; // top right
 
-        portraitVerticesMotion = new float[]{
-                -2.7f, 2.7f, 0.0f,   // top left
-                -2.7f, -2.7f, 0.0f,   // bottom left
-                2.7f, -2.7f, 0.0f,   // bottom right
-                2.7f, 2.7f, 0.0f}; // top right
-
         landscapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
                 2.4f, 2.4f, 0.0f}; // top right
 
-        landscapeVerticesMotion = new float[]{
-                -2.7f, 2.7f, 0.0f,   // top left
-                -2.7f, -2.7f, 0.0f,   // bottom left
-                2.7f, -2.7f, 0.0f,   // bottom right
-                2.7f, 2.7f, 0.0f}; // top right
-
-        textureNameIndex = Textures.BACKGROUND_TEXTURE_INDEX;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]{
                 1f, 1f, 1f, 1f,

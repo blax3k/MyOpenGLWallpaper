@@ -17,25 +17,12 @@ public class MechSprite extends SpriteData {
                 2.4f, -2.4f, 0.0f,   // bottom right
                 2.4f, 2.4f, 0.0f}; // top right
 
-        portraitVerticesMotion = new float[]{
-                -2.5f, 2.5f, 0.0f,   // top left
-                -2.5f, -2.5f, 0.0f,   // bottom left
-                2.5f, -2.5f, 0.0f,   // bottom right
-                2.5f, 2.5f, 0.0f}; // top right
-
         landscapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
                 2.4f, 2.4f, 0.0f}; // top right
 
-        landscapeVerticesMotion = new float[]{
-                -2.5f, 2.5f, 0.0f,   // top left
-                -2.5f, -2.5f, 0.0f,   // bottom left
-                2.5f, -2.5f, 0.0f,   // bottom right
-                2.5f, 2.5f, 0.0f}; // top right
-
-        textureNameIndex = Textures.GIRL_TEXTURE_INDEX;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
@@ -90,11 +77,11 @@ public class MechSprite extends SpriteData {
     @Override
     public int GetBitmapID(){
         if(currentBitmap == R.drawable.layer1){
-            currentBitmap = R.drawable.layer0;
+            currentBitmap = R.drawable.girl_atlas;
             return currentBitmap;
         }
         currentBitmap = R.drawable.layer1;
-        return R.drawable.layer1;
+        return currentBitmap;
     }
 
 }

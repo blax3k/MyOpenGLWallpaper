@@ -7,37 +7,23 @@ import com.hashimapp.myopenglwallpaper.R;
 public class GuySprite extends SpriteData
 {
 
-    int currentBitmap = R.drawable.guy;
+    int currentBitmap = R.drawable.mech;
 
     public GuySprite()
     {
-        zVertice = -0.1f;
+        zVertice = -0.3f;
         portraitVertices = new float[]{
                 0.4f, 2.3f, 0.0f,   // top left
                 0.4f, 0.4f, 0.0f,   // bottom left
                 2.3f, 0.4f, 0.0f,   // bottom right
-                2.3f, 2.3f, 0.0f}; // top right
+                2.3f, 2.3f, 0.0f};  // top right
 
-        portraitVerticesMotion = new float[]{
+        landscapeVertices = new float[]{
                 0.4f, 2.3f, 0.0f,   // top left
                 0.4f, 0.4f, 0.0f,   // bottom left
                 2.3f, 0.4f, 0.0f,   // bottom right
-                2.3f, 2.3f, 0.0f}; // top right
+                2.3f, 2.3f, 0.0f};  // top right
 
-        landscapeVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
-
-        landscapeVerticesMotion = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
-
-
-        textureNameIndex = Textures.TEMPLATE_TEXTURE_INDEX;
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
@@ -90,6 +76,11 @@ public class GuySprite extends SpriteData
 
     @Override
     public int GetBitmapID(){
+        if(currentBitmap == R.drawable.mech){
+            currentBitmap = R.drawable.mech_inverted;
+            return currentBitmap;
+        }
+        currentBitmap = R.drawable.mech;
         return currentBitmap;
     }
 }

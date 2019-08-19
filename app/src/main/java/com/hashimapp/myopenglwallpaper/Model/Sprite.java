@@ -4,6 +4,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.R;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -16,8 +18,10 @@ public class Sprite {
     // Geometric variables
 //    public static float vertices[];
     private static final float DEFAULT_BIAS = -1.0f;
-    private static final float ZOOM_MAX = 1.15f;
+    private static final float ZOOM_MAX = 1.20f;
     private static final float ZOOM_MIN = 1.0f;
+    private static final float FADE_DURATION = 0.4f; //duration of fade in percentage
+
     public short indices[];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
@@ -73,11 +77,11 @@ public class Sprite {
 
     public void OffsetChanged(float xOffset, boolean PortraitOrientation) {
         //parallax motion determined by how "far" the sprite is from the camera
-        float offsetMultiplier = (spriteData.getZVertices() + 1.0f);
+        float offsetMultiplier = (spriteData.getZVertices() + 1.0f) * 0.9f + 0.1f; //range between 0.1 and 1.0f
         if (PortraitOrientation) {
             this.xScrollOffset = -1 //reverse movement
                     * xOffset * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
-                    + spriteXPosOffset; //
+                    + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
         } else {
             this.xScrollOffset = -1 * ((xOffset * offsetMultiplier) + (-0.15f * offsetMultiplier));
         }
@@ -102,7 +106,7 @@ public class Sprite {
 
     public void SetOrientation(boolean portrait, boolean motionOffset, float spriteXPosOffset) {
         spriteData.setOrientation(portrait);
-        float offsetMultiplier = (spriteData.getZVertices() + 1.0f);
+        float offsetMultiplier = (spriteData.getZVertices() + 1.0f) * 0.9f + 0.1f;
         this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
         setVertices(spriteData.getShapeVertices(portrait, motionOffset));
     }
@@ -125,9 +129,9 @@ public class Sprite {
         //figure out how much the size is going to be modified
         Log.d("zoom", "zoomPercent: " + zoomPercent);
 
-        float newZoomPercent = (float) Math.sin((zoomPercent * Math.PI / 2));
-        float modifiedZoomMax = (1.0f + spriteData.getZVertices());
-        xScale = yScale = ZOOM_MAX - (newZoomPercent * (ZOOM_MAX - ZOOM_MIN) * modifiedZoomMax  ) ;
+        float sineZoomPercent = (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
+        float zPositionModifier = (1.0f + spriteData.getZVertices())* 0.9f + 0.1f; //zoom less if further from camera
+        xScale = yScale = ZOOM_MAX - (sineZoomPercent * zPositionModifier * (ZOOM_MAX - ZOOM_MIN) ) ;
         Log.d("zoom", "xscale: " + xScale);
 
     }
@@ -140,12 +144,38 @@ public class Sprite {
     }
 
 
-    public void SetAlpha(float alpha){
-        Log.d("alpha", "alpha set to " + alpha);
+    public void SetFade(float progress, boolean fadingIn){
         int length = colors.length;
+        float startPoint;
+        if(fadingIn){
+            startPoint = Math.abs(spriteData.getZVertices()) * (1.0f - FADE_DURATION);
+        }else{
+            startPoint = Math.abs(spriteData.getZVertices() + 1.0f) * (1.0f - FADE_DURATION);
+        }
+        float endPoint = startPoint + FADE_DURATION;
+
+        float spriteProgress;
+        if(progress <= startPoint){
+            spriteProgress = 0.0f;
+        }
+        else if(progress >= endPoint){
+            spriteProgress = 1.0f;
+        }
+        else{
+            spriteProgress = (progress - startPoint)/ FADE_DURATION;
+        }
+
+        //fade in closer sprites first
+        float newAlpha;
+        if(fadingIn){
+            newAlpha = spriteProgress;
+        }else{
+            newAlpha = 1.0f - spriteProgress;
+        }
+
         for(int i = 3; i < length; i+= 4)
         {
-            colors[i] = alpha;
+            colors[i] = newAlpha;
         }
         setColor(colors);
     }
@@ -173,14 +203,8 @@ public class Sprite {
     }
 
 
-    public int getGLTextureIndex(){
-        return GLTextureIndex;
-    }
     public int getTextureName(){
         return textureName;
-    }
-    public int getTextureNameIndex(){
-        return textureNameIndex;
     }
 
     public boolean TextureSwapRequired(){

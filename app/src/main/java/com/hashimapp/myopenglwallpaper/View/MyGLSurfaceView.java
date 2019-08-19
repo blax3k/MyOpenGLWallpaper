@@ -5,9 +5,6 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.hashimapp.myopenglwallpaper.Model.GLParticleRenderer;
-import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
-
 class MyGLSurfaceView extends GLSurfaceView
 {
 

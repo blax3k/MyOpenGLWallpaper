@@ -53,10 +53,6 @@ public class Textures {
 
     private boolean InterruptLoading = false;
 
-    public static final int TEMPLATE_TEXTURE_INDEX = 0;
-    public static final int GIRL_TEXTURE_INDEX = 1;
-    public static final int BACKGROUND_TEXTURE_INDEX = 2;
-
     private static final int MAX_OPEN_TEXTURE_SLOTS = 4;
     private static final int MAX_USABLE_TEXTURE_SLOTS = 28;
 
@@ -134,19 +130,6 @@ public class Textures {
 
     public int[] textureNames;
 
-    public void SwapTextures(HashMap<Integer, Integer> bitmapIdTextureNameHashMap)
-    {
-        Log.d("swap", "updating texture");
-        Loaded = false;
-        for(HashMap.Entry<Integer, Integer> textureData : bitmapIdTextureNameHashMap.entrySet()){
-            int bitmapID = textureData.getKey();
-            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
-            UpdateTexture(bmp, textureData.getValue(), 0);
-            GenerateBlurredTextures(bmp);
-        }
-
-        Loaded = true;
-    }
 
 
     public boolean UploadComplete(){

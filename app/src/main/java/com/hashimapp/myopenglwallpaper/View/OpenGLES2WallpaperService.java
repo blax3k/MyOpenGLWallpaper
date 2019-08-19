@@ -113,10 +113,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             renderer.EnableMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
-//            renderer.setAutoTimeEnabled(prefs.getBoolean(resources.getString(R.string.auto_time_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
             renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
             renderer.SetCameraBlurEnabled(prefs.getBoolean(resources.getString(R.string.blur_enabled_key), true));
+            renderer.SetZoomCameraEnabled(prefs.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true));
         }
 
         @Override
@@ -161,7 +161,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                     }
                     renderer.UpdateVisibility(visible);
-                    renderer.SwapTextures();
+//                    renderer.SwapTextures();
                     glSurfaceView.requestRender();
                 } else
                 {
@@ -197,6 +197,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             } else if (key.equals(resources.getString(R.string.touch_offset_setting_key)))
             {
                 boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
+                Log.d("touch", "touch offset enabled: " + touchOffsetEnabled);
                 renderer.SetTouchOffset(touchOffsetEnabled);
             } else if(key.equals(resources.getString(R.string.blur_enabled_key))){
                 boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
@@ -204,6 +205,9 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             } else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
                 boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
                 renderer.SetRackFocusEnabled(rackFocusEnabled);
+            }else if(key.equals(resources.getString(R.string.setting_zoom_camera_key))){
+                boolean cameraZoomEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
+                renderer.SetZoomCameraEnabled(cameraZoomEnabled);
             }
         }
 
@@ -237,7 +241,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             @Override
             public boolean onDoubleTap(MotionEvent e)
             {
-//                renderer.SwapTextures();
+                renderer.SwapTextures();
 //                renderer.ZoomCamera();
 ////                if(temp){
 ////                    renderer.SetTimeSetting(resources.getString(R.string.time_day));

@@ -36,7 +36,7 @@ public class GLRenderer implements Renderer
     private String timePhaseSelected;
     private boolean _cameraBlurEnabled;
     private boolean _rackFocusEnabled;
-    private boolean _zoomCameraEnabled;
+    private boolean _cameraZoomEnabled;
 
 
     public GLRenderer(Context context)
@@ -55,7 +55,6 @@ public class GLRenderer implements Renderer
 
     public boolean OnOffsetChanged(float xOffset, float yOffset)
     {
-
         if (camera.TouchOffsetEnabled())
         {
             float newXOffset = camera.getxOffsetStepPortrait(xOffset);
@@ -105,8 +104,8 @@ public class GLRenderer implements Renderer
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         sceneSetter.SetToTargetFocalPoint();
-
     }
+
 
     private void InitSpriteProgram(){
         riGraphicTools.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
@@ -149,12 +148,13 @@ public class GLRenderer implements Renderer
 
     public void SetTouchOffset(boolean touchOffsetOn)
     {
-        camera.EnableTouchOffset(touchOffsetOn);
         if (!touchOffsetOn)
         {
+            Log.d("touch", "setTouchOffset x");
             float xOffset = 0.5f; //halfway between 0 and 1.0
             OnOffsetChanged(xOffset, 0.0f);
         }
+        camera.EnableTouchOffset(touchOffsetOn);
     }
 
     public void SetCameraBlurEnabled(boolean enabled)
@@ -185,17 +185,19 @@ public class GLRenderer implements Renderer
         }
     }
 
+    public void SetZoomCameraEnabled(boolean enabled){
+        _cameraZoomEnabled = enabled;
+        if(!enabled){
+            sceneSetter.SetToTargetZoomPoint();
+        }
+    }
+
 
     public void SetTimePhase(String phaseOfDay)
     {
         timePhaseSelected = phaseOfDay;
         UpdateTime();
     }
-
-//    public void setAutoTimeEnabled(boolean enabled)
-//    {
-//        autoTimeEnabled = enabled;
-//    }
 
     public void SwapTextures()
     {
@@ -233,7 +235,10 @@ public class GLRenderer implements Renderer
             }else{
                 sceneSetter.TurnOffBlur();
             }
-            sceneSetter.ResetZoomPoint();
+
+            if(_cameraZoomEnabled){
+                sceneSetter.ResetZoomPoint();
+            }
 
 //            if(_zoomCameraEnabled){
 //                sceneSetter.SetTarget

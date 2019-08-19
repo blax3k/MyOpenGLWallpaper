@@ -9,11 +9,8 @@ import java.util.List;
 public class SpriteData implements ISpriteData {
 
     protected float[] portraitVertices;
-    protected float[] portraitVerticesMotion;
     protected float[] landscapeVertices;
-    protected float[] landscapeVerticesMotion;
     protected float[] textureVertices;
-    protected int textureNameIndex;
 
     protected short[] indices;
     protected float[] defaultColor;
@@ -25,6 +22,8 @@ public class SpriteData implements ISpriteData {
     protected float[] nightColor;
     protected float zVertice;
     protected boolean portrait = true;
+
+    private static final float MAX_QUAD_SCALE = 0.125f;
 
 
     @Override
@@ -74,17 +73,35 @@ public class SpriteData implements ISpriteData {
         {
             if(motionOffset)
             {
-                return portraitVerticesMotion;
+                //enlarge the quad
+                return ScaleQuad(portraitVertices);
             }
-            return portraitVertices;
+            else{
+                return portraitVertices;
+            }
         } else
         {
             if(motionOffset)
             {
-                return landscapeVerticesMotion;
+                return ScaleQuad(landscapeVertices);
             }
-            return landscapeVertices;
+            return portraitVertices;
         }
+    }
+
+    private float[] ScaleQuad(float[] verticeArray){
+        float[] motionArray = new float[12];
+        motionArray[0] = verticeArray[0] - (Math.abs(zVertice) * Math.abs( verticeArray[0] * MAX_QUAD_SCALE));
+        motionArray[3] = verticeArray[3] - (Math.abs(zVertice) *Math.abs( verticeArray[3] * MAX_QUAD_SCALE));
+        motionArray[4] = verticeArray[4] - (Math.abs(zVertice) *Math.abs( verticeArray[4] * MAX_QUAD_SCALE));
+        motionArray[7] = verticeArray[7] - (Math.abs(zVertice) *Math.abs( verticeArray[7] * MAX_QUAD_SCALE));
+
+        motionArray[1] = verticeArray[1] + (Math.abs(zVertice) *Math.abs( verticeArray[1] * MAX_QUAD_SCALE));
+        motionArray[6] = verticeArray[6] + (Math.abs(zVertice) *Math.abs( verticeArray[6] * MAX_QUAD_SCALE));
+        motionArray[9] = verticeArray[9] + (Math.abs(zVertice) *Math.abs( verticeArray[9] * MAX_QUAD_SCALE));
+        motionArray[10] = verticeArray[10] +(Math.abs(zVertice) * Math.abs( verticeArray[10] * MAX_QUAD_SCALE));
+
+        return motionArray;
     }
 
     @Override

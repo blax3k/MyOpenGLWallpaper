@@ -40,15 +40,21 @@
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_high">Heavy camera blur</string>
 
+    <string name="setting_zoom_camera_key">zoom_camera_key</string>
+    <string name="zoom_camera_title">Camera Zoom</string>
+
+    <string name="default_true">true</string>
+    <string name="default_false">false</string>
+
     //screen and gyro movement settings
-    <string name="setting_movement_section_title">Movement Settings</string>
+    <string name="camera_settings_section_title">Camera Settings</string>
 
     <string name="motion_parallax_key">motion_parallax</string>
-    <string name="motion_parallax_setting_title">Motion Parallax Enabled</string>
+    <string name="motion_parallax_setting_title">Motion Parallax</string>
     <string name="motion_parallax_default">true</string>
 
     <string name="touch_offset_setting_key">touch_offset</string>
-    <string name="touch_offset_setting_title">Home Scroll Parallax Enabled</string>
+    <string name="touch_offset_setting_title">Home Scroll Parallax</string>
     <string name="touch_offset_setting_default">true</string>
 
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
