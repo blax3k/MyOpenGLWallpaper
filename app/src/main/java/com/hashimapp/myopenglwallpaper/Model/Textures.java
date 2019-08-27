@@ -7,15 +7,21 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
 
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class Textures {
+
 
     class TextureUploadData
     {
@@ -28,27 +34,20 @@ public class Textures {
             _textureName = name;
             _textureLevel = level;
         }
+    }
 
-        public void SetBitmap(Bitmap bitmap){
-            _bitmap = bitmap;
-        }
-        public Bitmap GetBitmap(){
-            return _bitmap;
-        }
+    public static int GetBitmapSize(int widthHeight){
 
-        public void SetTextureName(int textureName){
-            _textureName = textureName;
-        }
-        public int GetTextureName(){
-            return _textureName;
+        int bmpSize;
+        if(widthHeight <= RESOLUTION_800){
+            bmpSize = IMAGE_SIZE_512;
+        }else if(widthHeight > RESOLUTION_800 && widthHeight <= RESOLUTION_1400){
+            bmpSize = IMAGE_SIZE_1024;
+        }else{//resolution >RESOLUTION_1400
+            bmpSize = IMAGE_SIZE_2048;
         }
 
-        public void SetTextureLevel(int level){
-            _textureLevel = level;
-        }
-        public int GetTextureLevel(){
-            return _textureLevel;
-        }
+        return bmpSize;
     }
 
     private boolean InterruptLoading = false;
@@ -56,15 +55,21 @@ public class Textures {
     private static final int MAX_OPEN_TEXTURE_SLOTS = 4;
     private static final int MAX_USABLE_TEXTURE_SLOTS = 28;
 
-    public static final int GL_TEXTURE_ID_INDEX = 0;
-    public static final int TEXTURE_NAME_INDEX = 1;
-    public static final int TEXTURE_NAME_INDEX_INDEX = 2;
+    private final static int RESOLUTION_800 = 512;
+    private final static int RESOLUTION_1400 = 1280;
+    private final static int RESOLUTION_1920 = 1920;
+
+    public static final int IMAGE_SIZE_512 = 512;
+    public static final int IMAGE_SIZE_1024 = 1024;
+    public static final int IMAGE_SIZE_2048 = 2048;
+
+    public static final float BLUR_RADIUS = 10.0f;
 
     private boolean Loaded;
+    private int widthHeight;
 
 
     private Deque<TextureUploadData> textureDataDeque;
-
 
     public static final int[] GL_TEXTURE_IDS = new int[]{
             GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1, GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
@@ -86,10 +91,11 @@ public class Textures {
 
     Date startDate;
 
-    public Textures(Context inContext) {
+    public Textures(Context inContext, int mWidthHeight) {
         startDate = new Date();
 
         context = inContext;
+        widthHeight = mWidthHeight;
 
         textureNames = new int[20];
         GLES20.glGenTextures(20, textureNames, 0);
@@ -114,7 +120,23 @@ public class Textures {
 
         TextureData textureData = new TextureData( glTextureID, textureNames[textureNameIndex], textureNameIndex);
 
-        SetTexture(bitmapID, textureData.GLTextureIndex, textureData.textureName);
+        Log.d("textures", "texture widthHeight: " + widthHeight);
+//        Bitmap bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), bitmapID), widthHeight, widthHeight, true);
+        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
+
+        GLES20.glActiveTexture(textureData.GLTextureIndex);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
+        //clamp texture to edge of shape
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        // Set filtering
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bmp, 0 );
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+
+        GenerateBlurredTextures(bmp);
 
         return new TextureData( glTextureID, textureNames[textureNameIndex], textureNameIndex);
 
@@ -143,12 +165,14 @@ public class Textures {
     ///load textures from storage into memory
     public void LoadTextures(HashMap<Integer, Integer> bitmapIdTextureNameHashMap){
         Loaded = false;
-        for(Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet()){
 
+        HashMap<Integer, Integer> sortedMap = sortByValues(bitmapIdTextureNameHashMap);
+
+        for(Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet())
+        {
             int bitmapId = data.getKey();
             int texName = data.getValue();
-
-            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapId);
+            Bitmap bmp =  BitmapFactory.decodeResource(context.getResources(), bitmapId);
             TextureUploadData uploadData = new TextureUploadData(bmp, texName, 0);
 
             textureDataDeque.add(uploadData);
@@ -167,8 +191,8 @@ public class Textures {
 
             int index = 1;
 
-            while (bmpWidth > 32 && bmpHeight > 32) {
-
+            while (bmpWidth >= 128 && bmpHeight >= 128)
+            {
                 if(InterruptLoading)
                 {
                     textureDataDeque.clear();
@@ -182,16 +206,36 @@ public class Textures {
                 bmpHeight /= 2;
 
                 //blur current image
-                Bitmap blurredFull = BlurBuilder.blur(context, bmp, (float)bmpWidth / originalWidth, (float)bmpHeight / originalHeight, 4.0f);
+                Bitmap blurredFull = BlurBuilder.blur(context, bmp, (float)bmpWidth / originalWidth, (float)bmpHeight / originalHeight, BLUR_RADIUS);
                 TextureUploadData blurredTexData = new TextureUploadData(blurredFull, texName, index);
                 textureDataDeque.add(blurredTexData);
 
                 index++;
             }
-
         }
         Loaded = true;
+    }
 
+
+    private static HashMap sortByValues(HashMap map) {
+//        List list = new LinkedList(map.entrySet());
+        // Defined Custom Comparator here
+//        Collections.sort(list, new Comparator() {
+//            public int compare(Object o1, Object o2) {
+//                return ((Comparable) ((Map.Entry) (o1)).getValue())
+//                        .compareTo(((Map.Entry) (o2)).getValue());
+//            }
+//        });
+
+        // Here I am copying the sorted list in HashMap
+        // using LinkedHashMap to preserve the insertion order
+//        HashMap sortedHashMap = new LinkedHashMap();
+//        for (Iterator it = list.iterator(); it.hasNext();) {
+//            Map.Entry entry = (Map.Entry) it.next();
+//            sortedHashMap.put(entry.getKey(), entry.getValue());
+//        }
+//        return sortedHashMap;
+        return map;
     }
 
     private void StopLoading(){
@@ -216,21 +260,6 @@ public class Textures {
     }
 
     private void SetTexture(int bitmapID, int GLImageIndex, int textureName) {
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
-
-        GLES20.glActiveTexture(GLImageIndex);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureName);
-        //clamp texture to edge of shape
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-        // Set filtering
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bmp, 0 );
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-
-        GenerateBlurredTextures(bmp);
     }
 
 
@@ -258,7 +287,7 @@ public class Textures {
             bmpHeight /= 2;
 
             //blur current image
-            Bitmap blurredFull = BlurBuilder.blur(context, bmp, (float)bmpWidth / originalWidth, (float)bmpHeight / originalHeight, 4.0f);
+            Bitmap blurredFull = BlurBuilder.blur(context, bmp, (float)bmpWidth / originalWidth, (float)bmpHeight / originalHeight, BLUR_RADIUS);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, index, blurredFull, 0);
             index++;
 

@@ -3,6 +3,7 @@ package com.hashimapp.myopenglwallpaper.View;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.LocationProvider;
 import android.opengl.GLSurfaceView;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -19,6 +20,9 @@ public abstract class GLWallpaperService extends WallpaperService
     protected SensorManager sensorManager;
     protected Sensor sensor;
     boolean rendererSet;
+
+    private LocationProvider locationProvider;
+
 
     public class GLEngine extends Engine
     {

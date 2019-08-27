@@ -125,7 +125,7 @@ public class SpriteData implements ISpriteData {
     }
 
     @Override
-    public int GetBitmapID(){
+    public int GetBitmapID(int bitmapSize){
         return 0;
     }
 

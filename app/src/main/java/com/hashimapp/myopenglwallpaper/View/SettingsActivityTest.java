@@ -38,6 +38,7 @@ public class SettingsActivityTest extends Activity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
         glSurfaceView = findViewById(R.id.GLView);
+
         SetRenderer(new GLRenderer(this));
         context = this.getApplicationContext();
         resources = context.getResources();

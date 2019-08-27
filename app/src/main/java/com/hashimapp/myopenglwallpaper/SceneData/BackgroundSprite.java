@@ -9,7 +9,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class BackgroundSprite extends SpriteData {
 
     public BackgroundSprite() {
-        zVertice = -1.0f;
+        zVertice = -0.98f;
         portraitVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -72,13 +72,20 @@ public class BackgroundSprite extends SpriteData {
                 1.0f, 1.0f,
                 1.0f, 0.0f
         };
-
-
     }
 
     @Override
-    public int GetBitmapID(){
-        return R.drawable.layer2;
+    public int GetBitmapID(int bitmapSize)
+    {
+        switch(bitmapSize){
+            case Textures.IMAGE_SIZE_512:
+                return R.drawable.sky_1024;
+            case Textures.IMAGE_SIZE_1024:
+                break;
+            case Textures.IMAGE_SIZE_2048:
+                break;
+        }
+        return R.drawable.sky;
     }
 
 }

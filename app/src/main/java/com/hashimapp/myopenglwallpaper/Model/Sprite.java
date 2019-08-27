@@ -14,10 +14,11 @@ import java.nio.ShortBuffer;
 /**
  * Created by Blake Hashimoto on 8/15/2015.
  */
-public class Sprite {
+public class Sprite
+{
     // Geometric variables
 //    public static float vertices[];
-    private static final float DEFAULT_BIAS = -1.0f;
+    private static final float DEFAULT_BIAS = -1.00f;
     private static final float ZOOM_MAX = 1.20f;
     private static final float ZOOM_MIN = 1.0f;
     private static final float FADE_DURATION = 0.4f; //duration of fade in percentage
@@ -51,9 +52,6 @@ public class Sprite {
 
     float xScale = 1.0f;
     float yScale = 1.0f;
-    float xScaleOffset = 0;
-    float yScaleOffset = 0;
-
 
 
     private int spriteKey;
@@ -61,12 +59,13 @@ public class Sprite {
     private float bias = 0.0f;
 
 
-    public Sprite(ISpriteData mSpriteData, int spriteKey) {
+    public Sprite(ISpriteData mSpriteData, int spriteKey)
+    {
         spriteData = mSpriteData;
 //        mvpMatrix = new float[16];
         colors = spriteData.getColor(TimeTracker.DAY, 100);
         indices = spriteData.getIndices();
-        currentBitmapID = spriteData.GetBitmapID();
+//        currentBitmapID = spriteData.GetBitmapID();
 
         setColor(colors);
         setVertices(spriteData.getShapeVertices(true, false));
@@ -75,19 +74,23 @@ public class Sprite {
         this.spriteKey = spriteKey;
     }
 
-    public void OffsetChanged(float xOffset, boolean PortraitOrientation) {
+    public void OffsetChanged(float xOffset, boolean PortraitOrientation)
+    {
         //parallax motion determined by how "far" the sprite is from the camera
-        float offsetMultiplier = (spriteData.getZVertices() + 1.0f) * 0.9f + 0.1f; //range between 0.1 and 1.0f
-        if (PortraitOrientation) {
+        float offsetMultiplier = (spriteData.getZVertices() + 1.0f);// * 0.9f + 0.1f; //range between 0.1 and 1.0f
+        if (PortraitOrientation)
+        {
             this.xScrollOffset = -1 //reverse movement
                     * xOffset * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
                     + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
-        } else {
+        } else
+        {
             this.xScrollOffset = -1 * ((xOffset * offsetMultiplier) + (-0.15f * offsetMultiplier));
         }
     }
 
-    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle){
+    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle)
+    {
         mColorHandle = colorHandle;
         mPositionHandle = positionHandle;
         mTexCoordLoc = texCoordLoc;
@@ -97,83 +100,92 @@ public class Sprite {
     }
 
 
-
-    public void SensorChanged(float xOffset, float yOffset) {
-        float offsetMultiplier = (spriteData.getZVertices()) * 2.0f + 0.2f; // z will be a vertice between 0.0 and -1.0f
+    public void SensorChanged(float xOffset, float yOffset)
+    {
+        float offsetMultiplier = (spriteData.getZVertices()) * 2.0f ; // z will be a vertice between 0.0 and -1.0f
         xAccelOffset = -1 * xOffset * offsetMultiplier;
         yAccelOffset = -1 * yOffset * offsetMultiplier;
     }
 
-    public void SetOrientation(boolean portrait, boolean motionOffset, float spriteXPosOffset) {
+    public void SetOrientation(boolean portrait, boolean motionOffset, float spriteXPosOffset)
+    {
         spriteData.setOrientation(portrait);
         float offsetMultiplier = (spriteData.getZVertices() + 1.0f) * 0.9f + 0.1f;
         this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
         setVertices(spriteData.getShapeVertices(portrait, motionOffset));
     }
 
-    public void SetTime(int time, int phasePercentage) {
+    public void SetTime(int time, int phasePercentage)
+    {
         colors = spriteData.getColor(time, phasePercentage);
         setColor(colors);
     }
 
-    public void SetFocalPoint(float currentFocalPoint){
+    public void SetFocalPoint(float currentFocalPoint)
+    {
         //get character distance from the 'in focus' camera depth
         float distanceFromFocalPoint = Math.abs(currentFocalPoint - spriteData.getZVertices());
         //translate that depth to the bias
         //todo: adjust bias based on screen resolution
-        bias = (distanceFromFocalPoint * 4 + DEFAULT_BIAS);
+        bias = (distanceFromFocalPoint * 3.5f + DEFAULT_BIAS);
     }
 
     ///zoom percent is some value between 0.0 and 1.0
-    public void SetZoomPoint(float zoomPercent){
+    public void SetZoomPoint(float zoomPercent)
+    {
         //figure out how much the size is going to be modified
         Log.d("zoom", "zoomPercent: " + zoomPercent);
 
         float sineZoomPercent = (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
-        float zPositionModifier = (1.0f + spriteData.getZVertices())* 0.9f + 0.1f; //zoom less if further from camera
-        xScale = yScale = ZOOM_MAX - (sineZoomPercent * zPositionModifier * (ZOOM_MAX - ZOOM_MIN) ) ;
+        float zPositionModifier = (1.0f + spriteData.getZVertices()) * 0.9f + 0.1f; //zoom less if further from camera
+        xScale = yScale = ZOOM_MAX - (sineZoomPercent * zPositionModifier * (ZOOM_MAX - ZOOM_MIN));
         Log.d("zoom", "xscale: " + xScale);
 
     }
 
 
-
-
-    public void turnOffBlur(){
+    public void turnOffBlur()
+    {
         bias = DEFAULT_BIAS;
     }
 
 
-    public void SetFade(float progress, boolean fadingIn){
+    public void SetFade(float progress, boolean fadingIn)
+    {
         int length = colors.length;
         float startPoint;
-        if(fadingIn){
+        if (fadingIn)
+        {
             startPoint = Math.abs(spriteData.getZVertices()) * (1.0f - FADE_DURATION);
-        }else{
+        } else
+        {
             startPoint = Math.abs(spriteData.getZVertices() + 1.0f) * (1.0f - FADE_DURATION);
         }
         float endPoint = startPoint + FADE_DURATION;
 
         float spriteProgress;
-        if(progress <= startPoint){
+        if (progress <= startPoint)
+        {
             spriteProgress = 0.0f;
-        }
-        else if(progress >= endPoint){
+        } else if (progress >= endPoint)
+        {
             spriteProgress = 1.0f;
-        }
-        else{
-            spriteProgress = (progress - startPoint)/ FADE_DURATION;
+        } else
+        {
+            spriteProgress = (progress - startPoint) / FADE_DURATION;
         }
 
         //fade in closer sprites first
         float newAlpha;
-        if(fadingIn){
+        if (fadingIn)
+        {
             newAlpha = spriteProgress;
-        }else{
+        } else
+        {
             newAlpha = 1.0f - spriteProgress;
         }
 
-        for(int i = 3; i < length; i+= 4)
+        for (int i = 3; i < length; i += 4)
         {
             colors[i] = newAlpha;
         }
@@ -181,37 +193,43 @@ public class Sprite {
     }
 
 
-    public int GetNextBitmapID(){
-        int newBitmapID = spriteData.GetBitmapID();
-        if(newBitmapID != currentBitmapID){
+    public int GetNextBitmapID(int bitmapSize)
+    {
+        int newBitmapID = spriteData.GetBitmapID(bitmapSize);
+        if (newBitmapID != currentBitmapID)
+        {
             currentBitmapID = newBitmapID;
             return currentBitmapID;
         }
         return -1;
     }
 
-    public int getCurrentBitmapID(){
+    public int getCurrentBitmapID()
+    {
         return currentBitmapID;
     }
 
 
-
-    public void SetTextureData(TextureData textureData){
+    public void SetTextureData(TextureData textureData)
+    {
         GLTextureIndex = textureData.GLTextureIndex;
         textureName = textureData.textureName;
         textureNameIndex = textureData.textureNameIndex;
     }
 
 
-    public int getTextureName(){
+    public int getTextureName()
+    {
         return textureName;
     }
 
-    public boolean TextureSwapRequired(){
+    public boolean TextureSwapRequired()
+    {
         return textureSwapRequired;
     }
 
-    public void SetTextureSwapRequired(boolean swapping){
+    public void SetTextureSwapRequired(boolean swapping)
+    {
         textureSwapRequired = swapping;
     }
 
@@ -255,7 +273,8 @@ public class Sprite {
     }
 
 
-    private void setColor(float[] textureColor) {
+    private void setColor(float[] textureColor)
+    {
         ByteBuffer cb = ByteBuffer.allocateDirect(textureColor.length * 4);
         cb.order(ByteOrder.nativeOrder());
         colorBuffer = cb.asFloatBuffer();
@@ -263,7 +282,8 @@ public class Sprite {
         colorBuffer.position(0);
     }
 
-    private void setVertices(float[] vertices) {
+    private void setVertices(float[] vertices)
+    {
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
@@ -271,7 +291,8 @@ public class Sprite {
         vertexBuffer.position(0);
     }
 
-    private void setIndices(short[] indices) {
+    private void setIndices(short[] indices)
+    {
         ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
         dlb.order(ByteOrder.nativeOrder());
         drawListBuffer = dlb.asShortBuffer();
@@ -279,7 +300,8 @@ public class Sprite {
         drawListBuffer.position(0);
     }
 
-    private void setTextureVertices(float[] vertices) {
+    private void setTextureVertices(float[] vertices)
+    {
         // The texture buffer
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
         bb.order(ByteOrder.nativeOrder());

@@ -223,7 +223,7 @@ public class GLCamera {
                 break;
         }
 
-        motionOffsetLimit = 0.16f * motionOffsetStrength;
+        motionOffsetLimit = 0.22f * motionOffsetStrength;
     }
 
     public boolean IsPortraitOrientation() {

@@ -8,7 +8,7 @@ interface ISpriteData {
     short[] getIndices();
     float getZVertices();
     void setOrientation(boolean portrait);
-    int GetBitmapID();
+    int GetBitmapID(int bitmapSize);
 
 
 }

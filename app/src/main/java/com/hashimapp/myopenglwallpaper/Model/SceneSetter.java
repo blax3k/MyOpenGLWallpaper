@@ -7,9 +7,11 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.GuySprite;
-import com.hashimapp.myopenglwallpaper.SceneData.MechSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.GirlSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
+import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.LampSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +33,8 @@ public class SceneSetter
     private static final int FADE_OUT_TRANSITION_DURATION = 500;
     private static final int FADE_IN_TRANSITION_DURATION = 2000;
     private static final int FOCAL_POINT_RESET_DURATION = 1500;
-    private static float MIN_ALPHA = 0.0f;
-    private static float MAX_ALPHA = 1.0f;
+    private static float MIN_PROGRESS = 0.0f;
+    private static float MAX_PROGRESS = 1.0f;
 
 
     Textures textures;
@@ -54,9 +56,7 @@ public class SceneSetter
 
     private long ZoomPointResetTime;
     private long ZoomPointTargetTime;
-    private float zoomPoint;
-    private float zoomPointStartingPoint;
-    private float zoomPointEndingPoint;
+    private float zoomPercent;
     private boolean zoomingCamera;
 
     private int textureSwapStatus;
@@ -65,8 +65,9 @@ public class SceneSetter
 
     private long FadeResetTime;
     private long FadeTargetTime;
-    private float fadeStartingPoint;
-    private float fadeEndingPoint;
+    private int _bitmapSize;
+
+
 
     Date startDate;
 
@@ -80,9 +81,8 @@ public class SceneSetter
         randomGenerator = new Random();
         timeTracker = new TimeTracker(resources);
         spriteList = new ArrayList<>();
-        textures = new Textures(this.context);
         focalPointStartingPoint = -1.0f;
-        focalPointEndingPoint = 0.0f;
+        focalPointEndingPoint = -0.2f;
 
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
@@ -94,21 +94,27 @@ public class SceneSetter
     {
         //todo: add sprite key generator
         spriteList.add(new Sprite(new BackgroundSprite(), 0));
-        spriteList.add(new Sprite(new MechSprite(), 1));
-        spriteList.add(new Sprite(new GuySprite(), 2));
-        spriteList.add(new Sprite(new GirlSprite(), 3));
+        spriteList.add(new Sprite(new HouseSprite(), 1));
+        spriteList.add(new Sprite(new RoomSprite(), 2));
+        spriteList.add(new Sprite(new DeskSprite(), 3));
+        spriteList.add(new Sprite(new BunnySprite(), 4));
+        spriteList.add(new Sprite(new LampSprite(), 5));
+    }
 
+    public void InitTextures(int widthHeight)
+    {
+        _bitmapSize = Textures.GetBitmapSize(widthHeight);
+        textures = new Textures(this.context, widthHeight);
         textures.InitTextures();
         int i = 0;
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.getCurrentBitmapID();
+            int bitmapID = sprite.GetNextBitmapID(_bitmapSize);
             TextureData textureData = textures.AddTexture(bitmapID, i);
             bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
             sprite.SetTextureData(textureData);
             i++;
         }
-
     }
 
     float[] mvpMatrix = new float[16];
@@ -157,7 +163,6 @@ public class SceneSetter
     }
 
 
-
     public void InitTextureSwap()
     {
         bitmapIdTextureNameHashMap.clear();
@@ -165,7 +170,7 @@ public class SceneSetter
 
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.GetNextBitmapID();
+            int bitmapID = sprite.GetNextBitmapID(_bitmapSize);
 
             if (bitmapID >= 0)
             { //valid bitmap
@@ -190,8 +195,10 @@ public class SceneSetter
 
     }
 
-    public void ResetTextureSwap(){
-        if(textureSwapStatus == STATUS_LOADING_TEXTURES){
+    public void ResetTextureSwap()
+    {
+        if (textureSwapStatus == STATUS_LOADING_TEXTURES)
+        {
             //don't do anything if we're loading int textures
         }
         bitmapIdTextureNameHashMap.clear();
@@ -216,7 +223,7 @@ public class SceneSetter
             float fadeProgress = (float) (currentTime - FadeResetTime) / (FadeTargetTime - FadeResetTime);
 //            if (textureSwapStatus == STATUS_FADING_OUT)
 //            {
-//                fadeProgress = MAX_ALPHA - fadeProgress;
+//                fadeProgress = MAX_PROGRESS - fadeProgress;
 //            }
             //don't have alpha exceed max or min
             if (fadeProgress >= 1.0f)
@@ -250,8 +257,8 @@ public class SceneSetter
         } else if (textureSwapStatus == STATUS_READY_TO_SWAP)
         {
             new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
-        textureSwapStatus = STATUS_LOADING_TEXTURES;
-    } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
+            textureSwapStatus = STATUS_LOADING_TEXTURES;
+        } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
         {
             if (!textures.UploadComplete())
             {
@@ -271,25 +278,21 @@ public class SceneSetter
         FadeResetTime = System.currentTimeMillis();
         if (textureSwapStatus == STATUS_FADING_OUT)
         {
-            fadeStartingPoint = MAX_ALPHA;
-            fadeEndingPoint = MIN_ALPHA;
             FadeTargetTime = FadeResetTime + FADE_OUT_TRANSITION_DURATION;
         } else
         { //fading in
-            fadeStartingPoint = MIN_ALPHA;
-            fadeEndingPoint = MAX_ALPHA;
             FadeTargetTime = FadeResetTime + FADE_IN_TRANSITION_DURATION;
         }
     }
 
 
-
-
-    public void SetToTargetFocalPoint(){
+    public void SetToTargetFocalPoint()
+    {
         Log.d("focal", "setting target focal point");
         rackingFocus = false;
         focalPoint = focalPointEndingPoint;
-        for(Sprite sprite : spriteList){
+        for (Sprite sprite : spriteList)
+        {
             sprite.SetFocalPoint(focalPointEndingPoint);
         }
 
@@ -316,7 +319,7 @@ public class SceneSetter
     {
         long currentTime = System.currentTimeMillis();
         float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
-        float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI /2);
+        float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI / 2);
         focalPoint = sinCurveProgression * Math.abs(focalPointStartingPoint - focalPointEndingPoint) + focalPointStartingPoint;
 
         for (Sprite sprite : spriteList)
@@ -324,32 +327,38 @@ public class SceneSetter
             sprite.SetFocalPoint(focalPoint);
         }
 
-        if(focalPointProgression >= 1.0f){
+        if (focalPointProgression >= 1.0f)
+        {
             rackingFocus = false;
         }
     }
 
-    public void SetToTargetZoomPoint(){
+    public void SetToMaxZoomPercent()
+    {
         zoomingCamera = false;
-        zoomPoint = zoomPointEndingPoint;
-        for(Sprite sprite : spriteList){
-            sprite.SetZoomPoint(zoomPoint);
+        zoomPercent = MAX_PROGRESS;
+        Log.d("zoom", "target zoom : " + zoomPercent);
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetZoomPoint(zoomPercent);
         }
     }
 
-    public boolean ZoomingCamera(){
+    public boolean ZoomingCamera()
+    {
         return zoomingCamera;
     }
 
-    public void ResetZoomPoint(){
+    public void ResetZoomPercent()
+    {
         ZoomPointResetTime = System.currentTimeMillis();
         ZoomPointTargetTime = ZoomPointResetTime + FOCAL_POINT_RESET_DURATION;
         zoomingCamera = true;
     }
 
-    public void UpdateZoomPoint(){
+    public void UpdateZoomPoint()
+    {
         long currentTime = System.currentTimeMillis();
-
         float zoomProgressionPercent = (float) (currentTime - ZoomPointResetTime) / (ZoomPointTargetTime - ZoomPointResetTime);
 
         for (Sprite sprite : spriteList)
@@ -357,13 +366,15 @@ public class SceneSetter
             sprite.SetZoomPoint(zoomProgressionPercent);
         }
 
-        if(zoomProgressionPercent >= 1.0f){
+        if (zoomProgressionPercent >= 1.0f)
+        {
             zoomingCamera = false;
         }
     }
 
 
-    public void TurnOffBlur(){
+    public void TurnOffBlur()
+    {
         FocalPointResetTime = FocalPointTargetTime = 0;
         rackingFocus = false;
         for (Sprite sprite : spriteList)
@@ -382,9 +393,10 @@ public class SceneSetter
     }
 
 
-
-    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle){
-        for(Sprite sprite : spriteList){
+    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle)
+    {
+        for (Sprite sprite : spriteList)
+        {
             sprite.SetSpriteMembers(colorHandle, positionHandle, texCoordLoc, mtrxHandle, samplerLoc, biasHandle);
         }
     }

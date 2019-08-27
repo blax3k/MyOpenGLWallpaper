@@ -90,17 +90,18 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             {
                 setEGLContextClientVersion(2);
                 setPreserveEGLContextOnPause(true);
-
-
-                setRenderer(new GLRenderer(context));
+                if(renderer == null)
+                {
+                    setRenderer(new GLRenderer(context));
+                }
                 gestureListener = new GestureDetector(getApplicationContext(), new GestureListener(renderer));
 //                Log.d("create", "OpenGLES2Engine " + startDate + " created renderer " +
 //                        renderer.startDate + " in surface view " + glSurfaceView.startDate);
 
-
                 InitRendererPrefs();
                 setTouchEventsEnabled(true);
-            } else
+            }
+            else
             {
                 return;
             }
