@@ -2,9 +2,8 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.support.annotation.FloatRange;
 import android.util.Log;
-
-import com.hashimapp.myopenglwallpaper.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,6 +18,12 @@ public class Sprite
     // Geometric variables
 //    public static float vertices[];
     private static final float DEFAULT_BIAS = -1.00f;
+    private static final float MIN_BIAS_MULTIPLIER = 1.0f;
+    private static final float MAX_BIAS_MULTIPLER = 6.0f;
+    private float maxBias = 3.5f;
+
+
+
     private static final float ZOOM_MAX = 1.20f;
     private static final float ZOOM_MIN = 1.0f;
     private static final float FADE_DURATION = 0.4f; //duration of fade in percentage
@@ -127,7 +132,13 @@ public class Sprite
         float distanceFromFocalPoint = Math.abs(currentFocalPoint - spriteData.getZVertices());
         //translate that depth to the bias
         //todo: adjust bias based on screen resolution
-        bias = (distanceFromFocalPoint * 3.5f + DEFAULT_BIAS);
+        Log.d("blur", "max bias while setting: " + maxBias);
+        bias = (distanceFromFocalPoint * maxBias + DEFAULT_BIAS);
+    }
+
+    public void SetTargetFocalPoint( @FloatRange(from = 0.0f, to = 1.0f) float targetMultiplier){
+        maxBias = targetMultiplier * (MAX_BIAS_MULTIPLER - MIN_BIAS_MULTIPLIER) + MIN_BIAS_MULTIPLIER;
+        Log.d("blur", "max bias: " + maxBias);
     }
 
     ///zoom percent is some value between 0.0 and 1.0

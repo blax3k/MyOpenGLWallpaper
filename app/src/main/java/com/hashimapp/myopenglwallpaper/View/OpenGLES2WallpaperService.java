@@ -1,5 +1,6 @@
 package com.hashimapp.myopenglwallpaper.View;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +10,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.opengl.GLSurfaceView;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -19,9 +22,13 @@ import android.view.WindowManager;
 
 import com.hashimapp.myopenglwallpaper.Model.GLParticleRenderer;
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
+import com.hashimapp.myopenglwallpaper.Model.MyLocation;
 import com.hashimapp.myopenglwallpaper.R;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.util.Date;
+
+import static java.lang.System.currentTimeMillis;
 
 /**
  * Created by Blake Hashimoto on 8/14/2015.
@@ -33,6 +40,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
     Display display;
     SharedPreferences prefs;
     private Date startDate;
+    MyLocation locationManager;
 
 
     @Override
@@ -45,13 +53,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         resources = context.getResources();
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        locationManager = new MyLocation();
 
     }
 
-//    public static Context getAppContext()
-//    {
-//        return OpenGLES2WallpaperService.context;
-//    }
 
     @Override
     public Engine onCreateEngine()
@@ -65,12 +70,15 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         private GestureDetector gestureListener;
         Context context;
         Date startTime;
+        long lastLocationUpdate;
+        private final long LOCATION_UPDATE_INTERVAL = 1000 * 60 * 60 * 2;
 
         OpenGLES2Engine(Context context)
         {
             super();
             this.context = context;
         }
+
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder)
@@ -100,6 +108,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
                 InitRendererPrefs();
                 setTouchEventsEnabled(true);
+                UpdateLocation();
             }
             else
             {
@@ -116,7 +125,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
             renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
-            renderer.SetCameraBlurEnabled(prefs.getBoolean(resources.getString(R.string.blur_enabled_key), true));
+            renderer.SetCameraBlurAmount(prefs.getInt(resources.getString(R.string.blur_amount_key), 5));
             renderer.SetZoomCameraEnabled(prefs.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true));
         }
 
@@ -161,6 +170,9 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     {
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                     }
+
+                    UpdateLocation();
+
                     renderer.UpdateVisibility(visible);
 //                    renderer.SwapTextures();
                     glSurfaceView.requestRender();
@@ -169,6 +181,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     //not visible
                     sensorManager.unregisterListener(this);
                     renderer.UpdateVisibility(visible);
+                    locationManager.cancelTimer();
                 }
             }
             super.onVisibilityChanged(visible);
@@ -200,10 +213,17 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
                 Log.d("touch", "touch offset enabled: " + touchOffsetEnabled);
                 renderer.SetTouchOffset(touchOffsetEnabled);
-            } else if(key.equals(resources.getString(R.string.blur_enabled_key))){
-                boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
-                renderer.SetCameraBlurEnabled(motionBlurEnabled);
-            } else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
+            }
+            else if(key.equals(resources.getString(R.string.blur_amount_key))){
+                int blurAmount = sharedPreferences.getInt(resources.getString(R.string.blur_amount_key), 5);
+                renderer.SetCameraBlurAmount(blurAmount);
+
+            }
+//            else if(key.equals(resources.getString(R.string.blur_enabled_key))){
+//                boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
+//                renderer.SetCameraBlurEnabled(motionBlurEnabled);
+//            }
+            else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
                 boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
                 renderer.SetRackFocusEnabled(rackFocusEnabled);
             }else if(key.equals(resources.getString(R.string.setting_zoom_camera_key))){
@@ -229,6 +249,25 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                         SensorManager.SENSOR_DELAY_GAME);
             }
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        }
+
+        private void UpdateLocation()
+        {
+            MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
+                @Override
+                public void gotLocation(android.location.Location location)
+                {
+                    renderer.SetLocation(location.getLatitude(), location.getLongitude());
+                    Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
+                }
+            };
+
+            long currentTime =  System.currentTimeMillis();
+            if(currentTime - lastLocationUpdate > LOCATION_UPDATE_INTERVAL){
+                Log.d("locationstuff", "location updated");
+                lastLocationUpdate =  currentTime;
+                locationManager.getLocation(context, locationResult);
+            }
         }
 
 

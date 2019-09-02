@@ -87,7 +87,7 @@ public class DeskSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer1;
 //        return currentBitmap;
 
-        return R.drawable.desk_2048;
+        return R.drawable.desk_1024;
     }
 
 }

@@ -36,9 +36,15 @@
     <string name="rack_focus_enabled_key">rackFocusEnabled</string>
     <string name="rack_focus_enabled_title">Rack Focus</string>
 
+    <string name="blur_amount_key">blurAmount</string>
+    <string name="blur_amount_title">Blur Intensity</string>
+
     <string name="blur_none">No camera blur</string>
     <string name="blur_low">Slight camera blur</string>
+    <string name="blur_medium"></string>
     <string name="blur_high">Heavy camera blur</string>
+
+
 
     <string name="setting_zoom_camera_key">zoom_camera_key</string>
     <string name="zoom_camera_title">Camera Zoom</string>
@@ -59,6 +65,9 @@
 
     <string name="motion_parallax_strength_key">motion_parallax_strength</string>
     <string name="motion_parallax_strength_setting_title">Motion Parallax Strength</string>
+
+    <string name="location_setting_key">location_setting</string>
+    <string name="location_setting_title">Use Current Location</string>
 
     <string name="max_volume_pref">Max volume</string>
 

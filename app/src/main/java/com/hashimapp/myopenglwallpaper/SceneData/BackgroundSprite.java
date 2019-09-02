@@ -85,7 +85,7 @@ public class BackgroundSprite extends SpriteData {
             case Textures.IMAGE_SIZE_2048:
                 break;
         }
-        return R.drawable.sky;
+        return R.drawable.sky_1024;
     }
 
 }

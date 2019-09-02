@@ -84,6 +84,6 @@ public class HouseSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer0;
 //        return currentBitmap;
 
-        return R.drawable.foregroundcitymap;
+        return R.drawable.foregroundcitymap_1024;
     }
 }

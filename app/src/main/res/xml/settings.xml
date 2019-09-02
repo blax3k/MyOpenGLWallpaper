@@ -26,10 +26,12 @@
             android:title="@string/zoom_camera_title"
             android:defaultValue="@string/default_true" />
 
-        <SwitchPreference
-            android:key="@string/blur_enabled_key"
-            android:title="@string/blur_enabled_title"
-            android:defaultValue="@string/default_true" />
+        <SeekBarPreference
+            android:key="@string/blur_amount_key"
+            android:title="@string/blur_amount_title"
+            android:max="10"
+            android:min="0"
+            android:defaultValue="5" />
 
         <SwitchPreference
             android:key="@string/rack_focus_enabled_key"
@@ -48,6 +50,11 @@
             android:title="@string/set_time_title"
             android:summary="%s"
             android:defaultValue="0"/>
+
+        <SwitchPreference
+            android:key="@string/location_setting_key"
+            android:title="@string/location_setting_title"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory

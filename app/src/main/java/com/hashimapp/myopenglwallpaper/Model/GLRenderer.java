@@ -22,9 +22,11 @@ public class GLRenderer implements Renderer
 
     SceneSetter sceneSetter;
     // Our screen resolution
-    float mScreenWidth = 1280;
-    float mScreenHeight = 768;
-    //    Sprite sky, template;
+    int mScreenWidth;
+    int mScreenHeight;
+    int widthHeight;
+    int _bitmapSize;
+
     Date dateCreated;
     Location location;
     Context context;
@@ -37,6 +39,7 @@ public class GLRenderer implements Renderer
     private boolean _cameraBlurEnabled;
     private boolean _rackFocusEnabled;
     private boolean _cameraZoomEnabled;
+    private boolean _created;
 
 
     public GLRenderer(Context context)
@@ -49,7 +52,6 @@ public class GLRenderer implements Renderer
         sceneSetter = new SceneSetter(context);
         location = new Location(47.760012, -122.307209);
         timeTracker = new TimeTracker(resources);
-//        autoTimeEnabled = true;
         timePhaseSelected = resources.getString(R.string.time_key_day);
     }
 
@@ -80,30 +82,57 @@ public class GLRenderer implements Renderer
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
     {
+        Log.d("textures", "surface created");
         startTime = System.currentTimeMillis();
         if (sceneSetter == null)
         {
             sceneSetter = new SceneSetter(this.context);
         }
-        sceneSetter.InitSprites();
         // Set the clear color to white
         GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
 
+        sceneSetter.InitSprites();
+
         // Create the shaders, images
         InitSpriteProgram();
+        sceneSetter.SetMaxBlurAmount(camera.maxBlur);
 
+//        riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
 
-        riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+//        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Particle);
+//        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Particle);
+//
+//        GLES20.glAttachShader(riGraphicTools.sp_Particle, vertexShader);   // add the vertex shader to program
+//        GLES20.glAttachShader(riGraphicTools.sp_Particle, fragmentShader); // add the fragment shader to program
+//        GLES20.glLinkProgram(riGraphicTools.sp_Particle);                  // creates OpenGL ES program executrees
+//        GLES20.glBlendFunc(GLES20.GL_ONE_MINUS_CONSTANT_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Particle);
-        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Particle);
+//        sceneSetter.SetToTargetFocalPoint();
+    }
 
-        GLES20.glAttachShader(riGraphicTools.sp_Particle, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(riGraphicTools.sp_Particle, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(riGraphicTools.sp_Particle);                  // creates OpenGL ES program executrees
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+    @Override
+    public void onSurfaceChanged(GL10 gl, int width, int height)
+    {
+        Log.d("textures", "surface changed. width: " + width + " height: " + height);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glFlush();
 
-        sceneSetter.SetToTargetFocalPoint();
+        mScreenHeight = width;
+        mScreenHeight = height;
+        int newWidthHeight = Math.max(width, height);
+
+        Log.d("textures", "surface changed. widthHeight: " + newWidthHeight + " widthHeight: " + widthHeight);
+
+        if(!_created){
+            _created = true;
+            widthHeight = newWidthHeight;
+            sceneSetter.InitTextures(widthHeight);
+        }
+
+        GLES20.glViewport(0, 0, width, height);
+
+        camera.OnSurfaceChanged(width, height);
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(), camera.GetXOffsetPosition());
     }
 
 
@@ -120,7 +149,7 @@ public class GLRenderer implements Renderer
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_ONE_MINUS_CONSTANT_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         // get handle to vertex shader's vPosition member
         int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
@@ -177,6 +206,33 @@ public class GLRenderer implements Renderer
         }
     }
 
+    public void SetCameraBlurAmount(int amount){
+        Log.d("blur", "set blur amount to: " + amount);
+        camera.maxBlur = amount;
+        if(amount == 0){
+            _cameraBlurEnabled = false;
+            sceneSetter.TurnOffBlur();
+        }else{
+            _cameraBlurEnabled = true;
+            sceneSetter.SetMaxBlurAmount(amount);
+            if (_rackFocusEnabled)
+            {
+                sceneSetter.ResetFocalPoint();
+            } else
+            {
+                sceneSetter.SetToTargetFocalPoint();
+            }
+        }
+    }
+
+
+    public void SetLocation(double latitude, double longitude)
+    {
+        location = new Location(latitude, longitude);
+        timeTracker.SetLocation(location);
+        UpdateTime();
+    }
+
     public void SetRackFocusEnabled(boolean enabled)
     {
         _rackFocusEnabled = enabled;
@@ -188,7 +244,8 @@ public class GLRenderer implements Renderer
     public void SetZoomCameraEnabled(boolean enabled){
         _cameraZoomEnabled = enabled;
         if(!enabled){
-            sceneSetter.SetToTargetZoomPoint();
+            Log.d("zoom", "set to target zoom point");
+            sceneSetter.SetToMaxZoomPercent();
         }
     }
 
@@ -209,7 +266,7 @@ public class GLRenderer implements Renderer
     }
 
     public void ZoomCamera(){
-        sceneSetter.ResetZoomPoint();
+        sceneSetter.ResetZoomPercent();
     }
 
     public void UpdateVisibility(boolean visible)
@@ -229,7 +286,8 @@ public class GLRenderer implements Renderer
                 if(_rackFocusEnabled)
                 {
                     sceneSetter.ResetFocalPoint();
-                }else{
+                }
+                else {
                     sceneSetter.SetToTargetFocalPoint();
                 }
             }else{
@@ -237,7 +295,7 @@ public class GLRenderer implements Renderer
             }
 
             if(_cameraZoomEnabled){
-                sceneSetter.ResetZoomPoint();
+                sceneSetter.ResetZoomPercent();
             }
 
 //            if(_zoomCameraEnabled){
@@ -274,23 +332,6 @@ public class GLRenderer implements Renderer
     }
 
 
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height)
-    {
-        Log.d("rotate", "surface changed");
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glFlush();
-
-        // We need to know the current width and height.
-        mScreenWidth = width;
-        mScreenHeight = height;
-        GLES20.glViewport(0, 0, width, height);
-
-
-        camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(), camera.GetXOffsetPosition());
-
-    }
 
 
     private int mFPS = 0;         // the value to show

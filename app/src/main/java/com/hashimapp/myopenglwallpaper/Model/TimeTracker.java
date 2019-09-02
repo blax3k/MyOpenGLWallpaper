@@ -48,6 +48,7 @@ public class TimeTracker
     Location location;
     TimeZone timeZone;
 
+
     public TimeTracker(Resources resources)
     {
         location = new Location(DEFAULT_LATITTUDE, DEFAULT_LONGITUDE);
@@ -56,10 +57,10 @@ public class TimeTracker
         this.resources = resources;
     }
 
-    public void SetLocation(double latitude, double longitude)
-    {
-        location.setLocation(latitude, longitude);
+    public void SetLocation(Location location){
+        this.location = location;
     }
+
 
     //calculates and returns the current time phase (index 0) and the current progression through that phase (index 1)
     public int[] GetTimePhase(Date date)

@@ -84,6 +84,6 @@ public class RoomSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer0;
 //        return currentBitmap;
 
-        return R.drawable.room;
+        return R.drawable.room_1024;
     }
 }

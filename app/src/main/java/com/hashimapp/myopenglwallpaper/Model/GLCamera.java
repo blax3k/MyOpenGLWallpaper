@@ -44,7 +44,7 @@ public class GLCamera {
     private boolean motionOffsetEnabled;
     private boolean touchOffsetEnabled;
 
-    private float focalPoint;
+    public int maxBlur;
     private float targetFocalPoint = 0.0f;
 
     private int screenWidth = 1;

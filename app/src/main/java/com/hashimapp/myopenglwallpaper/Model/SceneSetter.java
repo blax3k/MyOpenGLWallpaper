@@ -42,7 +42,6 @@ public class SceneSetter
 
     SharedPreferences preferences;
     Context context;
-    TimeTracker timeTracker;
     List<Sprite> spriteList;
     Resources resources;
 
@@ -79,7 +78,6 @@ public class SceneSetter
         resources = context.getResources();
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
         randomGenerator = new Random();
-        timeTracker = new TimeTracker(resources);
         spriteList = new ArrayList<>();
         focalPointStartingPoint = -1.0f;
         focalPointEndingPoint = -0.2f;
@@ -298,6 +296,16 @@ public class SceneSetter
 
     }
 
+    public void SetMaxBlurAmount(int max)
+    {
+        float newMax = max;
+        newMax *= 0.1f;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetTargetFocalPoint(newMax);
+        }
+    }
+
     public boolean RackingFocus()
     {
         return rackingFocus;
@@ -330,6 +338,16 @@ public class SceneSetter
         if (focalPointProgression >= 1.0f)
         {
             rackingFocus = false;
+        }
+    }
+
+    public void TurnOffBlur()
+    {
+        FocalPointResetTime = FocalPointTargetTime = 0;
+        rackingFocus = false;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.turnOffBlur();
         }
     }
 
@@ -373,15 +391,7 @@ public class SceneSetter
     }
 
 
-    public void TurnOffBlur()
-    {
-        FocalPointResetTime = FocalPointTargetTime = 0;
-        rackingFocus = false;
-        for (Sprite sprite : spriteList)
-        {
-            sprite.turnOffBlur();
-        }
-    }
+
 
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)

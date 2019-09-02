@@ -88,6 +88,8 @@ public abstract class GLWallpaperService extends WallpaperService
             super.onSurfaceDestroyed(holder);
         }
 
+
+
         public void setRenderer(GLSurfaceView.Renderer newRenderer)
         {
             renderer = (GLRenderer) newRenderer;
