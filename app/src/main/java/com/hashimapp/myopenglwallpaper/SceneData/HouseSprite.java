@@ -6,9 +6,10 @@ import com.hashimapp.myopenglwallpaper.R;
 
 public class HouseSprite extends SpriteData {
 
-    int currentBitmap = R.drawable.layer0;
     public HouseSprite() {
-        zVertice = -0.95f;
+        zVertice = 0.95f;
+        essentialLayer = true;
+
         portraitVertices = new float[]{
                 -2.4f, 1.6f, 0.0f,   // top left
                 -2.4f, -0.8f, 0.0f,   // bottom left
@@ -16,10 +17,10 @@ public class HouseSprite extends SpriteData {
                 2.4f, 1.6f, 0.0f }; // top right
 
         landscapeVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
+                -2.4f, 1.6f, 0.0f,   // top left
+                -2.4f, -0.8f, 0.0f,   // bottom left
+                2.4f, -0.8f, 0.0f,   // bottom right
+                2.4f, 1.6f, 0.0f }; // top right
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
@@ -35,33 +36,49 @@ public class HouseSprite extends SpriteData {
                         0f, 0.17f, 0.27f, 1f,};
 
         midDawnColor = new float[]{
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,};
+                1.0f, 0.8f, 0.8f, 1f,
+                1.0f, 0.8f, 0.8f, 1f,
+                0.5f, 0.5f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,};
 
-        dayColor = new float[]
+        dayStartColor = new float[]
                 {1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        0.9f, 0.9f, 0.9f, 1f};
+
+        dayEndColor = new float[]
+                {0.9f, 0.9f, 0.9f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]{0.92f, 0.69f, 0.44f, 1f,
+        earlyDuskColor = new float[]{
+                0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,
                 0.92f, 0.69f, 0.44f, 1f,};
 
         midDuskColor = new float[]{
-                0f, 0.07f, 0.17f, 1f,
+                0.0f, 0.14f, 0.30f, 1f,
+                0.0f, 0.10f, 0.20f, 1f,
+                0.0f, 0.03f, 0.07f, 1f,
+                0.0f, 0.07f, 0.14f, 1f,};
+
+
+        nightStartColor = new float[]{
+                0.1f, 0.17f, 0.37f, 1f,
                 0f, 0.07f, 0.17f, 1f,
                 0f, 0.07f, 0.17f, 1f,
                 0f, 0.07f, 0.17f, 1f,};
 
-        nightColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        nightEndColor = new float[]{
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0.1f, 0.17f, 0.37f, 1f,};
+
+
 
         textureVertices = new float[]{
                 0.0f, 0.0f,
@@ -71,8 +88,12 @@ public class HouseSprite extends SpriteData {
         };
     }
 
+    public float[] GetTextureVertices(){
+        return textureVertices;
+    }
+
     @Override
-    public int GetBitmapID(int bitmapSize){
+    public int GetBitmapID(int bitmapSize, int scene){
         switch(bitmapSize){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.foregroundcitymap_1024;

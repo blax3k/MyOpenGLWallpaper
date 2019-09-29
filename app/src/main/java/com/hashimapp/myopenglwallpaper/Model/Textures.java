@@ -68,7 +68,6 @@ public class Textures {
     private boolean Loaded;
     private int widthHeight;
 
-
     private Deque<TextureUploadData> textureDataDeque;
 
     public static final int[] GL_TEXTURE_IDS = new int[]{
@@ -97,23 +96,18 @@ public class Textures {
         context = inContext;
         widthHeight = mWidthHeight;
 
-        textureNames = new int[20];
-        GLES20.glGenTextures(20, textureNames, 0);
+        textureNames = new int[32];
+        GLES20.glGenTextures(32, textureNames, 0);
         textureDataDeque = new ArrayDeque<>();
-
         OpenTextureSlots = new ArrayList<>();
         UsedTextureSlots = new ArrayList<>();
+
 
         for(int i = 0; i < GL_TEXTURE_IDS.length; i++){
             OpenTextureSlots.add(i);
         }
     }
 
-    public void InitTextures()
-    {
-        textureNames = new int[32];
-        GLES20.glGenTextures(32, textureNames, 0);
-    }
 
     public TextureData AddTexture(int bitmapID, int textureNameIndex){
         int glTextureID = GL_TEXTURE_IDS[GetNextGLTextureIDIndex()];
@@ -166,13 +160,14 @@ public class Textures {
     public void LoadTextures(HashMap<Integer, Integer> bitmapIdTextureNameHashMap){
         Loaded = false;
 
-        HashMap<Integer, Integer> sortedMap = sortByValues(bitmapIdTextureNameHashMap);
 
         for(Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet())
         {
             int bitmapId = data.getKey();
             int texName = data.getValue();
-            Bitmap bmp =  BitmapFactory.decodeResource(context.getResources(), bitmapId);
+            BitmapFactory.Options op = new BitmapFactory.Options();
+            op.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bmp =  BitmapFactory.decodeResource(context.getResources(), bitmapId, op);
             TextureUploadData uploadData = new TextureUploadData(bmp, texName, 0);
 
             textureDataDeque.add(uploadData);

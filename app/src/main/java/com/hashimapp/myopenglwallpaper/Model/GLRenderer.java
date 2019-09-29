@@ -14,6 +14,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 
@@ -59,7 +60,7 @@ public class GLRenderer implements Renderer
     {
         if (camera.TouchOffsetEnabled())
         {
-            float newXOffset = camera.getxOffsetStepPortrait(xOffset);
+            float newXOffset = camera.GetXOffset(xOffset);
             sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
             return true;
         }
@@ -89,7 +90,7 @@ public class GLRenderer implements Renderer
             sceneSetter = new SceneSetter(this.context);
         }
         // Set the clear color to white
-        GLES20.glClearColor(0.9f, 0.9f, 0.9f, 0);
+        GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
         sceneSetter.InitSprites();
 
@@ -132,7 +133,8 @@ public class GLRenderer implements Renderer
         GLES20.glViewport(0, 0, width, height);
 
         camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(), camera.GetXOffsetPosition());
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(),
+                camera.GetXOffsetPosition(), camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale());
     }
 
 
@@ -149,7 +151,8 @@ public class GLRenderer implements Renderer
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_ONE_MINUS_CONSTANT_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
 
         // get handle to vertex shader's vPosition member
         int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
@@ -161,8 +164,9 @@ public class GLRenderer implements Renderer
         // Get handle to textures locations
         int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
         int biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
+        int alphaHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "alpha");
 
-        sceneSetter.SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle);
+        sceneSetter.SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
     }
 
     public void EnableMotionOffset(boolean motionOffsetOn)
@@ -265,9 +269,6 @@ public class GLRenderer implements Renderer
         }
     }
 
-    public void ZoomCamera(){
-        sceneSetter.ResetZoomPercent();
-    }
 
     public void UpdateVisibility(boolean visible)
     {
@@ -314,7 +315,7 @@ public class GLRenderer implements Renderer
         int timeOfDay, percentage;
         int[] timeInfo;
 
-        timeInfo = timeTracker.GetTimePhase(timePhaseSelected);
+        timeInfo = timeTracker.GetTimePhase(timePhaseSelected, null);
 
 //        if (autoTimeEnabled)
 //        {
@@ -330,8 +331,6 @@ public class GLRenderer implements Renderer
 
         sceneSetter.SetTimeOfDay(timeOfDay, percentage);
     }
-
-
 
 
     private int mFPS = 0;         // the value to show

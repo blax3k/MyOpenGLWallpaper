@@ -11,18 +11,20 @@ public class BunnySprite extends SpriteData
 
     public BunnySprite()
     {
-        zVertice = -0.2f;
+        zVertice = 0.2f;
+        essentialLayer = false;
         portraitVertices = new float[]{
-                -1.3f, 0.6f, 0.0f,   // top left
-                -1.3f, -2.0f, 0.0f,   // bottom left
-                1.3f, -2.0f, 0.0f,   // bottom right
-                1.3f, 0.6f, 0.0f};  // top right
+                -0.8f, 0.3f, 0.0f,   // top left
+                -0.8f, -2.0f, 0.0f,   // bottom left
+                0.8f, -2.0f, 0.0f,   // bottom right
+                0.8f, 0.3f, 0.0f};  // top right
 
         landscapeVertices = new float[]{
-                -1.3f, 0.6f, 0.0f,   // top left
-                -1.3f, -2.0f, 0.0f,   // bottom left
-                1.3f, -2.0f, 0.0f,   // bottom right
-                1.3f, 0.6f, 0.0f};  // top right
+                -0.8f, 0.3f, 0.0f,   // top left
+                -0.8f, -2.0f, 0.0f,   // bottom left
+                0.8f, -2.0f, 0.0f,   // bottom right
+                0.8f, 0.3f, 0.0f};  // top right
+
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
@@ -31,40 +33,53 @@ public class BunnySprite extends SpriteData
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDawnColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        earlyDawnColor = new float[]{
+                0f, 0.27f, 0.37f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,};
 
         midDawnColor = new float[]{
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,};
+                1.0f, 0.8f, 0.8f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,};
 
-        dayColor = new float[]
+        dayStartColor = new float[]
                 {1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        0.9f, 0.9f, 0.9f, 1f};
+
+        dayEndColor = new float[]
+                {0.9f, 0.9f, 0.9f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]{0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,};
+        earlyDuskColor = new float[]
+                {1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f};
 
         midDuskColor = new float[]{
                 0f, 0.07f, 0.17f, 1f,
                 0f, 0.07f, 0.17f, 1f,
-                0f, 0.07f, 0.17f, 1f,
-                0f, 0.07f, 0.17f, 1f,};
+                0.9f, 0.9f, 0.9f, 1f,
+                1f, 1f, 1f, 1f,};
 
-        nightColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        nightStartColor = new float[]{
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0.9f, 0.9f, 0.9f, 1f,
+                1f, 1f, 1f, 1f,};
+
+        nightEndColor = new float[]{
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0.9f, 0.9f, 0.9f, 1f,
+                1f, 1f, 1f, 1f,};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,
@@ -75,10 +90,10 @@ public class BunnySprite extends SpriteData
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize){
+    public int GetBitmapID(int bitmapSize, int scene){
         switch(bitmapSize){
             case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.rabbit;
+                return  R.drawable.rabbit_sheet;
         }
 //        if(currentBitmap == R.drawable.guy){
 //            currentBitmap = R.drawable.guy2;
@@ -87,7 +102,55 @@ public class BunnySprite extends SpriteData
 //        }
 //        return currentBitmap;
 
-        return R.drawable.rabbit;
+        return R.drawable.rabbit_sheet;
+    }
+
+    @Override
+    public float[] GetTextureVertices(int scene){
+        changeTextureVertices = CHANGE_NOW;
+        switch(scene){
+            case SceneManager.DEFAULT:
+                textureVertices = new float[]{
+                        0.0f, 0.5f,
+                        0.0f, 1.0f,
+                        0.33f, 1.0f,
+                        0.33f, 0.5f
+                };
+                break;
+            case SceneManager.BLUE:
+                textureVertices = new float[]{
+                        0.0f, 0.0f,
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.66f
+                };
+                break;
+            case SceneManager.GREEN:
+                textureVertices = new float[]{
+                        0.0f, 0.66f,
+                        0.66f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.66f
+                };
+                break;
+            case SceneManager.PINK:
+                textureVertices = new float[]{
+                        0.0f, 0.0f,
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.0f
+                };
+                break;
+            case SceneManager.YELLOW:
+                textureVertices = new float[]{
+                        0.0f, 0.5f,
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.0f
+                };
+                break;
+        }
+        return textureVertices;
     }
 }
 

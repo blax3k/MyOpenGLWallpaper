@@ -6,11 +6,9 @@ import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.hashimapp.myopenglwallpaper.SceneData.BackgroundSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
-import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.LampSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
 
 import java.util.ArrayList;
@@ -61,10 +59,12 @@ public class SceneSetter
     private int textureSwapStatus;
 
     private HashMap<Integer, Integer> bitmapIdTextureNameHashMap;
+    private HashMap<Integer, float[]> bitmapTextureVerticesHashMap;
 
     private long FadeResetTime;
     private long FadeTargetTime;
     private int _bitmapSize;
+    private int currentScene;
 
 
 
@@ -84,6 +84,7 @@ public class SceneSetter
 
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
+        bitmapTextureVerticesHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
     }
 
@@ -91,26 +92,28 @@ public class SceneSetter
     public void InitSprites()
     {
         //todo: add sprite key generator
-        spriteList.add(new Sprite(new BackgroundSprite(), 0));
-        spriteList.add(new Sprite(new HouseSprite(), 1));
-        spriteList.add(new Sprite(new RoomSprite(), 2));
-        spriteList.add(new Sprite(new DeskSprite(), 3));
-        spriteList.add(new Sprite(new BunnySprite(), 4));
-        spriteList.add(new Sprite(new LampSprite(), 5));
+        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
+        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
+//        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
+        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
+        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
+//        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
     }
 
     public void InitTextures(int widthHeight)
     {
         _bitmapSize = Textures.GetBitmapSize(widthHeight);
         textures = new Textures(this.context, widthHeight);
-        textures.InitTextures();
         int i = 0;
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.GetNextBitmapID(_bitmapSize);
+            int bitmapID = sprite.GetNextBitmapID(_bitmapSize, currentScene);
             TextureData textureData = textures.AddTexture(bitmapID, i);
             bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
             sprite.SetTextureData(textureData);
+            sprite.PrepNextTextureVertices(currentScene);
+            sprite.SetNextTextureVertices();
+
             i++;
         }
     }
@@ -124,6 +127,10 @@ public class SceneSetter
         {
             sprite.SetTime(timePhase, percentage);
         }
+    }
+
+    public void SetScene(int scene){
+        currentScene = scene;
     }
 
 
@@ -143,7 +150,7 @@ public class SceneSetter
         }
     }
 
-    public void SurfaceChanged(boolean portrait, boolean motionOffset, float spriteXPosOffset)
+    public void SurfaceChanged(boolean portrait, boolean motionOffset, float spriteXPosOffset, float touchScale, float motionScale)
     {
 //        GetMembers();
 //        GLES20.glEnableVertexAttribArray(mColorHandle);
@@ -152,23 +159,26 @@ public class SceneSetter
         // check if textures need to be swapped
         // Get textures and corresponding sprites that need to be swapped
         // tell textures class which textures to load
-
+        Log.d("offset", "sprite x pos offset: " + spriteXPosOffset);
 
         for (Sprite sprite : spriteList)
         {
-            sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset);
+            sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset, touchScale, motionScale);
         }
     }
 
 
     public void InitTextureSwap()
     {
+        //get textures
         bitmapIdTextureNameHashMap.clear();
+        bitmapTextureVerticesHashMap.clear();
+        boolean FadeAll = false;
         //decide which scene
 
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.GetNextBitmapID(_bitmapSize);
+            int bitmapID = sprite.GetNextBitmapID(_bitmapSize, currentScene);
 
             if (bitmapID >= 0)
             { //valid bitmap
@@ -177,33 +187,29 @@ public class SceneSetter
                 {
                     bitmapIdTextureNameHashMap.put(bitmapID, sprite.getTextureName());
                     sprite.SetTextureSwapRequired(true);
+                    if(sprite.IsEssentialLayer()){
+                        FadeAll = true;
+                    }
                 }
+            }
+
+            if(sprite.PrepNextTextureVertices(currentScene) ){
+                sprite.SetTextureSwapRequired(true);
+                if(sprite.IsEssentialLayer()){
+                    FadeAll = true;
+                }
+            }
+        }
+        if(FadeAll){
+            for (Sprite sprite: spriteList){
+                sprite.SetTextureSwapRequired(true);
             }
         }
 
         textureSwapStatus = STATUS_FADING_OUT;
         ResetFadePoint();
-
-
-//        textureSwapStatus = STATUS_FADING_OUT;
-//        ResetFadePoint();
-
-//        textures.SwapTextures(bitmapIdTextureNameHashMap);
-
-
     }
 
-    public void ResetTextureSwap()
-    {
-        if (textureSwapStatus == STATUS_LOADING_TEXTURES)
-        {
-            //don't do anything if we're loading int textures
-        }
-        bitmapIdTextureNameHashMap.clear();
-        textureSwapStatus = STATUS_FADING_IN;
-        ResetFadePoint();
-
-    }
 
     public int GetTextureSwapStatus()
     {
@@ -246,9 +252,18 @@ public class SceneSetter
             {
                 if (textureSwapStatus == STATUS_FADING_OUT)
                 { //finished fading out. load textures
+
+                    for (Sprite sprite : spriteList)
+                    {
+                        sprite.SetNextTextureVertices();
+                    }
                     textureSwapStatus = STATUS_READY_TO_SWAP;
                 } else
                 {  //finshed fading in. stop
+                    for (Sprite sprite : spriteList)
+                    {
+                        sprite.SetTextureSwapRequired(false);
+                    }
                     textureSwapStatus = STATUS_DONE;
                 }
             }
@@ -391,9 +406,6 @@ public class SceneSetter
     }
 
 
-
-
-
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
         for (Sprite sprite : spriteList)
@@ -403,11 +415,11 @@ public class SceneSetter
     }
 
 
-    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle)
+    public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle, int samplerLoc, int biasHandle, int alphaHandle)
     {
         for (Sprite sprite : spriteList)
         {
-            sprite.SetSpriteMembers(colorHandle, positionHandle, texCoordLoc, mtrxHandle, samplerLoc, biasHandle);
+            sprite.SetSpriteMembers(colorHandle, positionHandle, texCoordLoc, mtrxHandle, samplerLoc, biasHandle, alphaHandle);
         }
     }
 

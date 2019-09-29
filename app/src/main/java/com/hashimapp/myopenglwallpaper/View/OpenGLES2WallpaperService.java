@@ -257,8 +257,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 @Override
                 public void gotLocation(android.location.Location location)
                 {
-                    renderer.SetLocation(location.getLatitude(), location.getLongitude());
-                    Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
+                    if(renderer != null && location != null){
+                        renderer.SetLocation(location.getLatitude(), location.getLongitude());
+                        Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
+                    }
                 }
             };
 

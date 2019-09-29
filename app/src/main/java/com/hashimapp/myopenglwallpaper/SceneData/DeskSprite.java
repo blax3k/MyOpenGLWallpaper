@@ -10,7 +10,8 @@ public class DeskSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
-        zVertice = -0.2f;
+        zVertice = 0.2f;
+        essentialLayer = true;
         portraitVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -30,40 +31,53 @@ public class DeskSprite extends SpriteData {
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDawnColor = new float[]
-                        {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        earlyDawnColor = new float[]{
+                0f, 0.27f, 0.37f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,};
 
         midDawnColor = new float[]{
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,};
+                1.0f, 0.8f, 0.8f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,};
 
-        dayColor = new float[]
+        dayStartColor = new float[]
                 {1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        0.9f, 0.9f, 0.9f, 1f};
+
+        dayEndColor = new float[]
+                {0.9f, 0.9f, 0.9f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]{0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,};
+        earlyDuskColor = new float[]{
+                1f, 0.933f, 0.78f, 1f,
+                1f, 0.933f, 0.78f, 1f,
+                1f, 0.933f, 0.78f, 1f,
+                1f, 0.933f, 0.78f, 1f};
 
         midDuskColor = new float[]{
-                0f, 0.12f, 0.20f, 1f,
-                0f, 0.12f, 0.20f, 1f,
-                0f, 0.12f, 0.20f, 1f,
-                0f, 0.12f, 0.20f, 1f,};
+                0.5f, 0.5f, 0.5f, 1f,
+                0.5f, 0.5f, 0.5f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f};
 
-        nightColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,
-                        0f, 0.17f, 0.27f, 1f,};
+        nightStartColor = new float[]{
+                0.5f, 0.5f, 0.5f, 1f,
+                0.5f, 0.5f, 0.5f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f};
+
+        nightEndColor = new float[]{
+                0.5f, 0.5f, 0.5f, 1f,
+                0.5f, 0.5f, 0.5f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 1f, 1f, 1f};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,
@@ -75,7 +89,7 @@ public class DeskSprite extends SpriteData {
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize){
+    public int GetBitmapID(int bitmapSize, int scene){
         switch(bitmapSize){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.desk_1024;

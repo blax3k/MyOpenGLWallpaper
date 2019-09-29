@@ -1,6 +1,7 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.R;
@@ -113,10 +114,17 @@ public class TimeTracker
         return timeInfo;
     }
 
-    public int[] GetTimePhase(String timePhase)
+    public int[] GetTimePhase(String timePhase, @Nullable Date dt)
     {
         if(timePhase.equals(resources.getString(R.string.time_key_automatic))){
             Date date = Calendar.getInstance().getTime();
+//            if(dt != null){
+//                if(dt.getDay() >= date.getDay()){
+//                    dt.setTime(dt.getTime() - 1000*60*60*24);
+//                }
+//                date = dt;
+//                Log.d("timey", "set date: " + date.toString());
+//            }
             return  GetTimePhase(date);
         }
 

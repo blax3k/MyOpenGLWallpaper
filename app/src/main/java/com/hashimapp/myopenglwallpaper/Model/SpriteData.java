@@ -6,7 +6,13 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 
-public class SpriteData implements ISpriteData {
+public class SpriteData {
+
+    public static final int NO_CHANGE = 0;
+    public static final int CHANGE_NOW = 1;
+    public static final int CHANGE_ON_FADE = 2;
+
+    public int changeTextureVertices = NO_CHANGE;
 
     protected float[] portraitVertices;
     protected float[] landscapeVertices;
@@ -16,39 +22,41 @@ public class SpriteData implements ISpriteData {
     protected float[] defaultColor;
     protected float[] earlyDawnColor;
     protected float[] midDawnColor;
-    protected float[] dayColor;
+//    protected float[] dayColor;
+    protected float[] dayStartColor;
+    protected float[] dayEndColor;
     protected float[] earlyDuskColor;
     protected float[] midDuskColor;
-    protected float[] nightColor;
+//    protected float[] nightColor;
+    protected float[] nightStartColor;
+    protected float[] nightEndColor;
     protected float zVertice;
-    protected boolean portrait = true;
+    protected boolean essentialLayer;
 
     private static final float MAX_QUAD_SCALE = 0.125f;
 
 
-    @Override
     public float[] getColor(int timeOfDay, int phasePercentage) {
         switch (timeOfDay) {
             case TimeTracker.DAY:
-                return dayColor;
+                return MultiplyColors(phasePercentage, dayStartColor, dayEndColor);
             case TimeTracker.NIGHT:
-                return nightColor;
+                return MultiplyColors(phasePercentage, nightStartColor, nightEndColor);
             case TimeTracker.EARLY_DAWN:
-                return MultiplyColors(phasePercentage, nightColor, earlyDawnColor);
+                return MultiplyColors(phasePercentage, nightEndColor, earlyDawnColor);
             case TimeTracker.MID_DAWN:
                 return MultiplyColors(phasePercentage, earlyDawnColor, midDawnColor);
             case TimeTracker.LATE_DAWN:
-                return MultiplyColors(phasePercentage, midDawnColor, dayColor);
+                return MultiplyColors(phasePercentage, midDawnColor, dayStartColor);
             case TimeTracker.EARLY_DUSK:
-                return MultiplyColors(phasePercentage, dayColor, earlyDuskColor);
+                return MultiplyColors(phasePercentage, dayEndColor, earlyDuskColor);
             case TimeTracker.MID_DUSK:
                 return MultiplyColors(phasePercentage, earlyDuskColor, midDuskColor);
             case TimeTracker.LATE_DUSK:
-                return MultiplyColors(phasePercentage, midDuskColor, nightColor);
+                return MultiplyColors(phasePercentage, midDuskColor, nightStartColor);
         }
         return defaultColor;
     }
-
 
 
     private float[] MultiplyColors(int phasePercent, float[] current, float[] next){
@@ -67,66 +75,55 @@ public class SpriteData implements ISpriteData {
         return result;
     }
 
-    @Override
     public float[] getShapeVertices(boolean portrait, boolean motionOffset) {
         if (portrait)
         {
-            if(motionOffset)
-            {
-                //enlarge the quad
-                return ScaleQuad(portraitVertices);
-            }
-            else{
+//            if(motionOffset)
+//            {
+//                //enlarge the quad
+//                return ScaleQuad(portraitVertices);
+//            }
                 return portraitVertices;
-            }
         } else
         {
-            if(motionOffset)
-            {
-                return ScaleQuad(landscapeVertices);
-            }
+//            if(motionOffset)
+//            {
+//                return ScaleQuad(landscapeVertices);
+//            }
             return portraitVertices;
         }
     }
 
-    private float[] ScaleQuad(float[] verticeArray){
-        float[] motionArray = new float[12];
-        motionArray[0] = verticeArray[0] - (Math.abs(zVertice) * Math.abs( verticeArray[0] * MAX_QUAD_SCALE));
-        motionArray[3] = verticeArray[3] - (Math.abs(zVertice) *Math.abs( verticeArray[3] * MAX_QUAD_SCALE));
-        motionArray[4] = verticeArray[4] - (Math.abs(zVertice) *Math.abs( verticeArray[4] * MAX_QUAD_SCALE));
-        motionArray[7] = verticeArray[7] - (Math.abs(zVertice) *Math.abs( verticeArray[7] * MAX_QUAD_SCALE));
 
-        motionArray[1] = verticeArray[1] + (Math.abs(zVertice) *Math.abs( verticeArray[1] * MAX_QUAD_SCALE));
-        motionArray[6] = verticeArray[6] + (Math.abs(zVertice) *Math.abs( verticeArray[6] * MAX_QUAD_SCALE));
-        motionArray[9] = verticeArray[9] + (Math.abs(zVertice) *Math.abs( verticeArray[9] * MAX_QUAD_SCALE));
-        motionArray[10] = verticeArray[10] +(Math.abs(zVertice) * Math.abs( verticeArray[10] * MAX_QUAD_SCALE));
-
-        return motionArray;
-    }
-
-    @Override
-    public float[] getTextureVertices() {
+    public float[] GetTextureVertices(int scene) {
         return textureVertices;
     }
 
-    @Override
-    public short[] getIndices() {
+    public short[] GetIndices() {
         return indices;
     }
 
-    @Override
-    public float getZVertices() {
+    /*
+    returns value between 0 and 1.0f with closest values at 0
+     */
+    public float GetZVertice() {
         return zVertice;
     }
 
-    @Override
-    public void setOrientation(boolean portrait) {
-        this.portrait = portrait;
+    /*
+    return values from 0 to 1 with closest values at 1.0
+     */
+    public float GetZVerticeInverse(){
+        return (float) Math.abs(1.0 - zVertice);
     }
 
-    @Override
-    public int GetBitmapID(int bitmapSize){
+    public int GetBitmapID(int bitmapSize, int scene){
         return 0;
     }
+
+    public boolean IsEssentialLayer(){
+        return essentialLayer;
+    }
+
 
 }

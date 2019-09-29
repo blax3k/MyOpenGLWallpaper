@@ -8,7 +8,8 @@ public class RoomSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer0;
     public RoomSprite() {
-        zVertice = -0.6f;
+        zVertice = 0.0f;
+        essentialLayer = true;
         portraitVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -35,33 +36,46 @@ public class RoomSprite extends SpriteData {
                         0f, 0.17f, 0.27f, 1f,};
 
         midDawnColor = new float[]{
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,};
+                1.0f, 0.8f, 0.8f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,
+                0.8f, 0.8f, 1.0f, 1f,};
 
-        dayColor = new float[]
-                {1f, 1f, 1f, 1f,
+        dayStartColor = new float[]
+                {       1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        0.9f, 0.9f, 0.9f, 1f};
+
+        dayEndColor = new float[]
+                {0.9f, 0.9f, 0.9f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]{0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,};
+        earlyDuskColor = new float[]
+                {1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f,
+                        1f, 0.933f, 0.78f, 1f};
 
         midDuskColor = new float[]{
-                0f, 0.07f, 0.17f, 1f,
-                0f, 0.07f, 0.17f, 1f,
-                0f, 0.07f, 0.17f, 1f,
-                0f, 0.07f, 0.17f, 1f,};
+                0f, 0.18f, 0.40f, 1f,
+                0f, 0.18f, 0.40f, 1f,
+                0f, 0.14f, 0.30f, 1f,
+                0f, 0.14f, 0.30f, 1f,};
 
-        nightColor = new float[]
-                {0f, 0.17f, 0.27f, 1f,
+        nightStartColor = new float[]
+                {0.1f, 0.27f, 0.37f, 1f,
                         0f, 0.17f, 0.27f, 1f,
                         0f, 0.17f, 0.27f, 1f,
                         0f, 0.17f, 0.27f, 1f,};
+
+        nightEndColor = new float[]{
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0f, 0.17f, 0.27f, 1f,
+                0.1f, 0.27f, 0.37f, 1f,};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,
@@ -72,10 +86,10 @@ public class RoomSprite extends SpriteData {
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize){
+    public int GetBitmapID(int bitmapSize, int scene){
         switch(bitmapSize){
             case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.room_1024;
+                return  R.drawable.layer0;
         }
 //        if(currentBitmap == R.drawable.layer0){
 //            currentBitmap = R.drawable.layer00;
@@ -84,6 +98,6 @@ public class RoomSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer0;
 //        return currentBitmap;
 
-        return R.drawable.room_1024;
+        return R.drawable.layer0;
     }
 }

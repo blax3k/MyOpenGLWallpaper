@@ -1,15 +1,14 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import android.opengl.GLES20;
-
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;
 
-public class BackgroundSprite extends SpriteData {
+public class SkySprite extends SpriteData {
 
-    public BackgroundSprite() {
-        zVertice = -0.98f;
+    public SkySprite() {
+        zVertice = 0.98f;
+        essentialLayer = true;
         portraitVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -36,22 +35,28 @@ public class BackgroundSprite extends SpriteData {
                 0.4f, 0.57f, 0.77f, 1f,};
 
         midDawnColor = new float[]{
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,
-                0.4f, 0.57f, 0.77f, 1f,};
+                1.0f, 0.8f, 0.8f, 1f,
+                1.0f, 0.8f, 0.8f, 1f,
+                1.0f, 0.8f, 0.8f, 1f,
+                1.0f, 1.0f, 1.0f, 1f,};
 
-        dayColor = new float[]{
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f,
-                1f, 1f, 1f, 1f};
+        dayStartColor = new float[]
+                {1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        0.9f, 0.9f, 0.9f, 1f};
+
+        dayEndColor = new float[]
+                {0.9f, 0.9f, 0.9f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f,
+                        1f, 1f, 1f, 1f};
 
         earlyDuskColor = new float[]{
                 1f, 1f, 1f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,
-                0.92f, 0.45f, 0.098f, 1f,
-                0.92f, 0.69f, 0.44f, 1f,};
+                0.98f, 0.69f, 0.44f, 1f,
+                0.98f, 0.45f, 0.098f, 1f,
+                1.0f, 0.69f, 0.24f, 1f,};
 
         midDuskColor = new float[]{
                 0.62f, 0.39f, 0.24f, 1f,
@@ -59,12 +64,17 @@ public class BackgroundSprite extends SpriteData {
                 0.12f, 0.19f, 0.14f, 1f,
                 0.12f, 0.19f, 0.14f, 1f,};
 
-        nightColor = new float[]{
-                0f, 0.17f, 0.27f, 1f,
-                0f, 0.17f, 0.27f, 1f,
-                0f, 0.17f, 0.27f, 1f,
-                0f, 0.17f, 0.27f, 1f,};
+        nightStartColor = new float[]{
+                0.1f, 0.17f, 0.37f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,};
 
+        nightEndColor = new float[]{
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0f, 0.07f, 0.17f, 1f,
+                0.1f, 0.17f, 0.37f, 1f,};
 
         textureVertices = new float[]{
                 0.0f, 0.0f,
@@ -75,17 +85,17 @@ public class BackgroundSprite extends SpriteData {
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize)
+    public int GetBitmapID(int bitmapSize, int scene)
     {
         switch(bitmapSize){
             case Textures.IMAGE_SIZE_512:
-                return R.drawable.sky_1024;
+                return R.drawable.sky_1024_border;
             case Textures.IMAGE_SIZE_1024:
                 break;
             case Textures.IMAGE_SIZE_2048:
                 break;
         }
-        return R.drawable.sky_1024;
+        return R.drawable.sky_1024_border;
     }
 
 }

@@ -51,6 +51,7 @@ public class GLCamera {
     private int screenHeight = 1;
     float relativeScreenWidth = 0;
     float screenWidthDiff = 0;
+    private float xPositionOffset;
 
     public GLCamera() {
         mModelMatrix = new float[16];
@@ -75,6 +76,7 @@ public class GLCamera {
             fov = (float) Math.toDegrees(Math.atan((TEXTURE_WIDTH/2)/depth)) * 2;
             portraitOrientation = false;
         }
+
         relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
         screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
         lookX = eyeX;
@@ -88,7 +90,7 @@ public class GLCamera {
     }
 
 
-    public float getxOffsetStepPortrait(float xOffset) {
+    public float GetXOffset(float xOffset) {
         if (xOffset > 1.0f) {
             return 1.0f;
 
@@ -106,12 +108,34 @@ public class GLCamera {
     Sprites will start centered. In order to support different screen ratios, the textures
     will match the Y axis in portrait mode, and then will be shifted along the X axis, so that
     the left edge of the foremost texture lines up with the left edge of the screen.
+    if it's in landscape then the pixels are going to line up edge to edge anyway, so no x positioning
+    is needed
      */
     public float GetXOffsetPosition(){
-        float relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
-        float screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
-        return screenWidthDiff/2;
+        if(portraitOrientation){
+            float relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
+            float screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
+            xPositionOffset =  screenWidthDiff/2;
+        }else{
+            xPositionOffset =  X_OFFSET_STEP_LANDSCAPE/2;
+
+        }
+        return  xPositionOffset;
     }
+
+
+    public float GetTouchOffsetScale(){
+        if(portraitOrientation){
+            return 0;
+        }else{
+           return (X_OFFSET_STEP_LANDSCAPE) / TEXTURE_WIDTH;
+        }
+    }
+
+    public float GetMotionOffsetScale(){
+        return  motionOffsetStrength / TEXTURE_WIDTH;
+    }
+
 
     float[] finalValues = new float[3];
 
@@ -225,6 +249,7 @@ public class GLCamera {
 
         motionOffsetLimit = 0.22f * motionOffsetStrength;
     }
+
 
     public boolean IsPortraitOrientation() {
         return portraitOrientation;
