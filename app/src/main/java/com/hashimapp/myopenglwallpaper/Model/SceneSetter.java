@@ -6,6 +6,9 @@ import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.GradientBarSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
@@ -33,6 +36,7 @@ public class SceneSetter
     private static final int FOCAL_POINT_RESET_DURATION = 1500;
     private static float MIN_PROGRESS = 0.0f;
     private static float MAX_PROGRESS = 1.0f;
+    private static float LANDSCAPE_Y_OFFSET_ADJUST = 0.8f;
 
 
     Textures textures;
@@ -79,8 +83,8 @@ public class SceneSetter
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
         randomGenerator = new Random();
         spriteList = new ArrayList<>();
-        focalPointStartingPoint = -1.0f;
-        focalPointEndingPoint = -0.2f;
+        focalPointStartingPoint = 1.0f;
+        focalPointEndingPoint = 0.3f;
 
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
@@ -94,10 +98,11 @@ public class SceneSetter
         //todo: add sprite key generator
         spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
         spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-//        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
-        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
         spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
-//        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
+        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
+        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+//        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
 
     public void InitTextures(int widthHeight)
@@ -134,11 +139,11 @@ public class SceneSetter
     }
 
 
-    public void OffsetChanged(float xOffset, boolean portraitOrientation)
+    public void OffsetChanged(float xOffset)
     {
         for (Sprite sprite : spriteList)
         {
-            sprite.OffsetChanged(xOffset, portraitOrientation);
+            sprite.SetXOffset(xOffset);
         }
     }
 
@@ -164,6 +169,11 @@ public class SceneSetter
         for (Sprite sprite : spriteList)
         {
             sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset, touchScale, motionScale);
+            if(portrait){
+                sprite.SetYOffset(0);
+            }else{
+                sprite.SetYOffset(LANDSCAPE_Y_OFFSET_ADJUST);
+            }
         }
     }
 
@@ -314,10 +324,20 @@ public class SceneSetter
     public void SetMaxBlurAmount(int max)
     {
         float newMax = max;
-        newMax *= 0.1f;
+        newMax *= 0.12f;
         for (Sprite sprite : spriteList)
         {
             sprite.SetTargetFocalPoint(newMax);
+        }
+    }
+
+    public void TurnOffBlur()
+    {
+        FocalPointResetTime = FocalPointTargetTime = 0;
+        rackingFocus = false;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.turnOffBlur();
         }
     }
 
@@ -343,7 +363,8 @@ public class SceneSetter
         long currentTime = System.currentTimeMillis();
         float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
         float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI / 2);
-        focalPoint = sinCurveProgression * Math.abs(focalPointStartingPoint - focalPointEndingPoint) + focalPointStartingPoint;
+        focalPoint = sinCurveProgression * (focalPointEndingPoint - focalPointStartingPoint) + focalPointStartingPoint;
+        Log.d("focal", "focal point: " + focalPoint);
 
         for (Sprite sprite : spriteList)
         {
@@ -356,15 +377,6 @@ public class SceneSetter
         }
     }
 
-    public void TurnOffBlur()
-    {
-        FocalPointResetTime = FocalPointTargetTime = 0;
-        rackingFocus = false;
-        for (Sprite sprite : spriteList)
-        {
-            sprite.turnOffBlur();
-        }
-    }
 
     public void SetToMaxZoomPercent()
     {

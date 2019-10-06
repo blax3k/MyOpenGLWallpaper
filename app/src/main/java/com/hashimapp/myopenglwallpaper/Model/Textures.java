@@ -63,7 +63,7 @@ public class Textures {
     public static final int IMAGE_SIZE_1024 = 1024;
     public static final int IMAGE_SIZE_2048 = 2048;
 
-    public static final float BLUR_RADIUS = 10.0f;
+    public static final float BLUR_RADIUS = 3.0f;
 
     private boolean Loaded;
     private int widthHeight;

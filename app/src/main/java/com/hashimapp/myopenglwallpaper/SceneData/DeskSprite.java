@@ -13,10 +13,10 @@ public class DeskSprite extends SpriteData {
         zVertice = 0.2f;
         essentialLayer = true;
         portraitVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
+                -2.4f, 1.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
+                2.4f, 1.4f, 0.0f}; // top right
 
         landscapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
@@ -80,10 +80,10 @@ public class DeskSprite extends SpriteData {
                 1f, 1f, 1f, 1f};
 
         textureVertices = new float[]{
-                0.0f, 0.0f,
+                0.0f, 0.2f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
-                1.0f, 0.0f
+                1.0f, 0.2f
         };
 
     }

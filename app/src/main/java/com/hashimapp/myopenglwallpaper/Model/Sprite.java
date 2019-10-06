@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 import javax.microedition.khronos.opengles.GL;
 
@@ -58,6 +59,7 @@ public class Sprite
     private float[] currentTextureVertices;
     public SpriteData spriteData;
     float xScrollOffset = 0;
+    float yOrientationOffset = 0;
     float xAccelOffset = 0;
     float yAccelOffset = 0;
 
@@ -88,7 +90,7 @@ public class Sprite
         this.spriteKey = spriteKey;
     }
 
-    public void OffsetChanged(float xOffset, boolean PortraitOrientation)
+    public void SetXOffset(float xOffset)
     {
         //parallax motion determined by how "far" the sprite is from the camera
         float offsetMultiplier = (spriteData.GetZVerticeInverse());// * 0.9f + 0.1f; //range between 0.1 and 1.0f
@@ -101,6 +103,12 @@ public class Sprite
 //        {
 //            this.xScrollOffset = -1 * ((xOffset * offsetMultiplier) + (-0.15f * offsetMultiplier));
 //        }
+    }
+
+    public void SetYOffset(float yOffset){
+        float offsetMultiplier = (spriteData.GetZVerticeInverse());
+        yOrientationOffset = yOffset * offsetMultiplier;
+
     }
 
     public void SetSpriteMembers(int colorHandle, int positionHandle, int texCoordLoc, int mtrxHandle,
@@ -130,8 +138,6 @@ public class Sprite
         setVertices(spriteData.getShapeVertices(portrait, motionOffset));
         xTouchScale = yTouchScale = touchScale * spriteData.GetZVerticeInverse();
         xMotionScale = yMotionScale = motionScale * spriteData.GetZVertice();
-
-
     }
 
 
@@ -223,7 +229,6 @@ public class Sprite
         if (newBitmapID != currentBitmapID)
         {
             currentBitmapID = newBitmapID;
-            textureSwapRequired = true;
             return currentBitmapID;
         }
         return -1;
@@ -233,10 +238,9 @@ public class Sprite
 
         float[] newTextureVertices = spriteData.GetTextureVertices(scene);
 
-        if (newTextureVertices != currentTextureVertices)
+        if (!Arrays.equals(newTextureVertices, currentTextureVertices))
         {
             currentTextureVertices = newTextureVertices;
-            textureSwapRequired = true;
             return true;
         }
         return  false;
@@ -281,8 +285,8 @@ public class Sprite
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, float[] mMVPMatrix)
     {
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
-        Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, yZoomScale + yTouchScale + xMotionScale, 1.0f);
+        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset + yOrientationOffset, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, xZoomScale + yTouchScale + xMotionScale, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 

@@ -61,7 +61,7 @@ public class GLRenderer implements Renderer
         if (camera.TouchOffsetEnabled())
         {
             float newXOffset = camera.GetXOffset(xOffset);
-            sceneSetter.OffsetChanged(newXOffset, camera.IsPortraitOrientation());
+            sceneSetter.OffsetChanged(newXOffset);
             return true;
         }
         return false;
@@ -169,6 +169,46 @@ public class GLRenderer implements Renderer
         sceneSetter.SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
     }
 
+    public void UpdateVisibility(boolean visible)
+    {
+        Log.d("rotate", "visibility changed. visible: " + visible);
+        if (visible)
+        {
+            UpdateTime();
+            if (timeTracker.SceneChangeRequired())
+            {
+//                sceneSetter.InitTextureSwap();
+                timeTracker.SignalSceneChanged();
+            }
+
+            if (_cameraBlurEnabled)
+            {
+                if(_rackFocusEnabled)
+                {
+                    sceneSetter.ResetFocalPoint();
+                }
+                else {
+                    sceneSetter.SetToTargetFocalPoint();
+                }
+            }else{
+                sceneSetter.TurnOffBlur();
+            }
+
+            if(_cameraZoomEnabled){
+                sceneSetter.ResetZoomPercent();
+            }
+
+//            if(_zoomCameraEnabled){
+//                sceneSetter.SetTarget
+//            }
+
+        } else
+        {
+            camera.ResetSensorOffset();
+            sceneSetter.SensorChanged(0, 0);
+        }
+    }
+
     public void EnableMotionOffset(boolean motionOffsetOn)
     {
         camera.EnableMotionOffset(motionOffsetOn);
@@ -269,46 +309,6 @@ public class GLRenderer implements Renderer
         }
     }
 
-
-    public void UpdateVisibility(boolean visible)
-    {
-        Log.d("rotate", "visibility changed. visible: " + visible);
-        if (visible)
-        {
-            UpdateTime();
-            if (timeTracker.SceneChangeRequired())
-            {
-//                sceneSetter.InitTextureSwap();
-                timeTracker.SignalSceneChanged();
-            }
-
-            if (_cameraBlurEnabled)
-            {
-                if(_rackFocusEnabled)
-                {
-                    sceneSetter.ResetFocalPoint();
-                }
-                else {
-                    sceneSetter.SetToTargetFocalPoint();
-                }
-            }else{
-                sceneSetter.TurnOffBlur();
-            }
-
-            if(_cameraZoomEnabled){
-                sceneSetter.ResetZoomPercent();
-            }
-
-//            if(_zoomCameraEnabled){
-//                sceneSetter.SetTarget
-//            }
-
-        } else
-        {
-            camera.ResetSensorOffset();
-            sceneSetter.SensorChanged(0, 0);
-        }
-    }
 
     private void UpdateTime()
     {
