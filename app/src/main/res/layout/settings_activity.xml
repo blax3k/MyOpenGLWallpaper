@@ -1,84 +1,309 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout
-        android:id="@+id/Frame1"
-        android:layout_width="match_parent"
-        android:layout_height="200dp">
-
-
-        <com.hashimapp.myopenglwallpaper.View.MyGLSurfaceView
-            android:id="@+id/GLView"
-            android:layout_width="match_parent"
-            android:layout_height="200dip" />
-
-    </FrameLayout>
+    android:layout_height="match_parent"
+    >
 
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/Frame1">
+        android:layout_height="match_parent">
+
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
+
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+                <Button
+                    android:id="@+id/button_set"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="SetWallpaper"
+                    android:text="Set Wallpaper"
+                    android:layout_marginTop="20dp"/>
+
+                <TextView
+                    android:id="@+id/address_label"
+                    style="?android:attr/listSeparatorTextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/camera_settings_section_title"
+                    android:textSize="14dp"
+                    android:layout_marginTop="10dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/motion_parallax_setting_title"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"/>
+
+                    <SeekBar
+                        android:id="@+id/motion_parallax_strength"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:max="6"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="15dp"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@android:color/darker_gray"/>
+                </LinearLayout>
+
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch"
+                    android:id="@+id/invert_motion_parallax"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="match_parent"
+                    android:text="@string/invert_motion_parallax_setting_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch2"
+                    android:id="@+id/touch_offset"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="match_parent"
+                    android:text="@string/touch_offset_setting_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch3"
+                    android:id="@+id/camera_zoom"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="match_parent"
+                    android:text="@string/zoom_camera_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/blur_amount_title"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"/>
+
+                    <SeekBar
+                        android:id="@+id/blur_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:max="10"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="15dp"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@android:color/darker_gray"/>
+                </LinearLayout>
+
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch4"
+                    android:id="@+id/rack_focus_enabled"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="match_parent"
+                    android:text="@string/rack_focus_enabled_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+
+                <TextView
+                    android:id="@+id/color_settings"
+                    style="?android:attr/listSeparatorTextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weather_location_settings"
+                    android:textSize="14dp"
+                    android:layout_marginTop="20dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/set_time_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:shadowColor="@android:color/darker_gray"
+                        android:text="@string/set_time_title"
+                        android:layout_toLeftOf="@id/set_time_text"
+                        android:layout_alignParentLeft="true"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/set_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Automatic"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"/>
+
+
+                    </RelativeLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch5"
+                    android:id="@+id/use_current_location"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="match_parent"
+                    android:text="@string/location_setting_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+                <Button
+                    android:id="@+id/set_weather_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/weather_setting_title"
+                    android:shadowColor="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+
+                <TextView
+                    android:id="@+id/graphics_settings"
+                    style="?android:attr/listSeparatorTextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weather_location_settings"
+                    android:textSize="14dp"
+                    android:layout_marginTop="20dp"/>
 
                 <Switch
-                    android:id="@+id/motion_parallax_switch6"
+                    android:id="@+id/battery_saver_setting"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
-
-                <Switch
-                    android:id="@+id/motion_parallax_switch7"
+                    android:layout_height="match_parent"
+                    android:text="@string/battery_saver_setting_title"
+                    android:textSize="18sp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp" />
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:text="@string/motion_parallax_setting_title"
-                    android:textSize="18sp" />
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/particle_count_setting_title"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                    <SeekBar
+                        android:id="@+id/particle_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="15dp"
+                        android:max="6" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@android:color/darker_gray" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/copyright"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/terms_of_service"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/privacy_policy"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/version_number"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="40dp"/>
 
             </LinearLayout>
 

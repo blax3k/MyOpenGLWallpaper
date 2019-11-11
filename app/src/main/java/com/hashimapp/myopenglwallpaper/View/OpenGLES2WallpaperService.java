@@ -83,7 +83,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         @Override
         public void onCreate(SurfaceHolder surfaceHolder)
         {
-            startTime  = new Date();
+            startTime = new Date();
             super.onCreate(surfaceHolder);
             Log.d("create", "OpenGLES2Engine " + startDate + " onCreate");
             //check for GLES2 support
@@ -98,7 +98,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             {
                 setEGLContextClientVersion(2);
                 setPreserveEGLContextOnPause(true);
-                if(renderer == null)
+                if (renderer == null)
                 {
                     setRenderer(new GLRenderer(context));
                 }
@@ -109,8 +109,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 InitRendererPrefs();
                 setTouchEventsEnabled(true);
                 UpdateLocation();
-            }
-            else
+            } else
             {
                 return;
             }
@@ -120,7 +119,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
         private void InitRendererPrefs()
         {
-            renderer.EnableMotionOffset(prefs.getBoolean(resources.getString(R.string.motion_parallax_key), true));
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
@@ -163,6 +161,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             if (rendererSet)
             {
                 boolean motionParallaxEnabled = prefs.getBoolean("motion_parallax", false);
+                boolean updateLocation = prefs.getBoolean(resources.getString(R.string.location_setting_key), false);
 
                 if (visible)
                 {
@@ -170,8 +169,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     {
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                     }
-
-                    UpdateLocation();
+                    if(updateLocation)
+                    {
+                        UpdateLocation();
+                    }
 
                     renderer.UpdateVisibility(visible);
 //                    renderer.SwapTextures();
@@ -190,19 +191,16 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
-            if (key.equals(resources.getString(R.string.motion_parallax_key)))
+            if (key.equals(resources.getString(R.string.motion_parallax_strength_key)))
             {
-                if (sharedPreferences.getBoolean(resources.getString(R.string.motion_parallax_key), true))
-                {
-                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-                    renderer.EnableMotionOffset(true);
-                } else
+                int strength = sharedPreferences.getInt(resources.getString(R.string.motion_parallax_strength_key), 6);
+                if (strength == 0)
                 {
                     sensorManager.unregisterListener(this);
-                    renderer.EnableMotionOffset(false);
+                } else
+                {
+                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                 }
-            } else if (key.equals(resources.getString(R.string.motion_parallax_strength_key)))
-            {
                 renderer.SetMotionOffsetStrength(sharedPreferences.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             } else if (key.equals(resources.getString(R.string.time_phase_key)))
             {
@@ -213,22 +211,24 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
                 Log.d("touch", "touch offset enabled: " + touchOffsetEnabled);
                 renderer.SetTouchOffset(touchOffsetEnabled);
-            }
-            else if(key.equals(resources.getString(R.string.blur_amount_key))){
+            } else if (key.equals(resources.getString(R.string.blur_amount_key)))
+            {
                 int blurAmount = sharedPreferences.getInt(resources.getString(R.string.blur_amount_key), 5);
                 renderer.SetCameraBlurAmount(blurAmount);
 
-            }
-//            else if(key.equals(resources.getString(R.string.blur_enabled_key))){
-//                boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
-//                renderer.SetCameraBlurEnabled(motionBlurEnabled);
-//            }
-            else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
+            } else if (key.equals(resources.getString(R.string.rack_focus_enabled_key)))
+            {
                 boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
                 renderer.SetRackFocusEnabled(rackFocusEnabled);
-            }else if(key.equals(resources.getString(R.string.setting_zoom_camera_key))){
+                renderer.UpdateVisibility(true);
+            } else if (key.equals(resources.getString(R.string.setting_zoom_camera_key)))
+            {
                 boolean cameraZoomEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
                 renderer.SetZoomCameraEnabled(cameraZoomEnabled);
+                renderer.UpdateVisibility(true);
+            }else if (key.equals(resources.getString(R.string.invert_motion_parallax_key))){
+                boolean motionOffsetInverted = sharedPreferences.getBoolean(resources.getString(R.string.invert_motion_parallax_key), false);
+                renderer.SetMotionOffsetInverted(motionOffsetInverted);
             }
         }
 
@@ -253,21 +253,24 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
         private void UpdateLocation()
         {
-            MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
+            MyLocation.LocationResult locationResult = new MyLocation.LocationResult()
+            {
                 @Override
                 public void gotLocation(android.location.Location location)
                 {
-                    if(renderer != null && location != null){
+                    if (renderer != null && location != null)
+                    {
                         renderer.SetLocation(location.getLatitude(), location.getLongitude());
                         Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
                     }
                 }
             };
 
-            long currentTime =  System.currentTimeMillis();
-            if(currentTime - lastLocationUpdate > LOCATION_UPDATE_INTERVAL){
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastLocationUpdate > LOCATION_UPDATE_INTERVAL)
+            {
                 Log.d("locationstuff", "location updated");
-                lastLocationUpdate =  currentTime;
+                lastLocationUpdate = currentTime;
                 locationManager.getLocation(context, locationResult);
             }
         }
@@ -276,7 +279,8 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         private class GestureListener extends GestureDetector.SimpleOnGestureListener
         {
 
-            public GestureListener(GLRenderer newRenderer){
+            public GestureListener(GLRenderer newRenderer)
+            {
                 renderer = newRenderer;
             }
 

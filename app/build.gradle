@@ -29,7 +29,7 @@ implementation 'com.android.support:appcompat-v7:26.1.0'
 
 buildscript {
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
     repositories {
         mavenCentral()

@@ -38,11 +38,14 @@
 
     <string name="blur_amount_key">blurAmount</string>
     <string name="blur_amount_title">Blur Intensity</string>
+    <string name="blur_amount_max">10</string>
+    <string name="blur_amount_default">5</string>
 
     <string name="blur_none">No camera blur</string>
     <string name="blur_low">Slight camera blur</string>
     <string name="blur_medium"></string>
     <string name="blur_high">Heavy camera blur</string>
+
 
 
 
@@ -54,10 +57,23 @@
 
     //screen and gyro movement settings
     <string name="camera_settings_section_title">Camera Settings</string>
+    <string name="graphics_settings_section_title">Graphics Settings</string>
+    <string name="weather_location_settings">Location and Weather Settings</string>
 
     <string name="motion_parallax_key">motion_parallax</string>
     <string name="motion_parallax_setting_title">Motion Parallax</string>
     <string name="motion_parallax_default">true</string>
+
+    <string name="invert_motion_parallax_key">invert_motion_parallax</string>
+    <string name="invert_motion_parallax_setting_title">Invert Motion Parallax</string>
+    <string name="invert_motion_parallax_default">false</string>
+
+    <string name="battery_saver_setting_key">battery_saver</string>
+    <string name="battery_saver_setting_title">Battery Saver</string>
+    <string name="battery_saver_setting_default">false</string>
+
+    <string name="particle_count_setting_key">particle_count</string>
+    <string name="particle_count_setting_title">Particle Count</string>
 
     <string name="touch_offset_setting_key">touch_offset</string>
     <string name="touch_offset_setting_title">Home Scroll Parallax</string>
@@ -71,11 +87,14 @@
 
     <string name="max_volume_pref">Max volume</string>
 
+
     //auto time settings
-    <string name="setting_color_section">Color Settings</string>
     <string name="auto_time_setting_key">auto_time_key</string>
     <string name="auto_time_setting_title">Automatic Time</string>
     <string name="auto_time_setting_default">true</string>
+
+    <string name="weather_setting_key">weather_setting</string>
+    <string name="weather_setting_title">Set Weather</string>
 
     //time phase settings
     <string name="time_phase_key">set_time_key</string>
@@ -96,6 +115,24 @@
     <string name="time_title_mid_dusk">Sunset</string>
     <string name="time_title_late_dusk">Twilight</string>
     <string name="time_title_night">Night</string>
+
+    //scene settings
+    <string name="set_scene_key">set_scene_key</string>
+    <string name="scene_green">scene_green</string>
+    <string name="scene_pink">scene_pink</string>
+    <string name="scene_white">scene_white</string>
+
+    //scene settings
+    <string name="scene_title_green">scene_green</string>
+    <string name="scene_title_pink">scene_pink</string>
+    <string name="scene_title_white">scene_white</string>
+
+
+
+    <string name="version_number">Version 0.0.1</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms Of Service</string>
+    <string name="copyright">Copyright Canvas Hammer Studios 2019</string>
 
 
 

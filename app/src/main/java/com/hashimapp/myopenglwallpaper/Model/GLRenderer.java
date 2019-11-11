@@ -67,16 +67,13 @@ public class GLRenderer implements Renderer
         return false;
     }
 
-    float[] prevSensorValues = new float[3];
 
     public void OnSensorChanged(SensorEvent event, int rotation)
     {
         if (camera.MotionOffsetEnabled())
         {
             float[] newSensorValues = camera.SensorChanged(event, rotation);
-            prevSensorValues[0] = newSensorValues[0];
-            prevSensorValues[1] = newSensorValues[1];
-            sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1]);
+            sceneSetter.SensorChanged(newSensorValues[0], newSensorValues[1], camera.isMotionOffsetInverted());
         }
     }
 
@@ -133,8 +130,8 @@ public class GLRenderer implements Renderer
         GLES20.glViewport(0, 0, width, height);
 
         camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.MotionOffsetEnabled(),
-                camera.GetXOffsetPosition(), camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale());
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition(),
+                camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale());
     }
 
 
@@ -205,18 +202,19 @@ public class GLRenderer implements Renderer
         } else
         {
             camera.ResetSensorOffset();
-            sceneSetter.SensorChanged(0, 0);
+            sceneSetter.SensorChanged(0, 0, camera.isMotionOffsetInverted());
         }
     }
 
-    public void EnableMotionOffset(boolean motionOffsetOn)
-    {
-        camera.EnableMotionOffset(motionOffsetOn);
-    }
 
     public void SetMotionOffsetStrength(int offsetStrength)
     {
         camera.setMotionOffsetStrength(offsetStrength);
+        sceneSetter.SetMotionsSale(camera.GetMotionOffsetScale());
+    }
+
+    public void SetMotionOffsetInverted(boolean inverted){
+        camera.SetMotionOffsetInverted(inverted);
     }
 
     public void SetTouchOffset(boolean touchOffsetOn)
@@ -230,25 +228,6 @@ public class GLRenderer implements Renderer
         camera.EnableTouchOffset(touchOffsetOn);
     }
 
-    public void SetCameraBlurEnabled(boolean enabled)
-    {
-        _cameraBlurEnabled = enabled;
-
-        if (!enabled)
-        {
-            sceneSetter.TurnOffBlur();
-            Log.d("focal", "blur turned off");
-        } else
-        {
-            if (_rackFocusEnabled)
-            {
-                sceneSetter.ResetFocalPoint();
-            } else
-            {
-                sceneSetter.SetToTargetFocalPoint();
-            }
-        }
-    }
 
     public void SetCameraBlurAmount(int amount){
         Log.d("blur", "set blur amount to: " + amount);
@@ -259,13 +238,6 @@ public class GLRenderer implements Renderer
         }else{
             _cameraBlurEnabled = true;
             sceneSetter.SetMaxBlurAmount(amount);
-            if (_rackFocusEnabled)
-            {
-                sceneSetter.ResetFocalPoint();
-            } else
-            {
-                sceneSetter.SetToTargetFocalPoint();
-            }
         }
     }
 

@@ -14,12 +14,12 @@ public class GLCamera {
 
     private static float X_OFFSET_STEP_PORTRAIT = 2.1F;
     private static float X_OFFSET_STEP_LANDSCAPE = 0.3F;
-    private static float MOTION_OFFSET_0 = 0.1f;
-    private static float MOTION_OFFSET_1 = 0.25f;
-    private static float MOTION_OFFSET_2 = 0.4f;
-    private static float MOTION_OFFSET_3 = 0.55f;
+    private static float MOTION_OFFSET_0 = 0.0f;
+    private static float MOTION_OFFSET_1 = 0.1f;
+    private static float MOTION_OFFSET_2 = 0.3f;
+    private static float MOTION_OFFSET_3 = 0.5f;
     private static float MOTION_OFFSET_4 = 0.7f;
-    private static float MOTION_OFFSET_5 = 0.85f;
+    private static float MOTION_OFFSET_5 = 0.9f;
     private static float MOTION_OFFSET_6 = 1.0f;
 
 
@@ -41,7 +41,7 @@ public class GLCamera {
     private float motionOffsetLimit;
     private float motionOffsetStrength;
     private boolean portraitOrientation;
-    private boolean motionOffsetEnabled;
+    private boolean motionOffsetInverted;
     private boolean touchOffsetEnabled;
 
     public int maxBlur;
@@ -52,6 +52,10 @@ public class GLCamera {
     float relativeScreenWidth = 0;
     float screenWidthDiff = 0;
     private float xPositionOffset;
+
+    public boolean isMotionOffsetInverted(){
+        return motionOffsetInverted;
+    }
 
     public GLCamera() {
         mModelMatrix = new float[16];
@@ -90,18 +94,22 @@ public class GLCamera {
     }
 
 
-    public float GetXOffset(float xOffset) {
-        if (xOffset > 1.0f) {
-            return 1.0f;
+    public float GetXOffset(float xOffsetM) {
+        float xOffset = xOffsetM;
+        if (xOffsetM > 1.0f) {
+            xOffset = 1.0f;
 
-        } else if (xOffset < 0.0f) {
-            return 0.0f;
-
-        } else if(portraitOrientation) {
-            return xOffset * screenWidthDiff;
-        }else{
-            return xOffset * X_OFFSET_STEP_LANDSCAPE;
+        } else if (xOffsetM < 0.0f) {
+            xOffset = 0.0f;
         }
+        float result;
+
+        if(portraitOrientation) {
+            result = xOffset * screenWidthDiff;
+        }else{
+            result = xOffset * X_OFFSET_STEP_LANDSCAPE;
+        }
+        return result;
     }
 
     /*
@@ -113,8 +121,6 @@ public class GLCamera {
      */
     public float GetXOffsetPosition(){
         if(portraitOrientation){
-            float relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
-            float screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
             xPositionOffset =  screenWidthDiff/2;
         }else{
             xPositionOffset =  X_OFFSET_STEP_LANDSCAPE/2;
@@ -137,29 +143,31 @@ public class GLCamera {
     }
 
 
+    public void SetMotionOffsetInverted(boolean inverted){
+        motionOffsetInverted = inverted;
+    }
+
     float[] finalValues = new float[3];
+    float[] prevSensorData = new float[3];
 
     /*
     handle user tilting and rotating device
      */
-    float[] prevSensorData = new float[3];
     public float[] SensorChanged(SensorEvent event, int rotation) {
-//        Log.d("rotation", "X:" + event[0] + " Y:" + event[1] + " Z:" + event[2]);
-
         float[] rawSensorData = new float[3];
         switch (rotation)
         {
             case Surface.ROTATION_0:
                 rawSensorData[0] = event.values[0];
-                rawSensorData[1] = event.values[1];
+                rawSensorData[1] = -event.values[1];
                 rawSensorData[2] = event.values[2];
                 break;
             case Surface.ROTATION_90:
                 rawSensorData[0] = -event.values[1];
-                rawSensorData[1] = event.values[0];
+                rawSensorData[1] = -event.values[0];
                 break;
             case Surface.ROTATION_180:
-                rawSensorData[0] = -event.values[0];
+                rawSensorData[0] = event.values[0];
                 rawSensorData[1] = -event.values[1];
                 break;
             case Surface.ROTATION_270:
@@ -170,35 +178,31 @@ public class GLCamera {
         float[] lowPassSensorData = lowPass(rawSensorData, prevSensorData);
         prevSensorData = rawSensorData;
 
+        finalValues[1] += lowPassSensorData[0] * 0.005 * motionOffsetStrength;
+        finalValues[0] += lowPassSensorData[1] * 0.005 * motionOffsetStrength;
+        finalValues[2] += lowPassSensorData[2] * 0.005 * motionOffsetStrength;
 
-            finalValues[1] += lowPassSensorData[0] * 0.005 * motionOffsetStrength;
-            finalValues[0] += lowPassSensorData[1] * 0.005 * motionOffsetStrength;
-            finalValues[2] += lowPassSensorData[2] * 0.005 * motionOffsetStrength;
+        if (finalValues[0] > motionOffsetLimit)
+        {
+            finalValues[0] = motionOffsetLimit;
+        } else if (finalValues[0] < -motionOffsetLimit)
+        {
+            finalValues[0] = -motionOffsetLimit;
+        }
 
-            if (finalValues[0] > motionOffsetLimit) {
-                finalValues[0] = motionOffsetLimit;
-            } else if (finalValues[0] < -motionOffsetLimit) {
-                finalValues[0] = -motionOffsetLimit;
-            }
-
-            if (finalValues[1] > motionOffsetLimit) {
-                finalValues[1] = motionOffsetLimit;
-            } else if (finalValues[1] < -motionOffsetLimit) {
-                finalValues[1] = -motionOffsetLimit;
-            }
+        if (finalValues[1] > motionOffsetLimit)
+        {
+            finalValues[1] = motionOffsetLimit;
+        } else if (finalValues[1] < -motionOffsetLimit)
+        {
+            finalValues[1] = -motionOffsetLimit;
+        }
 
         return finalValues;
-        // User code should concatenate the delta rotation we computed with the current rotation
-        // in order to get the updated rotation.
-        // rotationCurrent = rotationCurrent * deltaRotationMatrix;
-    }
-
-    public void EnableMotionOffset(boolean enabled){
-        this.motionOffsetEnabled = enabled;
     }
 
     public boolean MotionOffsetEnabled(){
-        return motionOffsetEnabled;
+        return motionOffsetStrength != MOTION_OFFSET_0;
     }
 
     public void EnableTouchOffset(boolean enabled){

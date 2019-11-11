@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.GradientBarSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
@@ -37,6 +36,7 @@ public class SceneSetter
     private static float MIN_PROGRESS = 0.0f;
     private static float MAX_PROGRESS = 1.0f;
     private static float LANDSCAPE_Y_OFFSET_ADJUST = 0.8f;
+    private float motionOffsetFocalPoint = 0.3f;
 
 
     Textures textures;
@@ -70,6 +70,8 @@ public class SceneSetter
     private int _bitmapSize;
     private int currentScene;
 
+    private boolean _invertMotion;
+
 
 
     Date startDate;
@@ -102,6 +104,9 @@ public class SceneSetter
         spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
         spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
         spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+        for(Sprite sprite :spriteList){
+            sprite.SetMotionOffsetFocalPoint(motionOffsetFocalPoint);
+        }
 //        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
 
@@ -147,15 +152,15 @@ public class SceneSetter
         }
     }
 
-    public void SensorChanged(float xOffset, float yOffset)
+    public void SensorChanged(float xOffset, float yOffset, boolean invert)
     {
         for (Sprite sprite : spriteList)
         {
-            sprite.SensorChanged(xOffset, yOffset);
+            sprite.SensorChanged(xOffset, yOffset, invert);
         }
     }
 
-    public void SurfaceChanged(boolean portrait, boolean motionOffset, float spriteXPosOffset, float touchScale, float motionScale)
+    public void SurfaceChanged(boolean portrait, float spriteXPosOffset, float touchScale, float motionScale)
     {
 //        GetMembers();
 //        GLES20.glEnableVertexAttribArray(mColorHandle);
@@ -168,12 +173,20 @@ public class SceneSetter
 
         for (Sprite sprite : spriteList)
         {
-            sprite.SetOrientation(portrait, motionOffset, spriteXPosOffset, touchScale, motionScale);
+            sprite.SetOrientation(spriteXPosOffset, touchScale, motionScale);
+            sprite.SetMotionOffsetFocalPoint(motionOffsetFocalPoint);
             if(portrait){
                 sprite.SetYOffset(0);
             }else{
                 sprite.SetYOffset(LANDSCAPE_Y_OFFSET_ADJUST);
             }
+        }
+    }
+
+    public void SetMotionsSale(float motionScale){
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetMotionScale(motionScale);
         }
     }
 
@@ -325,9 +338,11 @@ public class SceneSetter
     {
         float newMax = max;
         newMax *= 0.12f;
+        focalPoint = focalPointEndingPoint;
         for (Sprite sprite : spriteList)
         {
             sprite.SetTargetFocalPoint(newMax);
+            sprite.SetFocalPoint(focalPointEndingPoint);
         }
     }
 

@@ -32,7 +32,7 @@
         <item>high</item>
     </string-array>
 
-    <string-array name="setTimePrefs">
+    <string-array name="setTimePrefTitles">
         <item>@string/time_title_automatic</item>
         <item>@string/time_title_early_dawn</item>
         <item>@string/time_title_mid_dawn</item>
@@ -42,7 +42,28 @@
         <item>@string/time_title_night</item>
     </string-array>
 
-    <integer-array name="setTimeValues">
+    <integer-array name="setTimePrefValues">
+        <item>@string/time_key_automatic</item>
+        <item>@string/time_key_early_dawn</item>
+        <item>@string/time_key_mid_dawn</item>
+        <item>@string/time_key_day</item>
+        <item>@string/time_key_early_dusk</item>
+        <item>@string/time_key_mid_dusk</item>
+        <item>@string/time_key_night</item>
+    </integer-array>
+
+
+    <string-array name="setScenePrefTitles">
+        <item>@string/time_title_automatic</item>
+        <item>@string/time_title_early_dawn</item>
+        <item>@string/time_title_mid_dawn</item>
+        <item>@string/time_title_day</item>
+        <item>@string/time_title_mid_dusk</item>
+        <item>@string/time_title_late_dusk</item>
+        <item>@string/time_title_night</item>
+    </string-array>
+
+    <integer-array name="setScenePrefValues">
         <item>@string/time_key_automatic</item>
         <item>@string/time_key_early_dawn</item>
         <item>@string/time_key_mid_dawn</item>

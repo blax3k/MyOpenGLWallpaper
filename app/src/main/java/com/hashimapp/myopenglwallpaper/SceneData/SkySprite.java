@@ -1,5 +1,6 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
+import com.hashimapp.myopenglwallpaper.Model.SceneData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;
@@ -10,12 +11,6 @@ public class SkySprite extends SpriteData {
         zVertice = 0.98f;
         essentialLayer = true;
         portraitVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
-
-        landscapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -97,6 +92,25 @@ public class SkySprite extends SpriteData {
         }
         return R.drawable.sky_1024_border;
     }
+
+//    @Override
+//    public SceneData GetScene(int scene, int bitmapSize){
+//        switch(scene){
+//            case SceneManager.DEFAULT:
+//                return new SceneData(GetBitmapID(bitmapSize, scene), textureVertices, portraitVertices,
+//                        )
+//                break;
+//            case SceneManager.PINK:
+//                break;
+//            case SceneManager.GREEN:
+//                break;
+//
+//        }
+//        return new SceneData();
+//    }
+
+
+
 
 }
 

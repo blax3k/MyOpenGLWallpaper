@@ -25,8 +25,7 @@ public class Sprite
     private static final float MAX_BIAS_MULTIPLER = 6.0f;
     private float maxBias = 3.5f;
 
-
-    private static final float ZOOM_MAX = 1.20f;
+    private static final float ZOOM_MAX = 1.30f;
     private static final float ZOOM_MIN = 1.0f;
     private static final float FADE_DURATION = 0.4f; //duration of fade in percentage
 
@@ -49,13 +48,13 @@ public class Sprite
 
     private float spriteXPosOffset;
 
+    private float motionOffsetFocalPoint;
+
     private boolean textureSwapRequired;
-    private boolean textureVerticeSwapRequired;
 
     private int textureName;
     private int textureNameIndex;
     private int currentBitmapID;
-    public int changeTextureVertices = SpriteData.NO_CHANGE;
     private float[] currentTextureVertices;
     public SpriteData spriteData;
     float xScrollOffset = 0;
@@ -64,7 +63,7 @@ public class Sprite
     float yAccelOffset = 0;
 
     float xZoomScale, xMotionScale, xTouchScale;
-    float yZoomScale, yMotionScale, yTouchScale = 1.0f;
+    float yZoomScale, yMotionScale, yTouchScale;
 
 
 
@@ -97,7 +96,7 @@ public class Sprite
 //        if (PortraitOrientation)
 //        {
         this.xScrollOffset = -1 //reverse movement
-                * xOffset * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
+                * (xOffset) * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
                 + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
 //        } else
 //        {
@@ -124,20 +123,35 @@ public class Sprite
     }
 
 
-    public void SensorChanged(float xOffset, float yOffset)
+    public void SensorChanged(float xOffset, float yOffset, boolean inverted)
     {
-        float offsetMultiplier = (spriteData.GetZVertice()) * 2.0f; // z will be a vertice between 0.0 and -1.0f
-        xAccelOffset = xOffset * offsetMultiplier;
-        yAccelOffset = yOffset * offsetMultiplier;
+        float inversion = 1.0f;
+        if(inverted){
+            inversion = -1.0f;
+        }
+        float offsetMultiplier = ((motionOffsetFocalPoint - spriteData.GetZVertice())) * 2.0f; // z will be a vertice between 0.0 and -1.0f
+        xAccelOffset = xOffset * offsetMultiplier * inversion;
+        yAccelOffset = yOffset * offsetMultiplier* inversion;
     }
 
-    public void SetOrientation(boolean portrait, boolean motionOffset, float spriteXPosOffset, float touchScale, float motionScale)
+
+
+    public void SetOrientation(float spriteXPosOffset, float touchScale, float motionScale)
     {
         float offsetMultiplier = (spriteData.GetZVerticeInverse()) * 0.9f + 0.1f;
         this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
-        setVertices(spriteData.getShapeVertices(portrait, motionOffset));
+        SetTouchScale(touchScale);
+        SetMotionScale(motionScale);
+    }
+
+    public void SetTouchScale(float touchScale){
         xTouchScale = yTouchScale = touchScale * spriteData.GetZVerticeInverse();
-        xMotionScale = yMotionScale = motionScale * spriteData.GetZVertice();
+
+    }
+
+    public void SetMotionScale(float motionScale){
+        xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetFocalPoint - spriteData.GetZVertice());
+
     }
 
 
@@ -169,11 +183,23 @@ public class Sprite
         //figure out how much the size is going to be modified
         Log.d("zoom", "zoomPercent: " + zoomPercent);
 
-        float sineZoomPercent = (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
-        float zPositionModifier = (spriteData.GetZVerticeInverse()) * 0.9f + 0.1f; //zoom less if further from camera
-        xZoomScale = yZoomScale = ZOOM_MAX - (sineZoomPercent * zPositionModifier * (ZOOM_MAX - ZOOM_MIN));
-        Log.d("zoom", "xscale: " + xZoomScale);
+        if(zoomPercent > 1.0f){
+            zoomPercent = 1.0f;
+        }else if(zoomPercent < 0.0f){
+            zoomPercent = 0.0f;
+        }
 
+        float zPositionModifier = (spriteData.GetZVerticeInverse()) * 0.9f + 0.1f; //zoom less if further from camera
+        float maxZoomPercent = (ZOOM_MAX - ZOOM_MIN) * zPositionModifier;
+
+        float sineZoomPercentInverse = 1.0f -(float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
+        xZoomScale = yZoomScale = (ZOOM_MIN + maxZoomPercent * sineZoomPercentInverse);
+        Log.d("zoom", "xscale: " + xZoomScale + " " + yZoomScale);
+
+    }
+
+    public void SetMotionOffsetFocalPoint(float point){
+        motionOffsetFocalPoint = point;
     }
 
 
@@ -284,9 +310,12 @@ public class Sprite
 
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, float[] mMVPMatrix)
     {
+        if(spriteData.GetZVertice() == 0.98f){
+//            Log.d("zoom", "zoom: " + xZoomScale + " touch:" + xTouchScale + " motion:" + xMotionScale);
+        }
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset + yOrientationOffset, 1.0f);
-        Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, xZoomScale + yTouchScale + xMotionScale, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, yZoomScale + yTouchScale + yMotionScale, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
 

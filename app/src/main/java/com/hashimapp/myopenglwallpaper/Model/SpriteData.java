@@ -15,7 +15,6 @@ public class SpriteData {
     public int changeTextureVertices = NO_CHANGE;
 
     protected float[] portraitVertices;
-    protected float[] landscapeVertices;
     protected float[] textureVertices;
 
     protected short[] indices;
@@ -123,6 +122,10 @@ public class SpriteData {
 
     public boolean IsEssentialLayer(){
         return essentialLayer;
+    }
+
+    public SceneData GetScene(int scene){
+        return new SceneData();
     }
 
 

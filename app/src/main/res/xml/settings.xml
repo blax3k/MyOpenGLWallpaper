@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen android:theme="@style/Theme.Transparent"
+<PreferenceScreen android:theme="@style/Theme.Special"
     xmlns:android="http://schemas.android.com/apk/res/android" >
+
 
     <PreferenceCategory
         android:title="@string/camera_settings_section_title">
-
-        <SwitchPreference
-            android:key="@string/motion_parallax_key"
-            android:title="@string/motion_parallax_setting_title"
-            android:defaultValue="@string/motion_parallax_default"/>
 
         <SeekBarPreference
             android:key="@string/motion_parallax_strength_key"
@@ -29,23 +25,29 @@
         <SeekBarPreference
             android:key="@string/blur_amount_key"
             android:title="@string/blur_amount_title"
-            android:max="10"
+            android:max="@string/blur_amount_max"
+            android:defaultValue="@string/blur_amount_default"
             android:min="0"
-            android:defaultValue="5" />
+            />
 
         <SwitchPreference
             android:key="@string/rack_focus_enabled_key"
             android:title="@string/rack_focus_enabled_title"
             android:defaultValue="@string/default_true" />
 
+        <CheckBoxPreference
+            android:key="@string/invert_motion_parallax_key"
+            android:title="@string/invert_motion_parallax_setting_title"
+            android:defaultValue="@string/invert_motion_parallax_default"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/setting_color_section">
+        android:title="@string/weather_location_settings">
 
         <ListPreference
-            android:entries="@array/setTimePrefs"
-            android:entryValues="@array/setTimeValues"
+            android:entries="@array/setTimePrefTitles"
+            android:entryValues="@array/setTimePrefValues"
             android:key="@string/time_phase_key"
             android:title="@string/set_time_title"
             android:summary="%s"
@@ -58,7 +60,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/setting_color_section">
+        android:title="@string/weather_location_settings">
 
 
 </PreferenceCategory>
@@ -79,9 +81,11 @@
 
     <Preference
         android:key="view_artist"
+        android:onClick=""
         android:title="Go to artists's website">
         <intent
-            android:action="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest" />
+            android:action="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest"
+            />
     </Preference>
 
     <SwitchPreference

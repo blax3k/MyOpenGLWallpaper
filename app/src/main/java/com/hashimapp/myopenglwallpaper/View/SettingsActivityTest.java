@@ -1,86 +1,84 @@
 package com.hashimapp.myopenglwallpaper.View;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.WallpaperManager;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
 
-import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 import com.hashimapp.myopenglwallpaper.R;
 
-public class SettingsActivityTest extends Activity implements SensorEventListener,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+import java.util.Arrays;
+
+public class SettingsActivityTest extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener
+{
 
     private static Context context;
-    private MyGLSurfaceView glSurfaceView;
     boolean rendererSet;
     protected SensorManager sensorManager;
     protected Sensor sensor;
-    public GLRenderer renderer;
     Display display;
     SharedPreferences prefs;
+    SharedPreferences.Editor prefsEditor;
     Resources resources;
 
-
+    private Button setTimeButton;
+    private SeekBar motionOffsetSeekbar;
+    int motionOffsetMax;
+    int motionOffsetDefault;
+    private Switch invertMotionParallaxSwitch;
+    private Switch touchOffsetParallaxSwitch;
+    private Switch cameraZoomSwitch;
+    private SeekBar blurIntensitySeekbar;
+    private Switch rackFocusSwitch;
+    private Switch useCurrentLocationSwitch;
+    private Button setWeatherButton;
+    private TextView setTimeText;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
-        glSurfaceView = findViewById(R.id.GLView);
 
-        SetRenderer(new GLRenderer(this));
         context = this.getApplicationContext();
         resources = context.getResources();
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        initSensor();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
+        prefsEditor = prefs.edit();
+        InitControls();
+        SetupSettings();
     }
 
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
-//        if (rendererSet)
-//        {
-//            glSurfaceView.onResume();
-//            glSurfaceView.requestRender();
-//        }
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
-//        if(rendererSet){
-//            glSurfaceView.onPause();
-//        }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event)
-    {
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
-        {
-            renderer.OnSensorChanged(event, display.getRotation());
-            glSurfaceView.requestRender();
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy)
-    {
-
     }
 
 
@@ -88,67 +86,196 @@ public class SettingsActivityTest extends Activity implements SensorEventListene
     public void onDestroy()
     {
         super.onDestroy();
-        glSurfaceView.onDestroy();
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.set_time_button:
+                PresentTimes();
+                break;
+            case R.id.invert_motion_parallax:
+
+                break;
+        }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
         Log.d("prefsChange", "preferences changed");
-        if (key.equals(resources.getString(R.string.motion_parallax_key)))
+        if (key.equals(resources.getString(R.string.motion_parallax_strength_key)))
         {
-            if (sharedPreferences.getBoolean(resources.getString(R.string.motion_parallax_key), true))
-            {
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-                renderer.EnableMotionOffset(true);
-            } else
-            {
-                sensorManager.unregisterListener(this);
-                renderer.EnableMotionOffset(false);
-            }
-        } else if (key.equals(resources.getString(R.string.motion_parallax_strength_key)))
-        {
-            renderer.SetMotionOffsetStrength(sharedPreferences.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
         } else if (key.equals(resources.getString(R.string.time_phase_key)))
         {
             String timePhase = prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic));
-            renderer.SetTimePhase(timePhase);
-        }
-        else if (key.equals(resources.getString(R.string.touch_offset_setting_key)))
+        } else if (key.equals(resources.getString(R.string.touch_offset_setting_key)))
         {
             boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
-            renderer.SetTouchOffset(touchOffsetEnabled);
-        } else if(key.equals(resources.getString(R.string.blur_enabled_key))){
-            boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
-            renderer.SetCameraBlurEnabled(motionBlurEnabled);
-        } else if(key.equals(resources.getString(R.string.rack_focus_enabled_key))){
-            boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
-            renderer.SetRackFocusEnabled(rackFocusEnabled);
-        } else if(key.equals(resources.getString(R.string.setting_zoom_camera_key))){
-            boolean zoomCameraEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
-            renderer.SetZoomCameraEnabled(zoomCameraEnabled);
-        }
-    }
-
-    private void SetRenderer(MyGLSurfaceView.Renderer newRenderer){
-        renderer = (GLRenderer) newRenderer;
-        glSurfaceView.setRenderer(newRenderer);
-        rendererSet = true;
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-    }
-
-
-    private void initSensor()
-    {
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        if (sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0)
+        } else if (key.equals(resources.getString(R.string.blur_enabled_key)))
         {
-            Log.d("sensorStuff", "gyroscope registered");
-            sensorManager.registerListener(this,
-                    sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                    SensorManager.SENSOR_DELAY_GAME);
+            boolean motionBlurEnabled = sharedPreferences.getBoolean(resources.getString(R.string.blur_enabled_key), true);
+        } else if (key.equals(resources.getString(R.string.rack_focus_enabled_key)))
+        {
+            boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
+        } else if (key.equals(resources.getString(R.string.setting_zoom_camera_key)))
+        {
+            boolean zoomCameraEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
         }
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+    }
+
+    public void SetWallpaper(View view)
+    {
+        Log.d("Live wallpaper chooser", "tried launching the chooser");
+        Intent intent = new Intent();
+        intent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+        intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, OpenGLES2WallpaperService.class));
+        try
+        {
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex)
+        {
+            Log.d("Live wallpaper chooser", ex.getMessage());
+        }
+    }
+
+    private void InitControls()
+    {
+        setTimeButton = findViewById(R.id.set_time_button);
+        setTimeButton.setOnClickListener(this);
+        setTimeText = findViewById(R.id.set_time_text);
+
+        motionOffsetSeekbar = findViewById(R.id.motion_parallax_strength);
+        motionOffsetSeekbar.setOnSeekBarChangeListener(this);
+
+        invertMotionParallaxSwitch = findViewById(R.id.invert_motion_parallax);
+        invertMotionParallaxSwitch.setOnCheckedChangeListener(this);
+
+        touchOffsetParallaxSwitch = findViewById(R.id.touch_offset);
+        touchOffsetParallaxSwitch.setOnClickListener(this);
+
+        cameraZoomSwitch = findViewById(R.id.camera_zoom);
+        cameraZoomSwitch.setOnCheckedChangeListener(this);
+
+        blurIntensitySeekbar = findViewById(R.id.blur_amount);
+        blurIntensitySeekbar.setOnSeekBarChangeListener(this);
+
+        rackFocusSwitch = findViewById(R.id.rack_focus_enabled);
+        rackFocusSwitch.setOnCheckedChangeListener(this);
+
+        useCurrentLocationSwitch = findViewById(R.id.use_current_location);
+        useCurrentLocationSwitch.setOnCheckedChangeListener(this);
+    }
+
+
+    private void PresentTimes()
+    {
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(resources.getString(R.string.set_time_title));
+        builder.setNegativeButton("Cancel", null);
+
+        // add a radio button list
+        String[] timeTitles = getResources().getStringArray(R.array.setTimePrefTitles);
+        String timePref = prefs.getString(resources.getString(R.string.time_phase_key),
+                                          resources.getString(R.string.auto_time_setting_key));
+        int selected = Arrays.asList(resources.getStringArray(R.array.setTimePrefValues)).indexOf(timePref);
+        Log.d("selectedTime", "selcted: " + selected);
+        builder.setSingleChoiceItems(timeTitles, selected, (dialog, which) ->
+                {
+                    Log.d("stuff", "which: " + which);
+                    if(which >= 0){
+                        prefsEditor.putString(
+                                resources.getString(R.string.time_phase_key),
+                                resources.getStringArray(R.array.setTimePrefValues)[which]);
+
+                        prefsEditor.commit();
+                        setTimeText.setText(resources.getTextArray(R.array.setTimePrefTitles)[which]);
+                    }
+                    dialog.dismiss();
+                }
+        );
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void SetupSettings()
+    {
+        motionOffsetSeekbar.setProgress(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 5));
+        invertMotionParallaxSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.invert_motion_parallax_key), false));
+        touchOffsetParallaxSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
+        cameraZoomSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true));
+        blurIntensitySeekbar.setProgress(prefs.getInt(resources.getString(R.string.blur_amount_key), 3));
+        rackFocusSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
+        useCurrentLocationSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.location_setting_key), false));
+        setTimeText.setText(GetTimeTitle());
+
+    }
+
+    private String getResourceString(int id){
+        return resources.getString(id);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+    {
+        switch (buttonView.getId())
+        {
+            case R.id.invert_motion_parallax:
+                prefsEditor.putBoolean(resources.getString(R.string.invert_motion_parallax_key), isChecked);
+                break;
+            case R.id.touch_offset:
+                prefsEditor.putBoolean(resources.getString(R.string.touch_offset_setting_key), isChecked);
+                break;
+            case R.id.camera_zoom:
+                prefsEditor.putBoolean(resources.getString(R.string.setting_zoom_camera_key), isChecked);
+                break;
+            case R.id.rack_focus_enabled:
+                prefsEditor.putBoolean(resources.getString(R.string.rack_focus_enabled_key), isChecked);
+                break;
+            case R.id.use_current_location:
+                prefsEditor.putBoolean(resources.getString(R.string.location_setting_key), isChecked);
+                break;
+        }
+        prefsEditor.commit();
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+    {
+        switch (seekBar.getId())
+        {
+            case R.id.motion_parallax_strength:
+                prefsEditor.putInt(resources.getString(R.string.motion_parallax_strength_key), progress);
+                break;
+            case R.id.blur_amount:
+                prefsEditor.putInt(resources.getString(R.string.blur_amount_key), progress);
+                break;
+        }
+        prefsEditor.commit();
+    }
+
+    private String GetTimeTitle(){
+        String currentTime = prefs.getString(resources.getString(R.string.time_phase_key), null);
+        String[] timePrefValues = resources.getStringArray(R.array.setTimePrefValues);
+        int selected = Arrays.asList(timePrefValues).indexOf(currentTime);
+        return resources.getStringArray(R.array.setTimePrefTitles)[selected];
+    }
+
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar)
+    {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar)
+    {
+
     }
 }
