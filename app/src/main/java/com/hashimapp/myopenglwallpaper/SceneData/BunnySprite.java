@@ -19,13 +19,6 @@ public class BunnySprite extends SpriteData
                 0.8f, -2.0f, 0.0f,   // bottom right
                 0.8f, 0.3f, 0.0f};  // top right
 
-        landscapeVertices = new float[]{
-                -0.8f, 0.3f, 0.0f,   // top left
-                -0.8f, -2.0f, 0.0f,   // bottom left
-                0.8f, -2.0f, 0.0f,   // bottom right
-                0.8f, 0.3f, 0.0f};  // top right
-
-
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
@@ -90,8 +83,8 @@ public class BunnySprite extends SpriteData
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize, int scene){
-        switch(bitmapSize){
+    public int GetBitmapID(int scene){
+        switch(scene){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.rabbit_sheet;
         }
@@ -111,42 +104,50 @@ public class BunnySprite extends SpriteData
         switch(scene){
             case SceneManager.DEFAULT:
                 textureVertices = new float[]{
+                        0.0f, 0.0f,
+                        0.0f, 0.5f,
+                        0.33f, 0.5f,
+                        0.33f, 0.0f
+                };
+                break;
+            case SceneManager.BROWN:
+                textureVertices = new float[]{
+                        0.33f, 0.0f,
+                        0.33f, 0.5f,
+                        0.66f, 0.5f,
+                        0.66f, 0.0f
+                };
+                break;
+            case SceneManager.BLUE:
+                textureVertices = new float[]{
+                        0.66f, 0.0f,
+                        0.66f, 0.5f,
+                        1.0f, 0.5f,
+                        1.0f, 0.0f
+                };
+                break;
+            case SceneManager.GREEN:
+                textureVertices = new float[]{
                         0.0f, 0.5f,
                         0.0f, 1.0f,
                         0.33f, 1.0f,
                         0.33f, 0.5f
                 };
                 break;
-            case SceneManager.BLUE:
-                textureVertices = new float[]{
-                        0.0f, 0.0f,
-                        0.0f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.66f
-                };
-                break;
-            case SceneManager.GREEN:
-                textureVertices = new float[]{
-                        0.0f, 0.66f,
-                        0.66f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.66f
-                };
-                break;
             case SceneManager.PINK:
                 textureVertices = new float[]{
-                        0.0f, 0.0f,
-                        0.0f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.0f
+                        0.33f, 0.5f,
+                        0.33f, 1.0f,
+                        0.66f, 1.0f,
+                        0.66f, 0.5f
                 };
                 break;
             case SceneManager.YELLOW:
                 textureVertices = new float[]{
-                        0.0f, 0.5f,
-                        0.0f, 1.0f,
+                        0.66f, 0.5f,
+                        0.66f, 1.0f,
                         1.0f, 1.0f,
-                        1.0f, 0.0f
+                        1.0f, 0.5f
                 };
                 break;
         }

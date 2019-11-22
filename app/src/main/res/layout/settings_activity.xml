@@ -192,6 +192,22 @@
                     android:background="@android:color/darker_gray"/>
 
 
+                <Button
+                    android:id="@+id/set_scene_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:shadowColor="@android:color/darker_gray"
+                    android:text="@string/set_scene_title"
+                    android:textSize="18sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+
                 <Switch
                     android:id="@+id/use_current_location"
                     android:layout_width="match_parent"

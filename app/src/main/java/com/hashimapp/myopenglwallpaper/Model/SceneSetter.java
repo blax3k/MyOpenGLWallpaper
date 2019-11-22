@@ -8,10 +8,10 @@ import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
-import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
+import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +29,11 @@ public class SceneSetter
     public static final int STATUS_READY_TO_SWAP = 2;
     public static final int STATUS_LOADING_TEXTURES = 3;
     public static final int STATUS_FADING_IN = 4;
+
+    public static final int NO_TRANSITION = 0;
+    public static final int INSTANT_TRANSITION = 1;
+    public static final int PARTIAL_FADE_TRANSITION = 2;
+    public static final int FULL_FADE_TRANSITION = 3;
 
     private static final int FADE_OUT_TRANSITION_DURATION = 500;
     private static final int FADE_IN_TRANSITION_DURATION = 2000;
@@ -67,10 +72,9 @@ public class SceneSetter
 
     private long FadeResetTime;
     private long FadeTargetTime;
-    private int _bitmapSize;
     private int currentScene;
 
-    private boolean _invertMotion;
+    private boolean _textureSwapRequired;
 
 
 
@@ -110,24 +114,6 @@ public class SceneSetter
 //        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
 
-    public void InitTextures(int widthHeight)
-    {
-        _bitmapSize = Textures.GetBitmapSize(widthHeight);
-        textures = new Textures(this.context, widthHeight);
-        int i = 0;
-        for (Sprite sprite : spriteList)
-        {
-            int bitmapID = sprite.GetNextBitmapID(_bitmapSize, currentScene);
-            TextureData textureData = textures.AddTexture(bitmapID, i);
-            bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
-            sprite.SetTextureData(textureData);
-            sprite.PrepNextTextureVertices(currentScene);
-            sprite.SetNextTextureVertices();
-
-            i++;
-        }
-    }
-
     float[] mvpMatrix = new float[16];
 
 
@@ -139,8 +125,46 @@ public class SceneSetter
         }
     }
 
-    public void SetScene(int scene){
+    public void InitScene(int scene, int timePhase, int percentage, int weather, int widthHeight){
+//        QueueScene(scene, timePhase, percentage, weather);
+
+        for(Sprite sprite: spriteList){
+            sprite.QueueSceneData(scene, timePhase, percentage, weather);
+        }
+
+        textures = new Textures(this.context, widthHeight);
+        int i = 0;
+        for (Sprite sprite : spriteList)
+        {
+            int bitmapID = sprite.GetQueuedBitmapID();
+            TextureData textureData = textures.AddTexture(bitmapID, i);
+            bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
+            sprite.SetTextureData(textureData);
+            sprite.TextureVerticeChange();
+            sprite.SetNextTextureVertices();
+
+            i++;
+        }
+        for(Sprite sprite: spriteList){
+            sprite.DequeueSceneData();
+        }
+
+    }
+
+    public int QueueScene(int scene, int timePhase, int percentage, int weather) {
+        int highestTransition = SceneSetter.NO_TRANSITION;
+
         currentScene = scene;
+        for (Sprite sprite : spriteList)
+        {
+            int result = sprite.QueueSceneData(scene, timePhase, percentage, weather);
+            if (result > highestTransition)
+            {
+                highestTransition = result;
+            }
+        }
+
+        return highestTransition;
     }
 
 
@@ -190,6 +214,28 @@ public class SceneSetter
         }
     }
 
+    public void InitSceneChange(int transition){
+        //get textures
+        bitmapIdTextureNameHashMap.clear();
+        bitmapTextureVerticesHashMap.clear();
+        boolean FadeAll = false;
+
+        if(transition == SceneSetter.INSTANT_TRANSITION){
+            for(Sprite sprite: spriteList){
+                sprite.DequeueSceneData();
+            }
+        }else if(transition == SceneSetter.PARTIAL_FADE_TRANSITION){
+            for(Sprite sprite: spriteList){
+                sprite.DequeueColor();
+            }
+            InitTextureSwap();
+        }else if(transition == SceneSetter.FULL_FADE_TRANSITION){
+            for(Sprite sprite: spriteList){
+                sprite.DequeueColor();
+            }
+            InitTextureSwap();
+        }
+    }
 
     public void InitTextureSwap()
     {
@@ -201,23 +247,25 @@ public class SceneSetter
 
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.GetNextBitmapID(_bitmapSize, currentScene);
+            int bitmapID = sprite.GetQueuedBitmapID();
 
             if (bitmapID >= 0)
             { //valid bitmap
                 //check if bitmap is already on list
                 if (!bitmapIdTextureNameHashMap.containsKey(bitmapID))
                 {
+                    _textureSwapRequired = true;
                     bitmapIdTextureNameHashMap.put(bitmapID, sprite.getTextureName());
-                    sprite.SetTextureSwapRequired(true);
+                    sprite.SetFadeOutRequired(true);
                     if(sprite.IsEssentialLayer()){
                         FadeAll = true;
                     }
                 }
             }
 
-            if(sprite.PrepNextTextureVertices(currentScene) ){
-                sprite.SetTextureSwapRequired(true);
+            if(sprite.TextureVerticeChange())
+            {
+                sprite.SetFadeOutRequired(true);
                 if(sprite.IsEssentialLayer()){
                     FadeAll = true;
                 }
@@ -225,7 +273,7 @@ public class SceneSetter
         }
         if(FadeAll){
             for (Sprite sprite: spriteList){
-                sprite.SetTextureSwapRequired(true);
+                sprite.SetFadeOutRequired(true);
             }
         }
 
@@ -248,10 +296,7 @@ public class SceneSetter
 
             //get current progress for fade
             float fadeProgress = (float) (currentTime - FadeResetTime) / (FadeTargetTime - FadeResetTime);
-//            if (textureSwapStatus == STATUS_FADING_OUT)
-//            {
-//                fadeProgress = MAX_PROGRESS - fadeProgress;
-//            }
+
             //don't have alpha exceed max or min
             if (fadeProgress >= 1.0f)
             {
@@ -264,7 +309,7 @@ public class SceneSetter
 //            Log.d("alpha1", "fade progress:  " + fadeProgress);
             for (Sprite sprite : spriteList)
             {
-                if (sprite.TextureSwapRequired())
+                if (sprite.isFadeOutRequired())
                 {
                     sprite.SetFade(fadeProgress, textureSwapStatus == STATUS_FADING_IN);
                 }
@@ -276,24 +321,31 @@ public class SceneSetter
                 if (textureSwapStatus == STATUS_FADING_OUT)
                 { //finished fading out. load textures
 
-                    for (Sprite sprite : spriteList)
-                    {
-                        sprite.SetNextTextureVertices();
-                    }
                     textureSwapStatus = STATUS_READY_TO_SWAP;
                 } else
                 {  //finshed fading in. stop
                     for (Sprite sprite : spriteList)
                     {
-                        sprite.SetTextureSwapRequired(false);
+                        sprite.SetFadeOutRequired(false);
                     }
                     textureSwapStatus = STATUS_DONE;
                 }
             }
         } else if (textureSwapStatus == STATUS_READY_TO_SWAP)
         {
-            new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
-            textureSwapStatus = STATUS_LOADING_TEXTURES;
+            for (Sprite sprite : spriteList)
+            {
+                sprite.DequeueSceneData();
+            }
+            if(_textureSwapRequired)
+            {
+                Log.d("texture", "DID THE TEXTURE SWAP");
+                new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
+                textureSwapStatus = STATUS_LOADING_TEXTURES;
+            }else{
+                textureSwapStatus = STATUS_FADING_IN;
+                ResetFadePoint();
+            }
         } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
         {
             if (!textures.UploadComplete())

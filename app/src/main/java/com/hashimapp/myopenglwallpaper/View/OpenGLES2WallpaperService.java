@@ -229,6 +229,9 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             }else if (key.equals(resources.getString(R.string.invert_motion_parallax_key))){
                 boolean motionOffsetInverted = sharedPreferences.getBoolean(resources.getString(R.string.invert_motion_parallax_key), false);
                 renderer.SetMotionOffsetInverted(motionOffsetInverted);
+            }else if(key.equals(resources.getString(R.string.set_scene_key))){
+                int scene = sharedPreferences.getInt(resources.getString(R.string.set_scene_key), 0);
+                renderer.SetScene(scene);
             }
         }
 

@@ -6,7 +6,6 @@ import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -25,8 +24,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class SettingsActivityTest extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener
 {
@@ -52,6 +53,7 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
     private Switch useCurrentLocationSwitch;
     private Button setWeatherButton;
     private TextView setTimeText;
+    private Button setSceneButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -94,10 +96,12 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         switch (view.getId())
         {
             case R.id.set_time_button:
-                PresentTimes();
+                PresentTimesPopup();
                 break;
             case R.id.invert_motion_parallax:
-
+                break;
+            case R.id.set_scene_button:
+                PresentScenesPopup();
                 break;
         }
     }
@@ -147,6 +151,9 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         setTimeButton.setOnClickListener(this);
         setTimeText = findViewById(R.id.set_time_text);
 
+        setSceneButton = findViewById(R.id.set_scene_button);
+        setSceneButton.setOnClickListener(this);
+
         motionOffsetSeekbar = findViewById(R.id.motion_parallax_strength);
         motionOffsetSeekbar.setOnSeekBarChangeListener(this);
 
@@ -170,7 +177,7 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
     }
 
 
-    private void PresentTimes()
+    private void PresentTimesPopup()
     {
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -182,14 +189,45 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         String timePref = prefs.getString(resources.getString(R.string.time_phase_key),
                                           resources.getString(R.string.auto_time_setting_key));
         int selected = Arrays.asList(resources.getStringArray(R.array.setTimePrefValues)).indexOf(timePref);
-        Log.d("selectedTime", "selcted: " + selected);
         builder.setSingleChoiceItems(timeTitles, selected, (dialog, which) ->
                 {
-                    Log.d("stuff", "which: " + which);
                     if(which >= 0){
                         prefsEditor.putString(
                                 resources.getString(R.string.time_phase_key),
                                 resources.getStringArray(R.array.setTimePrefValues)[which]);
+
+                        prefsEditor.commit();
+                        setTimeText.setText(resources.getTextArray(R.array.setTimePrefTitles)[which]);
+                    }
+                    dialog.dismiss();
+                }
+        );
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    private void PresentScenesPopup()
+    {
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(resources.getString(R.string.set_scene_title));
+        builder.setNegativeButton("Cancel", null);
+
+        // add a radio button list
+        String[] sceneTitles = SceneManager.GetAllSceneTitles();
+        int scenePref = prefs.getInt(resources.getString(R.string.set_scene_key),
+                SceneManager.GetAllScenes()[1]);
+        List<Integer> sceneArray = Arrays.asList(SceneManager.GetAllScenes());
+        int selected = sceneArray.indexOf(scenePref);
+        builder.setSingleChoiceItems(sceneTitles, selected, (dialog, which) ->
+                {
+                    if(which >= 0){
+                        prefsEditor.putInt(
+                                resources.getString(R.string.set_scene_key),
+                                SceneManager.GetAllScenes()[which]);
 
                         prefsEditor.commit();
                         setTimeText.setText(resources.getTextArray(R.array.setTimePrefTitles)[which]);

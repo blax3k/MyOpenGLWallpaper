@@ -16,12 +16,6 @@ public class HouseSprite extends SpriteData {
                 2.4f, -0.8f, 0.0f,   // bottom right
                 2.4f, 1.6f, 0.0f }; // top right
 
-        landscapeVertices = new float[]{
-                -2.4f, 1.6f, 0.0f,   // top left
-                -2.4f, -0.8f, 0.0f,   // bottom left
-                2.4f, -0.8f, 0.0f,   // bottom right
-                2.4f, 1.6f, 0.0f }; // top right
-
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
@@ -88,13 +82,9 @@ public class HouseSprite extends SpriteData {
         };
     }
 
-    public float[] GetTextureVertices(){
-        return textureVertices;
-    }
-
     @Override
-    public int GetBitmapID(int bitmapSize, int scene){
-        switch(bitmapSize){
+    public int GetBitmapID( int scene){
+        switch(scene){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.foregroundcitymap_1024;
         }

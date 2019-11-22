@@ -80,9 +80,9 @@ public class SkySprite extends SpriteData {
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize, int scene)
+    public int GetBitmapID( int scene)
     {
-        switch(bitmapSize){
+        switch(scene){
             case Textures.IMAGE_SIZE_512:
                 return R.drawable.sky_1024_border;
             case Textures.IMAGE_SIZE_1024:
@@ -92,25 +92,6 @@ public class SkySprite extends SpriteData {
         }
         return R.drawable.sky_1024_border;
     }
-
-//    @Override
-//    public SceneData GetScene(int scene, int bitmapSize){
-//        switch(scene){
-//            case SceneManager.DEFAULT:
-//                return new SceneData(GetBitmapID(bitmapSize, scene), textureVertices, portraitVertices,
-//                        )
-//                break;
-//            case SceneManager.PINK:
-//                break;
-//            case SceneManager.GREEN:
-//                break;
-//
-//        }
-//        return new SceneData();
-//    }
-
-
-
 
 }
 

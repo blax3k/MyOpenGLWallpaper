@@ -118,6 +118,7 @@
 
     //scene settings
     <string name="set_scene_key">set_scene_key</string>
+    <string name="set_scene_title">Set Scene</string>
     <string name="scene_green">scene_green</string>
     <string name="scene_pink">scene_pink</string>
     <string name="scene_white">scene_white</string>

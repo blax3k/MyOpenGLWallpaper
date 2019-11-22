@@ -41,6 +41,7 @@ public class GLRenderer implements Renderer
     private boolean _rackFocusEnabled;
     private boolean _cameraZoomEnabled;
     private boolean _created;
+    int timeOfDay, percentage;
 
 
     public GLRenderer(Context context)
@@ -124,7 +125,8 @@ public class GLRenderer implements Renderer
         if(!_created){
             _created = true;
             widthHeight = newWidthHeight;
-            sceneSetter.InitTextures(widthHeight);
+//            sceneSetter.InitTextures(widthHeight);
+            sceneSetter.InitScene(SceneManager.DEFAULT, timeOfDay, percentage, 0, widthHeight);
         }
 
         GLES20.glViewport(0, 0, width, height);
@@ -206,6 +208,10 @@ public class GLRenderer implements Renderer
         }
     }
 
+    public void SetScene(int scene){
+        int transition = sceneSetter.QueueScene(scene, timeOfDay, percentage, 0);
+        sceneSetter.InitSceneChange(transition);
+    }
 
     public void SetMotionOffsetStrength(int offsetStrength)
     {
@@ -266,11 +272,6 @@ public class GLRenderer implements Renderer
     }
 
 
-    public void SetTimePhase(String phaseOfDay)
-    {
-        timePhaseSelected = phaseOfDay;
-        UpdateTime();
-    }
 
     public void SwapTextures()
     {
@@ -281,22 +282,17 @@ public class GLRenderer implements Renderer
         }
     }
 
+    public void SetTimePhase(String phaseOfDay)
+    {
+        timePhaseSelected = phaseOfDay;
+        UpdateTime();
+    }
 
     private void UpdateTime()
     {
-        int timeOfDay, percentage;
         int[] timeInfo;
 
         timeInfo = timeTracker.GetTimePhase(timePhaseSelected, null);
-
-//        if (autoTimeEnabled)
-//        {
-//            Date date = Calendar.getInstance().getTime();
-//            timeInfo = timeTracker.GetTimePhase(date);
-//        } else
-//        {
-//            timeInfo = timeTracker.GetTimePhase(timePhaseSelected);
-//        }
 
         timeOfDay = timeInfo[TimeTracker.TIME_PHASE_INDEX];
         percentage = timeInfo[TimeTracker.TIME_PHASE_PROGRESSION_INDEX];

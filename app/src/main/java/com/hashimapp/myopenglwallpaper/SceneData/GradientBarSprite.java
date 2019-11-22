@@ -17,13 +17,6 @@ public class GradientBarSprite extends SpriteData
                 2.4f, 2.0f, 0.0f,   // bottom right
                 2.4f, 2.4f, 0.0f}; // top right
 
-        landscapeVertices = new float[]{
-                -0.8f, 0.3f, 0.0f,   // top left
-                -0.8f, -2.0f, 0.0f,   // bottom left
-                0.8f, -2.0f, 0.0f,   // bottom right
-                0.8f, 0.3f, 0.0f};  // top right
-
-
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
                 {1f, 1f, 1f, 1f,
@@ -88,8 +81,8 @@ public class GradientBarSprite extends SpriteData
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize, int scene){
-        switch(bitmapSize){
+    public int GetBitmapID( int scene){
+        switch(scene){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.desk_1024;
         }

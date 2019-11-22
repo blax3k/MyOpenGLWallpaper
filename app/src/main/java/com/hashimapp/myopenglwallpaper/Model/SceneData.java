@@ -3,7 +3,7 @@ package com.hashimapp.myopenglwallpaper.Model;
 public class SceneData
 {
     public int BitmapID;
-    public float[] TexturePosition;
+    public float[] TextureVertices;
     public float[] Vertices;
     public float[] Colors;
     public float ZVertice;
@@ -12,10 +12,12 @@ public class SceneData
 
     }
 
-    public SceneData(int bitmapID, float[] texturePosition, float[] vertices, float zVertice){
+    public SceneData(int bitmapID, float[] textureVertices, float[] vertices, float zVertice, float[] colors)
+    {
         BitmapID = bitmapID;
-        TexturePosition = texturePosition;
+        TextureVertices = textureVertices;
         Vertices = vertices;
         ZVertice = zVertice;
+        Colors = colors;
     }
 }

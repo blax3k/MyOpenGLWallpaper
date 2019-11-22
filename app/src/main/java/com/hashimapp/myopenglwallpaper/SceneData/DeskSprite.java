@@ -18,11 +18,6 @@ public class DeskSprite extends SpriteData {
                 2.4f, -2.4f, 0.0f,   // bottom right
                 2.4f, 1.4f, 0.0f}; // top right
 
-        landscapeVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f}; // top right
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
@@ -89,8 +84,8 @@ public class DeskSprite extends SpriteData {
     }
 
     @Override
-    public int GetBitmapID(int bitmapSize, int scene){
-        switch(bitmapSize){
+    public int GetBitmapID(int scene){
+        switch(scene){
             case Textures.IMAGE_SIZE_1024:
                 return  R.drawable.desk_1024;
         }

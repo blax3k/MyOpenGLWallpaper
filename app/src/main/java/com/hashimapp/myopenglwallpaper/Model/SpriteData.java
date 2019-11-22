@@ -102,30 +102,31 @@ public class SpriteData {
         return indices;
     }
 
-    /*
-    returns value between 0 and 1.0f with closest values at 0
-     */
-    public float GetZVertice() {
-        return zVertice;
-    }
+//    /*
+//    returns value between 0 and 1.0f with closest values at 0
+//     */
+//    public float GetZVertice() {
+//        return zVertice;
+//    }
+//
+//    /*
+//    return values from 0 to 1 with closest values at 1.0
+//     */
+//    public float GetZVerticeInverse(){
+//        return (float) Math.abs(1.0 - zVertice);
+//    }
 
-    /*
-    return values from 0 to 1 with closest values at 1.0
-     */
-    public float GetZVerticeInverse(){
-        return (float) Math.abs(1.0 - zVertice);
-    }
-
-    public int GetBitmapID(int bitmapSize, int scene){
-        return 0;
+    public int GetBitmapID(int scene){
+        return -1;
     }
 
     public boolean IsEssentialLayer(){
         return essentialLayer;
     }
 
-    public SceneData GetScene(int scene){
-        return new SceneData();
+    public SceneData GetScene(int scene, int timePhase, int percentage, int weather){
+        return new SceneData(GetBitmapID(scene), GetTextureVertices(scene),
+            portraitVertices, zVertice, getColor(timePhase, percentage));
     }
 
 
