@@ -26,8 +26,9 @@ public class TimeTracker
     public static final int LATE_DUSK = 6;
     public static final int NIGHT = 7;
 
-    public static final double DEFAULT_LATITTUDE = 47.8734952;
-    public static final double DEFAULT_LONGITUDE = -122.2495432;
+    public static final double DEFAULT_LATITTUDE = 35.9078;
+    public static final double DEFAULT_LONGITUDE = 127.7669;
+    public static final String DEFAULT_TIMEZONE = "GMT+5:00";
 
     public static final int TIME_PHASE_INDEX = 0;
     public static final int TIME_PHASE_PROGRESSION_INDEX = 1;
@@ -60,6 +61,14 @@ public class TimeTracker
 
     public void SetLocation(Location location){
         this.location = location;
+        this.timeZone = Calendar.getInstance().getTimeZone();
+        calculator = new SunriseSunsetCalculator(location, timeZone);
+    }
+
+    public void SetDefaultLocation(){
+        this.location = new Location(DEFAULT_LATITTUDE, DEFAULT_LONGITUDE);
+        timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        calculator = new SunriseSunsetCalculator(location, timeZone);
     }
 
 

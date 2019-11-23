@@ -255,6 +255,11 @@ public class GLRenderer implements Renderer
         UpdateTime();
     }
 
+    public void SetDefaultLocation(){
+        timeTracker.SetDefaultLocation();
+        UpdateTime();
+    }
+
     public void SetRackFocusEnabled(boolean enabled)
     {
         _rackFocusEnabled = enabled;

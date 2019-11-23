@@ -41,6 +41,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
     SharedPreferences prefs;
     private Date startDate;
     MyLocation locationManager;
+    private boolean _useCurrentLocation;
 
 
     @Override
@@ -54,6 +55,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         locationManager = new MyLocation();
+        _useCurrentLocation = prefs.getBoolean(resources.getString(R.string.location_setting_key), false);
 
     }
 
@@ -108,7 +110,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
                 InitRendererPrefs();
                 setTouchEventsEnabled(true);
-                UpdateLocation();
+                UpdateLocation(true);
             } else
             {
                 return;
@@ -161,7 +163,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             if (rendererSet)
             {
                 boolean motionParallaxEnabled = prefs.getBoolean("motion_parallax", false);
-                boolean updateLocation = prefs.getBoolean(resources.getString(R.string.location_setting_key), false);
 
                 if (visible)
                 {
@@ -169,10 +170,8 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     {
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
                     }
-                    if(updateLocation)
-                    {
-                        UpdateLocation();
-                    }
+
+                    UpdateLocation(false);
 
                     renderer.UpdateVisibility(visible);
 //                    renderer.SwapTextures();
@@ -221,6 +220,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 boolean rackFocusEnabled = sharedPreferences.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true);
                 renderer.SetRackFocusEnabled(rackFocusEnabled);
                 renderer.UpdateVisibility(true);
+            } else if(key.equals(resources.getString(R.string.location_setting_key)))
+            {
+                _useCurrentLocation = prefs.getBoolean(resources.getString(R.string.location_setting_key), false);
+                UpdateLocation(true);
             } else if (key.equals(resources.getString(R.string.setting_zoom_camera_key)))
             {
                 boolean cameraZoomEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
@@ -254,27 +257,32 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         }
 
-        private void UpdateLocation()
+        private void UpdateLocation(boolean updateNow)
         {
-            MyLocation.LocationResult locationResult = new MyLocation.LocationResult()
+            if(_useCurrentLocation)
             {
-                @Override
-                public void gotLocation(android.location.Location location)
+                MyLocation.LocationResult locationResult = new MyLocation.LocationResult()
                 {
-                    if (renderer != null && location != null)
+                    @Override
+                    public void gotLocation(android.location.Location location)
                     {
-                        renderer.SetLocation(location.getLatitude(), location.getLongitude());
-                        Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
+                        if (renderer != null && location != null)
+                        {
+                            renderer.SetLocation(location.getLatitude(), location.getLongitude());
+                            Log.d("locationstuff", "set location. lat: " + location.getLatitude() + " long: " + location.getLongitude());
+                        }
                     }
-                }
-            };
+                };
 
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastLocationUpdate > LOCATION_UPDATE_INTERVAL)
-            {
-                Log.d("locationstuff", "location updated");
-                lastLocationUpdate = currentTime;
-                locationManager.getLocation(context, locationResult);
+                long currentTime = System.currentTimeMillis();
+                if (updateNow || currentTime - lastLocationUpdate > LOCATION_UPDATE_INTERVAL)
+                {
+                    Log.d("locationstuff", "location updated");
+                    lastLocationUpdate = currentTime;
+                    locationManager.getLocation(context, locationResult);
+                }
+            }else{
+                renderer.SetDefaultLocation();
             }
         }
 
