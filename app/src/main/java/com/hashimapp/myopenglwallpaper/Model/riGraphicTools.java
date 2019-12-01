@@ -66,7 +66,7 @@ public class riGraphicTools
 
 
     public static final String vs_Particle =
-            "uniform float u_time;                                		  \n" +
+                    "uniform float u_time;                                \n" +
                     "uniform vec3 u_centerPosition;                       \n" +
                     "attribute float a_lifetime;                          \n" +
                     "attribute vec3 a_startPosition;                      \n" +

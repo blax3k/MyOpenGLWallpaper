@@ -11,11 +11,9 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 
-/**
- * Created by Blake Hashimoto on 8/15/2015.
- */
-public class Sprite
+public class SpriteBatch
 {
+
     // Geometric variables
 //    public static float vertices[];
     private static final float DEFAULT_BIAS = -1.00f;
@@ -73,7 +71,7 @@ public class Sprite
     private float bias = 0.0f;
 
 
-    public Sprite(SpriteData mSpriteData, int spriteKey, int scene)
+    public SpriteBatch(SpriteData mSpriteData, int spriteKey, int scene)
     {
         xZoomScale = yZoomScale = 1.0f;
         alpha = 1.0f;
@@ -284,8 +282,8 @@ public class Sprite
             return SceneSetter.FULL_FADE_TRANSITION;
         }
         if (!Arrays.equals(queuedSceneData.Vertices, currentVertices) ||
-            !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices) ||
-             queuedSceneData.ZVertice != zVertice)
+                !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices) ||
+                queuedSceneData.ZVertice != zVertice)
         {
             //todo: apply local z vertice
             return SceneSetter.PARTIAL_FADE_TRANSITION;
@@ -402,8 +400,6 @@ public class Sprite
     }
 
 
-
-
     //region Private
     private void setColor(float[] textureColor)
     {
@@ -459,5 +455,5 @@ public class Sprite
     {
         return (float) Math.abs(1.0 - zVertice);
     }
-    //endregion
+
 }
