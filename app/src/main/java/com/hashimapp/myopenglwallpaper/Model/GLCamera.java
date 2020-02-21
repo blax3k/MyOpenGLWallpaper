@@ -84,7 +84,7 @@ public class GLCamera {
         relativeScreenWidth = (TEXTURE_WIDTH / screenHeight) * screenWidth;
         screenWidthDiff = TEXTURE_WIDTH - relativeScreenWidth;
         lookX = eyeX;
-        Matrix.perspectiveM(mtrxProjection, 0, fov, ratio, 0, 12);
+        Matrix.perspectiveM(mtrxProjection, 0, fov, ratio, 1f, 12);
         Matrix.setLookAtM(mtrxView, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
     }
 

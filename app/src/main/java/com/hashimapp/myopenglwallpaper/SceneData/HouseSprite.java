@@ -7,7 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class HouseSprite extends SpriteData {
 
     public HouseSprite() {
-        zVertice = 0.95f;
+        zVertice = -0.00095f;
         essentialLayer = true;
 
         portraitVertices = new float[]{

@@ -32,6 +32,13 @@ public class SpriteData {
     protected float zVertice;
     protected boolean essentialLayer;
 
+    protected float internalZVertice(float vertice){
+        float newVertice = vertice * -1.0f;
+        Log.d("vertice"," newVertice: " + newVertice);
+        return newVertice;
+
+    }
+
     private static final float MAX_QUAD_SCALE = 0.125f;
 
 

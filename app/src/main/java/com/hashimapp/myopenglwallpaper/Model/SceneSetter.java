@@ -3,6 +3,7 @@ package com.hashimapp.myopenglwallpaper.Model;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.opengl.GLES20;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -76,6 +77,8 @@ public class SceneSetter
 
     private boolean _textureSwapRequired;
 
+    private GLParticleRenderer particleRenderer;
+
 
 
     Date startDate;
@@ -96,22 +99,60 @@ public class SceneSetter
         bitmapIdTextureNameHashMap = new HashMap<>();
         bitmapTextureVerticesHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
+        particleRenderer = new GLParticleRenderer(context);
     }
 
 
-    public void InitSprites()
+    public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
+//        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
+//        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
+//        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
         spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
         spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
         spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
         for(Sprite sprite :spriteList){
             sprite.SetMotionOffsetFocalPoint(motionOffsetFocalPoint);
         }
+
+        particleRenderer.onSurfaceCreated(null, null);
+        InitSpriteProgram();
 //        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
+    }
+
+
+    private void InitSpriteProgram(){
+        riGraphicTools.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Image);
+        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Image);
+
+        GLES20.glAttachShader(riGraphicTools.sp_Image, vertexShader);   // add the vertex shader to program
+        GLES20.glAttachShader(riGraphicTools.sp_Image, fragmentShader); // add the fragment shader to program
+        GLES20.glLinkProgram(riGraphicTools.sp_Image);                  // creates OpenGL ES program executrees
+
+        // Set our shader program
+        GLES20.glUseProgram(riGraphicTools.sp_Image);
+//        GLES20.glDepthMask(true);
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_ALWAYS);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+
+        // get handle to vertex shader's vPosition member
+        int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
+        // get handle to vertex shader's vPosition member
+        int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
+        int mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
+        // Get handle to shape's transformation matrix and apply it
+        int mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
+        // Get handle to textures locations
+        int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
+        int biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
+        int alphaHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "alpha");
+
+        SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
     }
 
     float[] mvpMatrix = new float[16];
@@ -145,6 +186,17 @@ public class SceneSetter
 
             i++;
         }
+
+        int bitmapID = particleRenderer.GetQueuedBitmapID();
+        TextureData textureData = textures.AddTexture(bitmapID, i);
+        bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
+        particleRenderer.SetTextureData(textureData);
+
+//        int bitmapID = particleRenderer.GetQueuedBitmapID();
+//        TextureData textureData = textures.AddTexture(bitmapID, i);
+//        bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
+//        particleRenderer.SetTextureData(textureData);
+
         for(Sprite sprite: spriteList){
             sprite.DequeueSceneData();
         }
@@ -184,7 +236,8 @@ public class SceneSetter
         }
     }
 
-    public void SurfaceChanged(boolean portrait, float spriteXPosOffset, float touchScale, float motionScale)
+    public void SurfaceChanged(boolean portrait, float spriteXPosOffset, float touchScale, float motionScale,
+                               int width, int height)
     {
 //        GetMembers();
 //        GLES20.glEnableVertexAttribArray(mColorHandle);
@@ -205,6 +258,8 @@ public class SceneSetter
                 sprite.SetYOffset(LANDSCAPE_Y_OFFSET_ADJUST);
             }
         }
+        particleRenderer.onSurfaceChanged(null, width, height);
+
     }
 
     public void SetMotionsSale(float motionScale){
@@ -320,7 +375,6 @@ public class SceneSetter
             {
                 if (textureSwapStatus == STATUS_FADING_OUT)
                 { //finished fading out. load textures
-
                     textureSwapStatus = STATUS_READY_TO_SWAP;
                 } else
                 {  //finshed fading in. stop
@@ -339,7 +393,6 @@ public class SceneSetter
             }
             if(_textureSwapRequired)
             {
-                Log.d("texture", "DID THE TEXTURE SWAP");
                 new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
                 textureSwapStatus = STATUS_LOADING_TEXTURES;
             }else{
@@ -357,8 +410,6 @@ public class SceneSetter
                 ResetFadePoint();
             }
         }
-
-        Log.d("fade", "fade status: " + textureSwapStatus);
     }
 
     private void ResetFadePoint()
@@ -487,10 +538,18 @@ public class SceneSetter
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
+
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        GLES20.glUseProgram(riGraphicTools.sp_Particle);
+        particleRenderer.onDrawFrame(null, mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+
+        GLES20.glUseProgram(riGraphicTools.sp_Image);
         for (Sprite sprite : spriteList)
         {
             sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
         }
+
     }
 
 

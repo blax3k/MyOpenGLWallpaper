@@ -8,7 +8,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class SkySprite extends SpriteData {
 
     public SkySprite() {
-        zVertice = 0.98f;
+        zVertice = -0.00098f;
         essentialLayer = true;
         portraitVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left

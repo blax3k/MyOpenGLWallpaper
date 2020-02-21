@@ -90,10 +90,10 @@ public class GLRenderer implements Renderer
         // Set the clear color to white
         GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-        sceneSetter.InitSprites();
+        sceneSetter.OnSurfaceCreated();
 
         // Create the shaders, images
-        InitSpriteProgram();
+//        InitSpriteProgram();
         sceneSetter.SetMaxBlurAmount(camera.maxBlur);
 
 //        riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
@@ -133,22 +133,23 @@ public class GLRenderer implements Renderer
 
         camera.OnSurfaceChanged(width, height);
         sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition(),
-                camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale());
+                camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale(), mScreenWidth, mScreenHeight);
     }
 
 
     private void InitSpriteProgram(){
         riGraphicTools.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Image);
-        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Image);
+        riGraphicTools.vsImageID = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Image);
+        riGraphicTools.fsImageID = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Image);
 
-        GLES20.glAttachShader(riGraphicTools.sp_Image, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(riGraphicTools.sp_Image, fragmentShader); // add the fragment shader to program
+        GLES20.glAttachShader(riGraphicTools.sp_Image, riGraphicTools.vsImageID);   // add the vertex shader to program
+        GLES20.glAttachShader(riGraphicTools.sp_Image, riGraphicTools.fsImageID); // add the fragment shader to program
         GLES20.glLinkProgram(riGraphicTools.sp_Image);                  // creates OpenGL ES program executrees
 
         // Set our shader program
         GLES20.glUseProgram(riGraphicTools.sp_Image);
-        GLES20.glDepthMask(false);
+//        GLES20.glDepthMask(true);
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -341,12 +342,12 @@ public class GLRenderer implements Renderer
             sceneSetter.UpdateZoomPoint();
         }
 
+        GLES20.glUseProgram(riGraphicTools.sp_Image);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix);
 
 
-        GLES20.glUseProgram(riGraphicTools.sp_Image);
 
 //        }
 

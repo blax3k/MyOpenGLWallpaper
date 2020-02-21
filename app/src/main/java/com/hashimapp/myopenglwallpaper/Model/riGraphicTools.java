@@ -11,6 +11,11 @@ public class riGraphicTools
     public static int sp_Color;
     public static int sp_Particle;
 
+    public static int fsImageID;
+    public static int vsImageID;
+    public static int fsParticleID;
+    public static int vsParticleID;
+
 
     /* SHADER Solid
      *
@@ -97,8 +102,8 @@ public class riGraphicTools
                     "void main()                                          \n" +
                     "{                                                    \n" +
                     "  vec4 texColor;                                     \n" +
-                    "  texColor = texture2D( s_texture, gl_PointCoord );  \n" +
-                    "  gl_FragColor = vec4( u_color ) * texColor;         \n" +
+                    "  texColor = texture2D( s_texture, gl_PointCoord, -1.0 );  \n" +
+                    "  gl_FragColor = texColor;         \n" +
                     "  gl_FragColor.a *= v_lifetime;                      \n" +
                     "}                                                    \n";
 
