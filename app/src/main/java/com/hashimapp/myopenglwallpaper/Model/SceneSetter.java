@@ -106,9 +106,9 @@ public class SceneSetter
     public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-//        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-//        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-//        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
+        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
+        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
+        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
         spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
         spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
         spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
@@ -134,7 +134,7 @@ public class SceneSetter
         // Set our shader program
         GLES20.glUseProgram(riGraphicTools.sp_Image);
 //        GLES20.glDepthMask(true);
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 //        GLES20.glDepthFunc(GLES20.GL_ALWAYS);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -192,11 +192,6 @@ public class SceneSetter
         bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
         particleRenderer.SetTextureData(textureData);
 
-//        int bitmapID = particleRenderer.GetQueuedBitmapID();
-//        TextureData textureData = textures.AddTexture(bitmapID, i);
-//        bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
-//        particleRenderer.SetTextureData(textureData);
-
         for(Sprite sprite: spriteList){
             sprite.DequeueSceneData();
         }
@@ -226,6 +221,7 @@ public class SceneSetter
         {
             sprite.SetXOffset(xOffset);
         }
+        particleRenderer.SetXOffset(xOffset);
     }
 
     public void SensorChanged(float xOffset, float yOffset, boolean invert)
@@ -538,17 +534,16 @@ public class SceneSetter
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
-
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        GLES20.glUseProgram(riGraphicTools.sp_Particle);
-        particleRenderer.onDrawFrame(null, mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
 
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         for (Sprite sprite : spriteList)
         {
             sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
         }
+        GLES20.glUseProgram(riGraphicTools.sp_Particle);
+        particleRenderer.onDrawFrame(null, mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
 
     }
 

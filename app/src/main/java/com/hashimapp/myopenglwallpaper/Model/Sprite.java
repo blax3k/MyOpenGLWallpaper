@@ -369,6 +369,7 @@ public class Sprite
         Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, yZoomScale + yTouchScale + yMotionScale, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(mtrxHandle, 1, false, mMVPMatrix, 0);
 
         GLES20.glEnableVertexAttribArray(mColorHandle);
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, true, 0, colorBuffer);
@@ -380,7 +381,6 @@ public class Sprite
         GLES20.glEnableVertexAttribArray(mTexCoordLoc);
         GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT, false, 0, textureVerticeBuffer);
 
-        GLES20.glUniformMatrix4fv(mtrxHandle, 1, false, mMVPMatrix, 0);
 
         // Set the sampler texture unit to x, where we have saved the texture.
         GLES20.glActiveTexture(GLTextureIndex);
@@ -393,12 +393,6 @@ public class Sprite
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
-//        // Disable vertex array
-//        GLES20.glDisableVertexAttribArray(mPositionHandle);
-//        GLES20.glDisableVertexAttribArray(mColorHandle);
-//
-//        if (textureName >= 0)
-//            GLES20.glDisableVertexAttribArray(mTexCoordLoc);
     }
 
 

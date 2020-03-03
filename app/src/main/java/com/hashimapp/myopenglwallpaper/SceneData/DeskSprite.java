@@ -10,7 +10,7 @@ public class DeskSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
-        zVertice = -0.0009f;
+        zVertice = -0.0010f;
         essentialLayer = true;
         portraitVertices = new float[]{
                 -2.4f, 1.4f, (zVertice),   // top left

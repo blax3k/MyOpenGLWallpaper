@@ -11,7 +11,7 @@ public class BunnySprite extends SpriteData
 
     public BunnySprite()
     {
-        zVertice = -0.0005f;
+        zVertice = -0.0009f;
         essentialLayer = false;
         portraitVertices = new float[]{
                 -0.8f, 0.3f, zVertice,   // top left

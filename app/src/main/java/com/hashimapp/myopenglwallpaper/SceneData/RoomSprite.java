@@ -8,13 +8,13 @@ public class RoomSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer0;
     public RoomSprite() {
-        zVertice = -0.0005f;
+        zVertice = -0.0065f;
         essentialLayer = true;
         portraitVertices = new float[]{
-                -2.4f, 2.4f, 0.0f,   // top left
-                -2.4f, -2.4f, 0.0f,   // bottom left
-                2.4f, -2.4f, 0.0f,   // bottom right
-                2.4f, 2.4f, 0.0f }; // top right
+                -2.4f, 2.4f, zVertice,   // top left
+                -2.4f, -2.4f, zVertice,   // bottom left
+                2.4f, -2.4f, zVertice,   // bottom right
+                2.4f, 2.4f, zVertice }; // top right
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]
