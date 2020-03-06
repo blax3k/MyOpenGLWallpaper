@@ -10,13 +10,13 @@ public class DeskSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
-        zVertice = -0.0010f;
+        zVertice = 0.2f;
         essentialLayer = true;
         portraitVertices = new float[]{
-                -2.4f, 1.4f, (zVertice),   // top left
-                -2.4f, -2.4f, (zVertice),   // bottom left
-                2.4f, -2.4f, (zVertice),   // bottom right
-                2.4f, 1.4f, (zVertice)}; // top right
+                -2.4f, 1.4f, (0.0f),   // top left
+                -2.4f, -2.4f, (0.0f),   // bottom left
+                2.4f, -2.4f, (0.0f),   // bottom right
+                2.4f, 1.4f, (0.0f)}; // top right
 
 
         indices = new short[]{0, 1, 2, 0, 2, 3};

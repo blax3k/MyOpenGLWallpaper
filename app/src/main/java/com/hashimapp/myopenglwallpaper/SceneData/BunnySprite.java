@@ -11,13 +11,13 @@ public class BunnySprite extends SpriteData
 
     public BunnySprite()
     {
-        zVertice = -0.0009f;
+        zVertice = 0.2f;
         essentialLayer = false;
         portraitVertices = new float[]{
-                -0.8f, 0.3f, zVertice,   // top left
-                -0.8f, -2.0f, (zVertice),   // bottom left
-                0.8f, -2.0f, (zVertice),   // bottom right
-                0.8f, 0.3f, (zVertice)};  // top right
+                -0.8f, 0.3f, 0.0f,   // top left
+                -0.8f, -2.0f, (0.0f),   // bottom left
+                0.8f, -2.0f, (0.0f),   // bottom right
+                0.8f, 0.3f, (0.0f)};  // top right
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]

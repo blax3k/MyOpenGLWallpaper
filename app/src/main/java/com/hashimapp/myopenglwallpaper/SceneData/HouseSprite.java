@@ -7,14 +7,14 @@ import com.hashimapp.myopenglwallpaper.R;
 public class HouseSprite extends SpriteData {
 
     public HouseSprite() {
-        zVertice = -0.0097f;
+        zVertice = 1.0f;
         essentialLayer = true;
 
         portraitVertices = new float[]{
-                -2.4f, 1.6f, zVertice,   // top left
-                -2.4f, -0.8f, zVertice,   // bottom left
-                2.4f, -0.8f, zVertice,   // bottom right
-                2.4f, 1.6f, zVertice }; // top right
+                -2.4f, 1.6f, 0.0f,   // top left
+                -2.4f, -0.8f, 0.0f,   // bottom left
+                2.4f, -0.8f, 0.0f,   // bottom right
+                2.4f, 1.6f, 0.0f }; // top right
 
         indices = new short[]{0, 1, 2, 0, 2, 3};
         defaultColor = new float[]

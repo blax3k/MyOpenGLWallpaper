@@ -25,10 +25,7 @@ package com.hashimapp.myopenglwallpaper.Model;
         import javax.microedition.khronos.opengles.GL10;
 
         import android.content.Context;
-        import android.graphics.Bitmap;
-        import android.graphics.BitmapFactory;
         import android.opengl.GLES20;
-        import android.opengl.GLUtils;
         import android.opengl.Matrix;
         import android.os.SystemClock;
         import android.util.Log;
@@ -38,21 +35,9 @@ package com.hashimapp.myopenglwallpaper.Model;
 
 public class GLParticleRenderer
 {
-
-
-//    // Attribute locations
-//    private int mLifetimeLoc;
-//    private int mStartPositionLoc;
-//    private int mEndPositionLoc;
-//
-//    // Uniform location
-//    private int mTimeLoc;
-//    private int mElapsedTimeLoc;
-//    private int mColorLoc;
-//    private int mCenterPositionLoc;
     private int mSamplerLoc;
 
-    private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge;
+    private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge, iTexCoord, iTexCoordPointSize;
 
 
     float xScrollOffset, xAccelOffset, yAccelOffset, yOrientationOffset, xZoomScale,
@@ -63,18 +48,18 @@ public class GLParticleRenderer
 
     // Update time
     private float mTime;
+    private float textureSize;
     private long mLastTime;
 
     // Additional member variables
     private int mWidth;
-    private int mHeight;
     private FloatBuffer mParticles;
     private Context mContext;
     private float spriteXPosOffset;
 
-    private final int NUM_PARTICLES = 100;
-    private final int PARTICLE_SIZE = 11;
-    private float zVertice = 0;
+    private final int NUM_PARTICLES = 5000;
+    private final int PARTICLE_SIZE = 13;
+    private float zVertice = 0.0f;
 
     private final float[] fVertices = new float[NUM_PARTICLES * PARTICLE_SIZE];
 
@@ -127,6 +112,8 @@ public class GLParticleRenderer
         iTimes = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "a_time");
         iLife = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_life");
         iAge = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_age");
+        iTexCoord = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "TextureCoordIn");
+        iTexCoordPointSize = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "a_stufff");
 
 
 //        // Get the attribute locations
@@ -169,14 +156,21 @@ public class GLParticleRenderer
             fVertices[i*PARTICLE_SIZE + 8] =0.0f;
 
             //life
-            fVertices[i*PARTICLE_SIZE + 9] = rnd(0.5f, 1f);
+            fVertices[i*PARTICLE_SIZE + 9] = rnd(1.0f, 2.0f);
             //age
             fVertices[i*PARTICLE_SIZE + 10] = rnd(0.01f, 0.1f);
+
+            //texCoord
+            fVertices[i*PARTICLE_SIZE + 11] = 0.5f;
+            fVertices[i*PARTICLE_SIZE + 12] = 0.0f;
+
 //            fVertices[i * 7 + 6] = -1.0f;// generator.nextFloat() * 0.25f - 0.125f;
         }
         mParticles = ByteBuffer.allocateDirect(fVertices.length * 5)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mParticles.put(fVertices).position(0);
+
+
 
         // Initialize time to cause reset on first update
         mTime = 1.0f;
@@ -187,8 +181,8 @@ public class GLParticleRenderer
         //parallax motion determined by how "far" the sprite is from the camera
         float offsetMultiplier = (GetZVerticeInverse(zVertice));// * 0.9f + 0.1f; //range between 0.1 and 1.0f
         this.xScrollOffset = -1 //reverse movement
-                * (xOffset) * offsetMultiplier;// *  //screen offset position (0.0-1.0) multiplied by Z position parallax effect
-                //+ spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
+                * (xOffset) * offsetMultiplier  //screen offset position (0.0-1.0) multiplied by Z position parallax effect
+                + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
 
         Log.d("Set offset", "x: " + xScrollOffset);
 
@@ -233,6 +227,7 @@ public class GLParticleRenderer
 
         mTime += 0.002f;
 
+        textureSize = 0.5f;
 //        if ( mTime >= 1.0f )
 //        {
 //            Random generator = new Random();
@@ -258,7 +253,8 @@ public class GLParticleRenderer
 //        }
 
         // Load uniform time variable
-//        GLES20.glUniform1f ( mTimeLoc, mTime );
+        GLES20.glUniform1f ( iTimes, mTime );
+        GLES20.glUniform1f(iTexCoordPointSize, textureSize);
 //        GLES20.glUniform1f ( mElapsedTimeLoc, deltaTime );
     }
 
@@ -308,7 +304,13 @@ public class GLParticleRenderer
                 PARTICLE_SIZE * 4, mParticles);
         GLES20.glEnableVertexAttribArray(iAge);
 
-        GLES20.glUniform1f(iTimes, mTime);
+        mParticles.position(11);
+        GLES20.glVertexAttribPointer(iTexCoord, 2, GLES20.GL_FLOAT, false,
+                PARTICLE_SIZE * 4, mParticles);
+        GLES20.glEnableVertexAttribArray(iTexCoord);
+
+
+
 
         // Blend particles
 //        GLES20.glEnable ( GLES20.GL_BLEND );
@@ -328,8 +330,8 @@ public class GLParticleRenderer
     //
     public void onSurfaceChanged(GL10 glUnused, int width, int height)
     {
-        mWidth = width;
-        mHeight = height;
+//        mWidth = width;
+////        mHeight = height;
     }
 
 

@@ -77,12 +77,17 @@ public class riGraphicTools
             "attribute vec4 a_Position;" +
             "attribute vec4 a_move;" +
             "uniform float a_time;" +
+            "uniform float a_stufff;"+
             "attribute vec4 a_color;" +
             "varying vec4 v_color;" +
             "attribute float a_life;" +
             "attribute float a_age;" +
             "varying float alpha;" +
             "float time;" +
+            "attribute vec2 TextureCoordIn;"+
+            "varying vec2 TextureCoord;" +
+            "varying vec2 TextureSize;" +
+
             "void main()                                          \n" +
             "{                                                    \n" +
                     "alpha = a_life - (a_time * 10.0 * a_age);" +
@@ -99,11 +104,13 @@ public class riGraphicTools
                          "time = a_time - td;" +
                          "alpha = a_life - (time * 10.0 * a_age);" +
                     "}" +
-                    "gl_PointSize = 100.0;" +
 //                    "gl_Position = uMVPMatrix * vec4(a_Position.xyz, 1.0) ;              \n" +
                     "gl_Position = uMVPMatrix * a_Position ;              \n" +
                     "gl_Position += (time * a_move);" +
                     "gl_Position.w = 1.0;" +
+                    "TextureCoord = TextureCoordIn;" +
+                    "TextureSize = vec2(a_stufff, a_stufff);" +
+                    "gl_PointSize = 100.0;" +
 
 //                    "  if ( u_time <= a_lifetime )                        \n" +
 //                    "  {                                                  \n" +
@@ -119,39 +126,22 @@ public class riGraphicTools
                     "}";
 
 
-    public static final String vs_Particles2 =
-            "uniform float u_time;                                \n" +
-                    "uniform vec3 u_centerPosition;                       \n" +
-                    "attribute float a_lifetime;                          \n" +
-                    "attribute vec3 a_startPosition;                      \n" +
-                    "attribute vec3 a_endPosition;                        \n" +
-                    "varying float v_lifetime;                            \n" +
-                    "void main()                                          \n" +
-                    "{                                                    \n" +
-                    "  if ( u_time <= a_lifetime )                        \n" +
-                    "  {                                                  \n" +
-                    "    gl_Position.xyz = a_startPosition +              \n" +
-                    "                      (u_time * a_endPosition);      \n" +
-                    "    gl_Position.xyz += u_centerPosition;             \n" +
-                    "    gl_Position.w = 1.0;                             \n" +
-                    "  }                                                  \n" +
-//                    "  else                                               \n" +
-//                    "     gl_Position = vec4( -1000, -1000, 0, 0 );       \n" +
-                    "  v_lifetime = 1.0 - ( u_time / a_lifetime );        \n" +
-                    "  v_lifetime = clamp ( v_lifetime, 0.0, 1.0 );       \n" +
-                    "  gl_PointSize = ( v_lifetime * v_lifetime ) * 100.0; \n" +
-                    "}";
-
 
     public static final String fs_Particle =
             "precision mediump float;                             		        \n" +
                     "uniform vec4 u_color;                                      \n" +
                     "varying float v_lifetime;                                  \n" +
                     "uniform sampler2D s_texture;                               \n" +
+                    "varying mediump vec2 TextureCoord;                           " +
+                    "varying mediump vec2 TextureSize;                            " +
+
                     "void main()                                                \n" +
                     "{                                                          \n" +
-                    "  vec4 texColor;                                           \n" +
-                    "  texColor = texture2D( s_texture, gl_PointCoord, -1.0 );  \n" +
+                    "  mediump vec2 realTexCoord = TextureCoord + (gl_PointCoord * TextureSize);" +
+                    "  mediump vec4 texColor = texture2D( s_texture, realTexCoord, -1.0);   \n" +
+                    "    if(texColor.a == 0.0){\n" +
+                    "        discard;\n" +
+                    "    }"+
                     "  gl_FragColor = texColor;                                 \n" +
 //                    "  gl_FragColor.w *= alpha;                            \n" +
                     "}                                                          \n";
