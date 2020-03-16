@@ -82,6 +82,7 @@ public class riGraphicTools
             "varying vec4 v_color;" +
             "attribute float a_life;" +
             "attribute float a_age;" +
+            "attribute float a_size;" +
             "varying float alpha;" +
             "float time;" +
             "attribute vec2 TextureCoordIn;"+
@@ -110,7 +111,7 @@ public class riGraphicTools
                     "gl_Position.w = 1.0;" +
                     "TextureCoord = TextureCoordIn;" +
                     "TextureSize = vec2(a_stufff, a_stufff);" +
-                    "gl_PointSize = 100.0;" +
+                    "gl_PointSize = a_size;" +
 
 //                    "  if ( u_time <= a_lifetime )                        \n" +
 //                    "  {                                                  \n" +

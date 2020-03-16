@@ -19,6 +19,7 @@ package com.hashimapp.myopenglwallpaper.Model;
         import java.nio.ByteBuffer;
         import java.nio.ByteOrder;
         import java.nio.FloatBuffer;
+        import java.nio.file.FileVisitOption;
         import java.util.Random;
 
         import javax.microedition.khronos.egl.EGLConfig;
@@ -37,7 +38,8 @@ public class GLParticleRenderer
 {
     private int mSamplerLoc;
 
-    private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge, iTexCoord, iTexCoordPointSize;
+    private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge,
+            iTexCoord, iTexCoordPointSize, iSize;
 
 
     float xScrollOffset, xAccelOffset, yAccelOffset, yOrientationOffset, xZoomScale,
@@ -57,8 +59,8 @@ public class GLParticleRenderer
     private Context mContext;
     private float spriteXPosOffset;
 
-    private final int NUM_PARTICLES = 5000;
-    private final int PARTICLE_SIZE = 13;
+    private final int NUM_PARTICLES = 100;
+    private final int PARTICLE_SIZE = 14;
     private float zVertice = 0.0f;
 
     private final float[] fVertices = new float[NUM_PARTICLES * PARTICLE_SIZE];
@@ -114,6 +116,7 @@ public class GLParticleRenderer
         iAge = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_age");
         iTexCoord = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "TextureCoordIn");
         iTexCoordPointSize = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "a_stufff");
+        iSize = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_size");
 
 
 //        // Get the attribute locations
@@ -134,18 +137,21 @@ public class GLParticleRenderer
         Random gen = new Random();
 
         float inc = 1.0f/NUM_PARTICLES;
-        float vel = 4.0f;
+        float size;
+        float vel;
         int angle;
-        float z = 0.0f;
+        float xPos = -1.0f;
+        float xStep = 4.0f/NUM_PARTICLES;
         for ( int i = 0; i < NUM_PARTICLES; i++ )
         {
-            vel += inc;
-            angle = (int) (gen.nextFloat() * 360f);
-            z -= inc;
+            size  = rnd(50.0f, 100.0f);
+            vel = 5.0f + ((size)/50.0f)*10.0f;
+            angle = (int) (270.0f);
+            xPos += xStep;
             //x,y,z
-            fVertices[i*PARTICLE_SIZE + 0] = 0;
-            fVertices[i*PARTICLE_SIZE + 1] = 0;
-            fVertices[i*PARTICLE_SIZE + 2] = z;
+            fVertices[i*PARTICLE_SIZE + 0] = xPos;
+            fVertices[i*PARTICLE_SIZE + 1] = 2.0f;
+            fVertices[i*PARTICLE_SIZE + 2] = 0;
             //r,g,b
             fVertices[i*PARTICLE_SIZE + 3] = gen.nextFloat();
             fVertices[i*PARTICLE_SIZE + 4] = gen.nextFloat();
@@ -156,13 +162,15 @@ public class GLParticleRenderer
             fVertices[i*PARTICLE_SIZE + 8] =0.0f;
 
             //life
-            fVertices[i*PARTICLE_SIZE + 9] = rnd(1.0f, 2.0f);
+            fVertices[i*PARTICLE_SIZE + 9] = rnd(0.2f, 0.22f);
             //age
             fVertices[i*PARTICLE_SIZE + 10] = rnd(0.01f, 0.1f);
 
             //texCoord
             fVertices[i*PARTICLE_SIZE + 11] = 0.5f;
             fVertices[i*PARTICLE_SIZE + 12] = 0.0f;
+            //size
+            fVertices[i*PARTICLE_SIZE + 13] = size;
 
 //            fVertices[i * 7 + 6] = -1.0f;// generator.nextFloat() * 0.25f - 0.125f;
         }
@@ -308,6 +316,11 @@ public class GLParticleRenderer
         GLES20.glVertexAttribPointer(iTexCoord, 2, GLES20.GL_FLOAT, false,
                 PARTICLE_SIZE * 4, mParticles);
         GLES20.glEnableVertexAttribArray(iTexCoord);
+
+        mParticles.position(13);
+        GLES20.glVertexAttribPointer(iSize, 1, GLES20.GL_FLOAT, false,
+                PARTICLE_SIZE * 4, mParticles);
+        GLES20.glEnableVertexAttribArray(iSize);
 
 
 
