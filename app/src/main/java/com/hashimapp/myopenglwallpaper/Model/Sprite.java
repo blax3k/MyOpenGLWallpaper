@@ -260,18 +260,6 @@ public class Sprite
         bias = DEFAULT_BIAS;
     }
 
-
-    public int GetQueuedBitmapID()
-    {
-        if (queuedSceneData != null &&
-                queuedSceneData.BitmapID != currentBitmapID &&
-                queuedSceneData.BitmapID != 0)
-        {
-            return queuedSceneData.BitmapID;
-        }
-        return -1;
-    }
-
     /*
     Queues the next values for the next scene, and returns the 'severity' of the transition
      */
@@ -294,6 +282,17 @@ public class Sprite
             return SceneSetter.INSTANT_TRANSITION;
         }
         return SceneSetter.NO_TRANSITION;
+    }
+
+    public int GetQueuedBitmapID()
+    {
+        if (queuedSceneData != null &&
+                queuedSceneData.BitmapID != currentBitmapID &&
+                queuedSceneData.BitmapID != 0)
+        {
+            return queuedSceneData.BitmapID;
+        }
+        return -1;
     }
 
     public void DequeueSceneData()

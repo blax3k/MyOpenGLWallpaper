@@ -16,22 +16,23 @@ package com.hashimapp.myopenglwallpaper.Model;
 //
 
 
-        import java.nio.ByteBuffer;
-        import java.nio.ByteOrder;
-        import java.nio.FloatBuffer;
-        import java.nio.file.FileVisitOption;
-        import java.util.Random;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.file.FileVisitOption;
+import java.util.Random;
 
-        import javax.microedition.khronos.egl.EGLConfig;
-        import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
-        import android.content.Context;
-        import android.opengl.GLES20;
-        import android.opengl.Matrix;
-        import android.os.SystemClock;
-        import android.util.Log;
+import android.content.Context;
+import android.opengl.GLES20;
+import android.opengl.Matrix;
+import android.os.SystemClock;
+import android.util.Log;
 
-        import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 
 
 public class GLParticleRenderer
@@ -39,7 +40,7 @@ public class GLParticleRenderer
     private int mSamplerLoc;
 
     private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge,
-            iTexCoord, iTexCoordPointSize, iSize;
+            iTexCoord, iTexCoordPointSize, iSize, iAlpha;
 
 
     float xScrollOffset, xAccelOffset, yAccelOffset, yOrientationOffset, xZoomScale,
@@ -63,21 +64,25 @@ public class GLParticleRenderer
     private final int PARTICLE_SIZE = 14;
     private float zVertice = 0.0f;
 
+    private ParticleData _particleData;
+
     private final float[] fVertices = new float[NUM_PARTICLES * PARTICLE_SIZE];
 
     ///
     // Constructor
     //
-    public GLParticleRenderer(Context context)
+    public GLParticleRenderer()
     {
-        mContext = context;
+        _particleData = new RainParticle();
     }
 
-    public int GetQueuedBitmapID(){
+    public int GetQueuedBitmapID()
+    {
         return R.drawable.layer00;
     }
 
-    public void SetTextureData(TextureData texData){
+    public void SetTextureData(TextureData texData)
+    {
         GLTextureIndex = texData.GLTextureIndex;
         textureName = texData.textureName;
         textureNameIndex = texData.textureNameIndex;
@@ -90,8 +95,9 @@ public class GLParticleRenderer
     ///
     // Initialize the shader and program object
     //
-    public void onSurfaceCreated(GL10 glUnused, EGLConfig config)
+    public void onSurfaceCreated(ParticleData particleData)
     {
+        _particleData = particleData;
         // Load the shaders and get a linked program object
 
         riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
@@ -117,67 +123,55 @@ public class GLParticleRenderer
         iTexCoord = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "TextureCoordIn");
         iTexCoordPointSize = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "a_stufff");
         iSize = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_size");
-
-
-//        // Get the attribute locations
-//        mLifetimeLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_lifetime");
-//        mStartPositionLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_startPosition" );
-//        mEndPositionLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_endPosition" );
-//
-//        // Get the uniform locations
-//        mTimeLoc = GLES20.glGetUniformLocation ( riGraphicTools.sp_Particle, "u_time" );
-//        mElapsedTimeLoc = GLES20.glGetUniformLocation ( riGraphicTools.sp_Particle, "v_elapsedTime" );
-//        mCenterPositionLoc = GLES20.glGetUniformLocation ( riGraphicTools.sp_Particle, "u_centerPosition" );
-//        mColorLoc = GLES20.glGetUniformLocation ( riGraphicTools.sp_Particle, "u_color" );
-        mSamplerLoc = GLES20.glGetUniformLocation ( riGraphicTools.sp_Particle, "s_texture" );
+        mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "s_texture");
+        iAlpha = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_alpha");
 
         GLES20.glClearColor(0.3f, 0.4f, 0.6f, 0);
 
         // Fill in particle data array
         Random gen = new Random();
 
-        float inc = 1.0f/NUM_PARTICLES;
+        float inc = 1.0f / NUM_PARTICLES;
         float size;
         float vel;
         int angle;
         float xPos = -1.0f;
-        float xStep = 4.0f/NUM_PARTICLES;
-        for ( int i = 0; i < NUM_PARTICLES; i++ )
+        float xStep = 4.0f / NUM_PARTICLES;
+        for (int i = 0; i < NUM_PARTICLES; i++)
         {
-            size  = rnd(50.0f, 100.0f);
-            vel = 5.0f + ((size)/50.0f)*10.0f;
+            size = rnd(50.0f, 100.0f);
+            vel = 5.0f + ((size) / 50.0f) * 10.0f;
             angle = (int) (270.0f);
             xPos += xStep;
             //x,y,z
-            fVertices[i*PARTICLE_SIZE + 0] = xPos;
-            fVertices[i*PARTICLE_SIZE + 1] = 2.0f;
-            fVertices[i*PARTICLE_SIZE + 2] = 0;
+            fVertices[i * PARTICLE_SIZE + 0] = xPos;
+            fVertices[i * PARTICLE_SIZE + 1] = 2.0f;
+            fVertices[i * PARTICLE_SIZE + 2] = 0;
             //r,g,b
-            fVertices[i*PARTICLE_SIZE + 3] = gen.nextFloat();
-            fVertices[i*PARTICLE_SIZE + 4] = gen.nextFloat();
-            fVertices[i*PARTICLE_SIZE + 5] = gen.nextFloat();
+            fVertices[i * PARTICLE_SIZE + 3] = gen.nextFloat();
+            fVertices[i * PARTICLE_SIZE + 4] = gen.nextFloat();
+            fVertices[i * PARTICLE_SIZE + 5] = gen.nextFloat();
             //dx,dy,dz
-            fVertices[i*PARTICLE_SIZE + 6] = (float) (Math.cos(Math.toRadians(angle)) * vel);
-            fVertices[i*PARTICLE_SIZE + 7] = (float) (Math.sin(Math.toRadians(angle)) * vel);
-            fVertices[i*PARTICLE_SIZE + 8] =0.0f;
+            fVertices[i * PARTICLE_SIZE + 6] = (float) (Math.cos(Math.toRadians(angle)) * vel);
+            fVertices[i * PARTICLE_SIZE + 7] = (float) (Math.sin(Math.toRadians(angle)) * vel);
+            fVertices[i * PARTICLE_SIZE + 8] = 0.0f;
 
             //life
-            fVertices[i*PARTICLE_SIZE + 9] = rnd(0.2f, 0.22f);
+            fVertices[i * PARTICLE_SIZE + 9] = rnd(0.2f, 0.22f);
             //age
-            fVertices[i*PARTICLE_SIZE + 10] = rnd(0.01f, 0.1f);
+            fVertices[i * PARTICLE_SIZE + 10] = rnd(0.01f, 0.1f);
 
-            //texCoord
-            fVertices[i*PARTICLE_SIZE + 11] = 0.5f;
-            fVertices[i*PARTICLE_SIZE + 12] = 0.0f;
+            //texCoord-
+            fVertices[i * PARTICLE_SIZE + 11] = 0.5f;
+            fVertices[i * PARTICLE_SIZE + 12] = 0.0f;
             //size
-            fVertices[i*PARTICLE_SIZE + 13] = size;
+            fVertices[i * PARTICLE_SIZE + 13] = size;
 
 //            fVertices[i * 7 + 6] = -1.0f;// generator.nextFloat() * 0.25f - 0.125f;
         }
         mParticles = ByteBuffer.allocateDirect(fVertices.length * 5)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mParticles.put(fVertices).position(0);
-
 
 
         // Initialize time to cause reset on first update
@@ -195,6 +189,14 @@ public class GLParticleRenderer
         Log.d("Set offset", "x: " + xScrollOffset);
 
     }
+
+
+    public void SetTime(int time, int phasePercentage)
+    {
+        float[] colors = _particleData.getColor(time, phasePercentage);
+        SetColor(colors);
+    }
+
 
     public void SetOrientation(float spriteXPosOffset, float touchScale, float motionScale)
     {
@@ -214,8 +216,9 @@ public class GLParticleRenderer
         xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetFocalPoint - zVertice);
     }
 
-    public static float rnd(float min, float max) {
-        float fRandNum = (float)Math.random();
+    public static float rnd(float min, float max)
+    {
+        float fRandNum = (float) Math.random();
         return min + (max - min) * fRandNum;
     }
 
@@ -227,7 +230,9 @@ public class GLParticleRenderer
     private void update()
     {
         if (mLastTime == 0)
+        {
             mLastTime = SystemClock.uptimeMillis();
+        }
         long curTime = SystemClock.uptimeMillis();
         long elapsedTime = curTime - mLastTime;
         float deltaTime = elapsedTime / 2000.0f;
@@ -261,7 +266,7 @@ public class GLParticleRenderer
 //        }
 
         // Load uniform time variable
-        GLES20.glUniform1f ( iTimes, mTime );
+        GLES20.glUniform1f(iTimes, mTime);
         GLES20.glUniform1f(iTexCoordPointSize, textureSize);
 //        GLES20.glUniform1f ( mElapsedTimeLoc, deltaTime );
     }
@@ -289,8 +294,8 @@ public class GLParticleRenderer
 
         // Load the vertex attributes
         mParticles.position(0);
-        GLES20.glVertexAttribPointer ( iPosition, 3, GLES20.GL_FLOAT,
-                false, PARTICLE_SIZE * 4, mParticles );
+        GLES20.glVertexAttribPointer(iPosition, 3, GLES20.GL_FLOAT,
+                false, PARTICLE_SIZE * 4, mParticles);
 
         mParticles.position(3);
         GLES20.glVertexAttribPointer(iColor, 3, GLES20.GL_FLOAT, false,
@@ -323,8 +328,6 @@ public class GLParticleRenderer
         GLES20.glEnableVertexAttribArray(iSize);
 
 
-
-
         // Blend particles
 //        GLES20.glEnable ( GLES20.GL_BLEND );
 //        GLES20.glBlendFunc ( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE );
@@ -333,9 +336,10 @@ public class GLParticleRenderer
         GLES20.glActiveTexture(GLTextureIndex);
         GLES20.glBindTexture(GLTextureIndex, textureName);
         GLES20.glUniform1i(mSamplerLoc, textureNameIndex);
+        GLES20.glUniform1f(iAlpha, 1.0f);
 
 
-        GLES20.glDrawArrays( GLES20.GL_POINTS, 0, NUM_PARTICLES );
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, NUM_PARTICLES);
     }
 
     ///
@@ -347,6 +351,19 @@ public class GLParticleRenderer
 ////        mHeight = height;
     }
 
+
+    private void SetColor(float[] color)
+    {
+        for (int i = 0; i < NUM_PARTICLES; i++)
+        {
+            fVertices[i * PARTICLE_SIZE + 3] = color[0];
+            fVertices[i * PARTICLE_SIZE + 4] = color[1];
+            fVertices[i * PARTICLE_SIZE + 5] = color[2];
+        }
+        mParticles = ByteBuffer.allocateDirect(fVertices.length * 5)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mParticles.put(fVertices).position(0);
+    }
 
 
 }

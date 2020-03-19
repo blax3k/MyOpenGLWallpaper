@@ -26,7 +26,6 @@ public class GLRenderer implements Renderer
     int mScreenWidth;
     int mScreenHeight;
     int widthHeight;
-    int _bitmapSize;
 
     Date dateCreated;
     Location location;
@@ -35,7 +34,6 @@ public class GLRenderer implements Renderer
     TimeTracker timeTracker;
     GLCamera camera;
 
-//    private boolean autoTimeEnabled;
     private String timePhaseSelected;
     private boolean _cameraBlurEnabled;
     private boolean _rackFocusEnabled;
@@ -91,22 +89,7 @@ public class GLRenderer implements Renderer
         GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
         sceneSetter.OnSurfaceCreated();
-
-        // Create the shaders, images
-//        InitSpriteProgram();
         sceneSetter.SetMaxBlurAmount(camera.maxBlur);
-
-//        riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-
-//        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Particle);
-//        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Particle);
-//
-//        GLES20.glAttachShader(riGraphicTools.sp_Particle, vertexShader);   // add the vertex shader to program
-//        GLES20.glAttachShader(riGraphicTools.sp_Particle, fragmentShader); // add the fragment shader to program
-//        GLES20.glLinkProgram(riGraphicTools.sp_Particle);                  // creates OpenGL ES program executrees
-//        GLES20.glBlendFunc(GLES20.GL_ONE_MINUS_CONSTANT_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
-//        sceneSetter.SetToTargetFocalPoint();
     }
 
     @Override
@@ -137,37 +120,6 @@ public class GLRenderer implements Renderer
     }
 
 
-    private void InitSpriteProgram(){
-        riGraphicTools.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        riGraphicTools.vsImageID = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_Image);
-        riGraphicTools.fsImageID = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_Image);
-
-        GLES20.glAttachShader(riGraphicTools.sp_Image, riGraphicTools.vsImageID);   // add the vertex shader to program
-        GLES20.glAttachShader(riGraphicTools.sp_Image, riGraphicTools.fsImageID); // add the fragment shader to program
-        GLES20.glLinkProgram(riGraphicTools.sp_Image);                  // creates OpenGL ES program executrees
-
-        // Set our shader program
-        GLES20.glUseProgram(riGraphicTools.sp_Image);
-//        GLES20.glDepthMask(true);
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
-
-        // get handle to vertex shader's vPosition member
-        int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
-        // get handle to vertex shader's vPosition member
-        int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
-        int mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
-        // Get handle to shape's transformation matrix and apply it
-        int mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
-        // Get handle to textures locations
-        int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
-        int biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
-        int alphaHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "alpha");
-
-        sceneSetter.SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
-    }
 
     public void UpdateVisibility(boolean visible)
     {
@@ -228,16 +180,13 @@ public class GLRenderer implements Renderer
     {
         if (!touchOffsetOn)
         {
-            Log.d("touch", "setTouchOffset x");
             float xOffset = 0.5f; //halfway between 0 and 1.0
             OnOffsetChanged(xOffset, 0.0f);
         }
         camera.EnableTouchOffset(touchOffsetOn);
     }
 
-
     public void SetCameraBlurAmount(int amount){
-        Log.d("blur", "set blur amount to: " + amount);
         camera.maxBlur = amount;
         if(amount == 0){
             _cameraBlurEnabled = false;
@@ -247,7 +196,6 @@ public class GLRenderer implements Renderer
             sceneSetter.SetMaxBlurAmount(amount);
         }
     }
-
 
     public void SetLocation(double latitude, double longitude)
     {
@@ -276,8 +224,6 @@ public class GLRenderer implements Renderer
             sceneSetter.SetToMaxZoomPercent();
         }
     }
-
-
 
     public void SwapTextures()
     {

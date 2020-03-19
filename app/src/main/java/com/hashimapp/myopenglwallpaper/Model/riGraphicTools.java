@@ -109,6 +109,7 @@ public class riGraphicTools
                     "gl_Position = uMVPMatrix * a_Position ;              \n" +
                     "gl_Position += (time * a_move);" +
                     "gl_Position.w = 1.0;" +
+                    "v_color = a_color;"+
                     "TextureCoord = TextureCoordIn;" +
                     "TextureSize = vec2(a_stufff, a_stufff);" +
                     "gl_PointSize = a_size;" +
@@ -130,7 +131,8 @@ public class riGraphicTools
 
     public static final String fs_Particle =
             "precision mediump float;                             		        \n" +
-                    "uniform vec4 u_color;                                      \n" +
+                    "varying vec4 v_color;                                      \n" +
+                    "uniform float u_alpha;" +
                     "varying float v_lifetime;                                  \n" +
                     "uniform sampler2D s_texture;                               \n" +
                     "varying mediump vec2 TextureCoord;                           " +
@@ -139,11 +141,11 @@ public class riGraphicTools
                     "void main()                                                \n" +
                     "{                                                          \n" +
                     "  mediump vec2 realTexCoord = TextureCoord + (gl_PointCoord * TextureSize);" +
-                    "  mediump vec4 texColor = texture2D( s_texture, realTexCoord, -1.0);   \n" +
-                    "    if(texColor.a == 0.0){\n" +
-                    "        discard;\n" +
-                    "    }"+
-                    "  gl_FragColor = texColor;                                 \n" +
+                    "  mediump vec4 texColor = texture2D( s_texture, realTexCoord, -1.0) ;   \n" +
+//                    "    if(texColor.a == 0.0){\n" +
+//                    "        discard;\n" +
+//                    "    }"+
+                    "  gl_FragColor = texColor * v_color * u_alpha;                                 \n" +
 //                    "  gl_FragColor.w *= alpha;                            \n" +
                     "}                                                          \n";
 

@@ -10,6 +10,7 @@ import android.util.Log;
 import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
 import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
@@ -99,7 +100,7 @@ public class SceneSetter
         bitmapIdTextureNameHashMap = new HashMap<>();
         bitmapTextureVerticesHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
-        particleRenderer = new GLParticleRenderer(context);
+        particleRenderer = new GLParticleRenderer();
     }
 
 
@@ -116,7 +117,7 @@ public class SceneSetter
             sprite.SetMotionOffsetFocalPoint(motionOffsetFocalPoint);
         }
 
-        particleRenderer.onSurfaceCreated(null, null);
+        particleRenderer.onSurfaceCreated(new RainParticle());
         InitSpriteProgram();
 //        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
@@ -164,6 +165,7 @@ public class SceneSetter
         {
             sprite.SetTime(timePhase, percentage);
         }
+        particleRenderer.SetTime(timePhase, percentage);
     }
 
     public void InitScene(int scene, int timePhase, int percentage, int weather, int widthHeight){
@@ -269,18 +271,14 @@ public class SceneSetter
         //get textures
         bitmapIdTextureNameHashMap.clear();
         bitmapTextureVerticesHashMap.clear();
-        boolean FadeAll = false;
 
         if(transition == SceneSetter.INSTANT_TRANSITION){
             for(Sprite sprite: spriteList){
                 sprite.DequeueSceneData();
             }
-        }else if(transition == SceneSetter.PARTIAL_FADE_TRANSITION){
-            for(Sprite sprite: spriteList){
-                sprite.DequeueColor();
-            }
-            InitTextureSwap();
-        }else if(transition == SceneSetter.FULL_FADE_TRANSITION){
+        }else if(transition == SceneSetter.PARTIAL_FADE_TRANSITION ||
+                 transition == SceneSetter.FULL_FADE_TRANSITION)
+        {
             for(Sprite sprite: spriteList){
                 sprite.DequeueColor();
             }
