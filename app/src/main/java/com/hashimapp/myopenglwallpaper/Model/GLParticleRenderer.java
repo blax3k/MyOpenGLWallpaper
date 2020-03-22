@@ -40,7 +40,7 @@ public class GLParticleRenderer
     private int mSamplerLoc;
 
     private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge,
-            iTexCoord, iTexCoordPointSize, iSize, iAlpha;
+            iTexCoord, iTexCoordPointSize, iSize, iAlpha, iBlur;
 
 
     float xScrollOffset, xAccelOffset, yAccelOffset, yOrientationOffset, xZoomScale,
@@ -125,6 +125,7 @@ public class GLParticleRenderer
         iSize = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_size");
         mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "s_texture");
         iAlpha = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_alpha");
+        iBlur = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_blur");
 
         GLES20.glClearColor(0.3f, 0.4f, 0.6f, 0);
 
@@ -268,6 +269,7 @@ public class GLParticleRenderer
         // Load uniform time variable
         GLES20.glUniform1f(iTimes, mTime);
         GLES20.glUniform1f(iTexCoordPointSize, textureSize);
+        GLES20.glUniform1f(iBlur, -1.0f);
 //        GLES20.glUniform1f ( mElapsedTimeLoc, deltaTime );
     }
 

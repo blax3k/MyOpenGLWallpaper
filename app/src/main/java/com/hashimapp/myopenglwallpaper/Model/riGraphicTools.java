@@ -137,11 +137,12 @@ public class riGraphicTools
                     "uniform sampler2D s_texture;                               \n" +
                     "varying mediump vec2 TextureCoord;                           " +
                     "varying mediump vec2 TextureSize;                            " +
+                    "uniform float u_blur;" +
 
                     "void main()                                                \n" +
                     "{                                                          \n" +
                     "  mediump vec2 realTexCoord = TextureCoord + (gl_PointCoord * TextureSize);" +
-                    "  mediump vec4 texColor = texture2D( s_texture, realTexCoord, -1.0) ;   \n" +
+                    "  mediump vec4 texColor = texture2D( s_texture, realTexCoord, u_blur);   \n" +
 //                    "    if(texColor.a == 0.0){\n" +
 //                    "        discard;\n" +
 //                    "    }"+
