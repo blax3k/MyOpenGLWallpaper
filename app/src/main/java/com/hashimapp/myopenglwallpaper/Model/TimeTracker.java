@@ -26,8 +26,8 @@ public class TimeTracker
     public static final int LATE_DUSK = 6;
     public static final int NIGHT = 7;
 
-    public static final double DEFAULT_LATITTUDE = 35.9078;
-    public static final double DEFAULT_LONGITUDE = 127.7669;
+    public static final double DEFAULT_LATITTUDE = 47.639138;
+    public static final double DEFAULT_LONGITUDE = -122.332183;
     public static final String DEFAULT_TIMEZONE = "GMT+5:00";
 
     public static final int TIME_PHASE_INDEX = 0;
@@ -67,7 +67,7 @@ public class TimeTracker
 
     public void SetDefaultLocation(){
         this.location = new Location(DEFAULT_LATITTUDE, DEFAULT_LONGITUDE);
-        timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        timeZone = TimeZone.getTimeZone("GMT-8:00");
         calculator = new SunriseSunsetCalculator(location, timeZone);
     }
 
@@ -82,7 +82,7 @@ public class TimeTracker
 
         long currentTimeMillis = date.getTime();
         //Before sunrise. Night
-        if (date.before(AstronomicalSunrise.getTime()))
+        if (currentTimeMillis < AstronomicalSunrise.getTimeInMillis())
         {
             CurrentTimePhase = NIGHT;
         } else if (currentTimeMillis >= AstronomicalSunrise.getTimeInMillis() && currentTimeMillis < CivilSunrise.getTimeInMillis())

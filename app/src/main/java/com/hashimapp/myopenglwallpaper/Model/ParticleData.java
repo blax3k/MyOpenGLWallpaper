@@ -15,6 +15,18 @@ public class ParticleData
     protected float[] nightStartColor;
     protected float[] nightEndColor;
 
+    protected  float[] fVertices;
+
+    protected int particleCount;
+    protected int particleSize;
+
+    private final int DEFAULT_PARTICLE_COUNT = 100;
+    private final int PARTICLE_SIZE = 14;
+    public ParticleData(){
+        particleCount = DEFAULT_PARTICLE_COUNT;
+        particleSize = PARTICLE_SIZE;
+        fVertices = new float[DEFAULT_PARTICLE_COUNT * PARTICLE_SIZE];
+    }
 
     public float[] getColor(int timeOfDay, int phasePercentage)
     {
@@ -56,6 +68,24 @@ public class ParticleData
 
     public int GetBitmapID(int scene){
         return -1;
+    }
+
+    public float[] GetParticleData(){
+        return fVertices;
+    }
+
+    public void SetColor(float[] color)
+    {
+        if(fVertices.length <= 0){
+            return;
+        }
+
+        for (int i = 0; i < particleCount; i++)
+        {
+            fVertices[i * particleSize + 3] = color[0];
+            fVertices[i * particleSize + 4] = color[1];
+            fVertices[i * particleSize + 5] = color[2];
+        }
     }
 
 }

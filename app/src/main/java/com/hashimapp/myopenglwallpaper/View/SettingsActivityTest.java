@@ -51,7 +51,7 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
     private SeekBar blurIntensitySeekbar;
     private Switch rackFocusSwitch;
     private Switch useCurrentLocationSwitch;
-    private Button setWeatherButton;
+    private Switch enableParticleSwitch;
     private TextView setTimeText;
     private Button setSceneButton;
 
@@ -174,6 +174,9 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
 
         useCurrentLocationSwitch = findViewById(R.id.use_current_location);
         useCurrentLocationSwitch.setOnCheckedChangeListener(this);
+
+        enableParticleSwitch = findViewById(R.id.particle_enabled);
+        enableParticleSwitch.setOnCheckedChangeListener(this);
     }
 
 
@@ -250,6 +253,7 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         blurIntensitySeekbar.setProgress(prefs.getInt(resources.getString(R.string.blur_amount_key), 3));
         rackFocusSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
         useCurrentLocationSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.location_setting_key), false));
+        enableParticleSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.particle_enabled_key), true));
         setTimeText.setText(GetTimeTitle());
 
     }
@@ -278,6 +282,8 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
             case R.id.use_current_location:
                 prefsEditor.putBoolean(resources.getString(R.string.location_setting_key), isChecked);
                 break;
+            case R.id.particle_enabled:
+                prefsEditor.putBoolean(resources.getString(R.string.particle_enabled_key), isChecked);
         }
         prefsEditor.commit();
     }
@@ -301,6 +307,10 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         String currentTime = prefs.getString(resources.getString(R.string.time_phase_key), null);
         String[] timePrefValues = resources.getStringArray(R.array.setTimePrefValues);
         int selected = Arrays.asList(timePrefValues).indexOf(currentTime);
+        if(selected < 0)
+        {
+            selected = 0;
+        }
         return resources.getStringArray(R.array.setTimePrefTitles)[selected];
     }
 

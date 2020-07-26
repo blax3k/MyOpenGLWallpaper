@@ -26,6 +26,7 @@ import com.hashimapp.myopenglwallpaper.Model.MyLocation;
 import com.hashimapp.myopenglwallpaper.R;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
+import java.io.IOException;
 import java.util.Date;
 
 import static java.lang.System.currentTimeMillis;
@@ -51,6 +52,15 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         Log.d("create", "OpenGLES2WallpaperService " + startDate + "onCreate");
         super.onCreate();
         context = this.getApplicationContext();
+        String path = context.getFilesDir().getPath();
+        String path1 = context.getFilesDir().getAbsolutePath();
+        try
+        {
+            String path2 = context.getFilesDir().getCanonicalPath();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         resources = context.getResources();
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -124,9 +134,11 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
+            renderer.SetScene(prefs.getInt(resources.getString(R.string.set_scene_key),0));
             renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
             renderer.SetCameraBlurAmount(prefs.getInt(resources.getString(R.string.blur_amount_key), 5));
             renderer.SetZoomCameraEnabled(prefs.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true));
+            renderer.SetParticlesEnabled(prefs.getBoolean(resources.getString(R.string.particle_enabled_key), true));
         }
 
         @Override
@@ -166,10 +178,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
                 if (visible)
                 {
-                    if (motionParallaxEnabled)
-                    {
+//                    if (motionParallaxEnabled)
+//                    {
                         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-                    }
+//                    }
 
                     UpdateLocation(false);
 
@@ -235,6 +247,10 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             }else if(key.equals(resources.getString(R.string.set_scene_key))){
                 int scene = sharedPreferences.getInt(resources.getString(R.string.set_scene_key), 0);
                 renderer.SetScene(scene);
+            }else if(key.equals(resources.getString(R.string.particle_enabled_key)))
+            {
+                boolean particlesEnabled = sharedPreferences.getBoolean(resources.getString(R.string.particle_enabled_key), true);
+                renderer.SetParticlesEnabled(particlesEnabled);
             }
         }
 

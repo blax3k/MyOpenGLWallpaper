@@ -46,7 +46,7 @@ public class Sprite
 
     private float spriteXPosOffset;
 
-    private float motionOffsetFocalPoint;
+    private float motionOffsetPivotPoint;
 
     private boolean fadeOutRequired;
 
@@ -65,7 +65,7 @@ public class Sprite
     float xZoomScale, xMotionScale, xTouchScale;
     float yZoomScale, yMotionScale, yTouchScale;
 
-    private SceneData queuedSceneData;
+    private SpriteSceneData queuedSpriteSceneData;
 
 
     private int spriteKey;
@@ -98,7 +98,7 @@ public class Sprite
         {
             inversion = -1.0f;
         }
-        float offsetMultiplier = ((motionOffsetFocalPoint - zVertice)) * 2.0f; // z will be a vertice between 0.0 and -1.0f
+        float offsetMultiplier = ((motionOffsetPivotPoint - zVertice)) * 2.0f; // z will be a vertice between 0.0 and -1.0f
         xAccelOffset = xOffset * offsetMultiplier * inversion;
         yAccelOffset = yOffset * offsetMultiplier * inversion;
     }
@@ -162,7 +162,7 @@ public class Sprite
 
     public void SetMotionScale(float motionScale)
     {
-        xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetFocalPoint - zVertice);
+        xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetPivotPoint - zVertice);
     }
 
     public void SetTime(int time, int phasePercentage)
@@ -187,9 +187,14 @@ public class Sprite
         Log.d("blur", "max bias: " + maxBias);
     }
 
-    public void SetMotionOffsetFocalPoint(float point)
+    public void SetDefaultFocalPoint()
     {
-        motionOffsetFocalPoint = point;
+        bias = DEFAULT_BIAS;
+    }
+
+    public void SetMotionOffsetPivotPoint(float point)
+    {
+        motionOffsetPivotPoint = point;
     }
 
     ///zoom percent is some value between 0.0 and 1.0
@@ -255,29 +260,25 @@ public class Sprite
     //endregion
 
 
-    public void turnOffBlur()
-    {
-        bias = DEFAULT_BIAS;
-    }
 
     /*
     Queues the next values for the next scene, and returns the 'severity' of the transition
      */
     public int QueueSceneData(int scene, int timePhase, int percentage, int weather)
     {
-        queuedSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
+        queuedSpriteSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
 
-        if (queuedSceneData.BitmapID != currentBitmapID && queuedSceneData.BitmapID > 0 && currentBitmapID > 0)
+        if (queuedSpriteSceneData.BitmapID != currentBitmapID && queuedSpriteSceneData.BitmapID > 0 && currentBitmapID > 0)
         {
             return SceneSetter.FULL_FADE_TRANSITION;
         }
-        if (!Arrays.equals(queuedSceneData.Vertices, currentVertices) ||
-            !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices) ||
-             queuedSceneData.ZVertice != zVertice)
+        if (!Arrays.equals(queuedSpriteSceneData.Vertices, currentVertices) ||
+            !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices) ||
+             queuedSpriteSceneData.ZVertice != zVertice)
         {
             //todo: apply local z vertice
             return SceneSetter.PARTIAL_FADE_TRANSITION;
-        } else if (!Arrays.equals(queuedSceneData.Colors, colors))
+        } else if (!Arrays.equals(queuedSpriteSceneData.Colors, colors))
         {
             return SceneSetter.INSTANT_TRANSITION;
         }
@@ -286,31 +287,31 @@ public class Sprite
 
     public int GetQueuedBitmapID()
     {
-        if (queuedSceneData != null &&
-                queuedSceneData.BitmapID != currentBitmapID &&
-                queuedSceneData.BitmapID != 0)
+        if (queuedSpriteSceneData != null &&
+                queuedSpriteSceneData.BitmapID != currentBitmapID &&
+                queuedSpriteSceneData.BitmapID != 0)
         {
-            return queuedSceneData.BitmapID;
+            return queuedSpriteSceneData.BitmapID;
         }
         return -1;
     }
 
     public void DequeueSceneData()
     {
-        if (queuedSceneData != null)
+        if (queuedSpriteSceneData != null)
         {
-            currentBitmapID = queuedSceneData.BitmapID;
-            zVertice = queuedSceneData.ZVertice;
-            this.setVertices(queuedSceneData.Vertices);
-            this.setTextureVertices(queuedSceneData.TextureVertices);
+            currentBitmapID = queuedSpriteSceneData.BitmapID;
+            zVertice = queuedSpriteSceneData.ZVertice;
+            this.setVertices(queuedSpriteSceneData.Vertices);
+            this.setTextureVertices(queuedSpriteSceneData.TextureVertices);
 
-            queuedSceneData = null;
+            queuedSpriteSceneData = null;
         }
     }
 
     public void DequeueColor(){
-        if(queuedSceneData.Colors != null){
-            this.setColor(queuedSceneData.Colors);
+        if(queuedSpriteSceneData.Colors != null){
+            this.setColor(queuedSpriteSceneData.Colors);
         }
     }
 
@@ -323,10 +324,10 @@ public class Sprite
 
     public boolean TextureVerticeChange()
     {
-        if(currentTextureVertices == null || queuedSceneData == null || queuedSceneData.TextureVertices == null){
+        if(currentTextureVertices == null || queuedSpriteSceneData == null || queuedSpriteSceneData.TextureVertices == null){
             return false;
         }
-        return !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices);
+        return !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices);
     }
 
     /*
@@ -340,10 +341,10 @@ public class Sprite
 
     public boolean TextureSwapRequired()
     {
-        if(currentBitmapID == 0 || queuedSceneData == null || queuedSceneData.BitmapID == 0){
+        if(currentBitmapID == 0 || queuedSpriteSceneData == null || queuedSpriteSceneData.BitmapID == 0){
             return false;
         }
-        return currentBitmapID != queuedSceneData.BitmapID;
+        return currentBitmapID != queuedSpriteSceneData.BitmapID;
     }
 
     public void SetFadeOutRequired(boolean swapping)

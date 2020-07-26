@@ -4,7 +4,6 @@ package com.hashimapp.myopenglwallpaper.Model;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class SpriteData {
 
@@ -18,28 +17,18 @@ public class SpriteData {
     protected float[] textureVertices;
 
     protected short[] indices;
+
     protected float[] defaultColor;
     protected float[] earlyDawnColor;
     protected float[] midDawnColor;
-//    protected float[] dayColor;
     protected float[] dayStartColor;
     protected float[] dayEndColor;
     protected float[] earlyDuskColor;
     protected float[] midDuskColor;
-//    protected float[] nightColor;
     protected float[] nightStartColor;
     protected float[] nightEndColor;
     protected float zVertice;
     protected boolean essentialLayer;
-
-    protected float internalZVertice(float vertice){
-        float newVertice = vertice * -1.0f;
-        Log.d("vertice"," newVertice: " + newVertice);
-        return newVertice;
-
-    }
-
-    private static final float MAX_QUAD_SCALE = 0.125f;
 
 
     public float[] getColor(int timeOfDay, int phasePercentage) {
@@ -84,18 +73,9 @@ public class SpriteData {
     public float[] getShapeVertices(boolean portrait, boolean motionOffset) {
         if (portrait)
         {
-//            if(motionOffset)
-//            {
-//                //enlarge the quad
-//                return ScaleQuad(portraitVertices);
-//            }
                 return portraitVertices;
         } else
         {
-//            if(motionOffset)
-//            {
-//                return ScaleQuad(landscapeVertices);
-//            }
             return portraitVertices;
         }
     }
@@ -109,20 +89,6 @@ public class SpriteData {
         return indices;
     }
 
-//    /*
-//    returns value between 0 and 1.0f with closest values at 0
-//     */
-//    public float GetZVertice() {
-//        return zVertice;
-//    }
-//
-//    /*
-//    return values from 0 to 1 with closest values at 1.0
-//     */
-//    public float GetZVerticeInverse(){
-//        return (float) Math.abs(1.0 - zVertice);
-//    }
-
     public int GetBitmapID(int scene){
         return -1;
     }
@@ -131,8 +97,8 @@ public class SpriteData {
         return essentialLayer;
     }
 
-    public SceneData GetScene(int scene, int timePhase, int percentage, int weather){
-        return new SceneData(GetBitmapID(scene), GetTextureVertices(scene),
+    public SpriteSceneData GetScene(int scene, int timePhase, int percentage, int weather){
+        return new SpriteSceneData(GetBitmapID(scene), GetTextureVertices(scene),
             portraitVertices, zVertice, getColor(timePhase, percentage));
     }
 

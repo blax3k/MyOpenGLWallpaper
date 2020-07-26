@@ -1,6 +1,5 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import com.hashimapp.myopenglwallpaper.Model.SceneData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;

@@ -128,6 +128,10 @@
     <string name="scene_title_pink">scene_pink</string>
     <string name="scene_title_white">scene_white</string>
 
+    //particle enabled setting
+    <string name="particle_enabled_title">Enable Particles</string>
+    <string name="particle_enabled_key">EnableParticles</string>
+
 
 
     <string name="version_number">Version 0.0.1</string>

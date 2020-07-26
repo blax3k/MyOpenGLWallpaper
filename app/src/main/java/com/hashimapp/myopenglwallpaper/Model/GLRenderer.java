@@ -225,6 +225,11 @@ public class GLRenderer implements Renderer
         }
     }
 
+
+    public void SetParticlesEnabled(boolean enabled){
+        sceneSetter.SetParticlesEnabled(enabled);
+    }
+
     public void SwapTextures()
     {
         //only swap if the scene setter is not already swapping

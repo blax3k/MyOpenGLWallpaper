@@ -19,35 +19,39 @@ package com.hashimapp.myopenglwallpaper.Model;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.file.FileVisitOption;
-import java.util.Random;
 
-import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.SystemClock;
+import android.support.annotation.FloatRange;
 import android.util.Log;
-
-import com.hashimapp.myopenglwallpaper.R;
-import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 
 
 public class GLParticleRenderer
 {
+    private static final float DEFAULT_BIAS = -1.00f;
+    private static final float MIN_BIAS_MULTIPLIER = 1.0f;
+    private static final float MAX_BIAS_MULTIPLER = 6.0f;
+    private float maxBias = 3.5f;
+
+    private final int PARTICLE_COUNT = 100;
+    private final int PARTICLE_SIZE = 14;
+
+
     private int mSamplerLoc;
 
     private int iPosition, mtrxHandle, iColor, iMove, iTimes, iLife, iAge,
-            iTexCoord, iTexCoordPointSize, iSize, iAlpha, iBlur;
+            iTexCoord, iTexCoordPointSize, iSize, iAlpha, iBias;
 
 
     float xScrollOffset, xAccelOffset, yAccelOffset, yOrientationOffset, xZoomScale,
             xTouchScale, xMotionScale, yZoomScale, yTouchScale, yMotionScale;
     float motionOffsetFocalPoint;
     // Texture handle
-    private int mTextureId;
+    private int textureID;
 
     // Update time
     private float mTime;
@@ -59,26 +63,24 @@ public class GLParticleRenderer
     private FloatBuffer mParticles;
     private Context mContext;
     private float spriteXPosOffset;
+    private float _bias;
 
-    private final int NUM_PARTICLES = 100;
-    private final int PARTICLE_SIZE = 14;
     private float zVertice = 0.0f;
 
     private ParticleData _particleData;
 
-    private final float[] fVertices = new float[NUM_PARTICLES * PARTICLE_SIZE];
 
     ///
     // Constructor
     //
-    public GLParticleRenderer()
+    public GLParticleRenderer(ParticleData pData)
     {
-        _particleData = new RainParticle();
+        _particleData = pData;
     }
 
     public int GetQueuedBitmapID()
     {
-        return R.drawable.layer00;
+        return textureID;
     }
 
     public void SetTextureData(TextureData texData)
@@ -95,9 +97,9 @@ public class GLParticleRenderer
     ///
     // Initialize the shader and program object
     //
-    public void onSurfaceCreated(ParticleData particleData)
+    public void onSurfaceCreated(int currentScene)
     {
-        _particleData = particleData;
+        textureID = _particleData.GetBitmapID(currentScene);
         // Load the shaders and get a linked program object
 
         riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program
@@ -125,54 +127,15 @@ public class GLParticleRenderer
         iSize = GLES20.glGetAttribLocation(riGraphicTools.sp_Particle, "a_size");
         mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "s_texture");
         iAlpha = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_alpha");
-        iBlur = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_blur");
+        iBias = GLES20.glGetUniformLocation(riGraphicTools.sp_Particle, "u_bias");
 
         GLES20.glClearColor(0.3f, 0.4f, 0.6f, 0);
 
         // Fill in particle data array
-        Random gen = new Random();
-
-        float inc = 1.0f / NUM_PARTICLES;
-        float size;
-        float vel;
-        int angle;
-        float xPos = -1.0f;
-        float xStep = 4.0f / NUM_PARTICLES;
-        for (int i = 0; i < NUM_PARTICLES; i++)
-        {
-            size = rnd(50.0f, 100.0f);
-            vel = 5.0f + ((size) / 50.0f) * 10.0f;
-            angle = (int) (270.0f);
-            xPos += xStep;
-            //x,y,z
-            fVertices[i * PARTICLE_SIZE + 0] = xPos;
-            fVertices[i * PARTICLE_SIZE + 1] = 2.0f;
-            fVertices[i * PARTICLE_SIZE + 2] = 0;
-            //r,g,b
-            fVertices[i * PARTICLE_SIZE + 3] = gen.nextFloat();
-            fVertices[i * PARTICLE_SIZE + 4] = gen.nextFloat();
-            fVertices[i * PARTICLE_SIZE + 5] = gen.nextFloat();
-            //dx,dy,dz
-            fVertices[i * PARTICLE_SIZE + 6] = (float) (Math.cos(Math.toRadians(angle)) * vel);
-            fVertices[i * PARTICLE_SIZE + 7] = (float) (Math.sin(Math.toRadians(angle)) * vel);
-            fVertices[i * PARTICLE_SIZE + 8] = 0.0f;
-
-            //life
-            fVertices[i * PARTICLE_SIZE + 9] = rnd(0.2f, 0.22f);
-            //age
-            fVertices[i * PARTICLE_SIZE + 10] = rnd(0.01f, 0.1f);
-
-            //texCoord-
-            fVertices[i * PARTICLE_SIZE + 11] = 0.5f;
-            fVertices[i * PARTICLE_SIZE + 12] = 0.0f;
-            //size
-            fVertices[i * PARTICLE_SIZE + 13] = size;
-
-//            fVertices[i * 7 + 6] = -1.0f;// generator.nextFloat() * 0.25f - 0.125f;
-        }
-        mParticles = ByteBuffer.allocateDirect(fVertices.length * 5)
+        float[] particleData = _particleData.GetParticleData();
+        mParticles = ByteBuffer.allocateDirect(particleData.length * 5)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mParticles.put(fVertices).position(0);
+        mParticles.put(particleData).position(0);
 
 
         // Initialize time to cause reset on first update
@@ -217,11 +180,29 @@ public class GLParticleRenderer
         xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetFocalPoint - zVertice);
     }
 
-    public static float rnd(float min, float max)
+
+    public void SetFocalPoint(float currentFocalPoint)
     {
-        float fRandNum = (float) Math.random();
-        return min + (max - min) * fRandNum;
+        //get character distance from the 'in focus' camera depth
+        float distanceFromFocalPoint = Math.abs(currentFocalPoint - zVertice);
+        Log.d("blur", "distance from Focal Point: " + distanceFromFocalPoint);
+        //translate that depth to the bias
+        //todo: adjust bias based on screen resolution
+        _bias = (distanceFromFocalPoint * maxBias + DEFAULT_BIAS);
+        Log.d("blur", "bias: " + _bias);
     }
+
+    public void SetTargetFocalPoint(@FloatRange(from = 0.0f, to = 1.0f) float targetMultiplier)
+    {
+        maxBias = targetMultiplier * (MAX_BIAS_MULTIPLER - MIN_BIAS_MULTIPLIER) + MIN_BIAS_MULTIPLIER;
+        Log.d("blur", "max bias: " + maxBias);
+    }
+
+    public void SetDefaultFocalPoint()
+    {
+        _bias = DEFAULT_BIAS;
+    }
+
 
     private float GetZVerticeInverse(float z)
     {
@@ -242,34 +223,11 @@ public class GLParticleRenderer
         mTime += 0.002f;
 
         textureSize = 0.5f;
-//        if ( mTime >= 1.0f )
-//        {
-//            Random generator = new Random();
-//            float[] centerPos = new float[3];
-//            float[] color = new float[4];
-//
-//            mTime = 0.1f;
-//
-//            // Pick a new start location and color
-//            centerPos[0] = 0.0f;// generator.nextFloat() * 1.0f - 0.5f;
-//            centerPos[1] = 0.0f;// generator.nextFloat() * 1.0f - 0.5f;
-//            centerPos[2] = 0.0f;//generator.nextFloat() * 1.0f - 0.5f;
-//
-//            GLES20.glUniform3f ( mCenterPositionLoc, centerPos[0], centerPos[1], centerPos[2]);
-//
-//            // Random color
-//            color[0] = generator.nextFloat() * 0.5f + 0.5f;
-//            color[1] = generator.nextFloat() * 0.5f + 0.5f;
-//            color[2] = generator.nextFloat() * 0.5f + 0.5f;
-//            color[3] = 0.5f;
-//
-//            GLES20.glUniform4f ( mColorLoc, color[0], color[1], color[2], color[3] );
-//        }
 
         // Load uniform time variable
         GLES20.glUniform1f(iTimes, mTime);
         GLES20.glUniform1f(iTexCoordPointSize, textureSize);
-        GLES20.glUniform1f(iBlur, -1.0f);
+        GLES20.glUniform1f(iBias, _bias);
 //        GLES20.glUniform1f ( mElapsedTimeLoc, deltaTime );
     }
 
@@ -279,6 +237,11 @@ public class GLParticleRenderer
     public void onDrawFrame(GL10 glUnused, float[] mtrxView, float[] mtrxProjection,
                             float[] mModelMatrix, float[] mMVPMatrix)
     {
+        if(PARTICLE_COUNT == 0){
+            return;
+        }
+
+        GLES20.glUseProgram(riGraphicTools.sp_Particle);
         update();
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset,
@@ -341,7 +304,7 @@ public class GLParticleRenderer
         GLES20.glUniform1f(iAlpha, 1.0f);
 
 
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, NUM_PARTICLES);
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, PARTICLE_COUNT);
     }
 
     ///
@@ -356,15 +319,11 @@ public class GLParticleRenderer
 
     private void SetColor(float[] color)
     {
-        for (int i = 0; i < NUM_PARTICLES; i++)
-        {
-            fVertices[i * PARTICLE_SIZE + 3] = color[0];
-            fVertices[i * PARTICLE_SIZE + 4] = color[1];
-            fVertices[i * PARTICLE_SIZE + 5] = color[2];
-        }
-        mParticles = ByteBuffer.allocateDirect(fVertices.length * 5)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mParticles.put(fVertices).position(0);
+        _particleData.SetColor(color);
+        mParticles = ByteBuffer.allocateDirect(_particleData.GetParticleData().length * 5)
+        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mParticles.put(_particleData.GetParticleData()).position(0);
+
     }
 
 

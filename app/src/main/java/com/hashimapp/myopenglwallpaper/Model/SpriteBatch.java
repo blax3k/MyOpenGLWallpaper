@@ -63,7 +63,7 @@ public class SpriteBatch
     float xZoomScale, xMotionScale, xTouchScale;
     float yZoomScale, yMotionScale, yTouchScale;
 
-    private SceneData queuedSceneData;
+    private SpriteSceneData queuedSpriteSceneData;
 
 
     private int spriteKey;
@@ -261,11 +261,11 @@ public class SpriteBatch
 
     public int GetQueuedBitmapID()
     {
-        if (queuedSceneData != null &&
-                queuedSceneData.BitmapID != currentBitmapID &&
-                queuedSceneData.BitmapID != 0)
+        if (queuedSpriteSceneData != null &&
+                queuedSpriteSceneData.BitmapID != currentBitmapID &&
+                queuedSpriteSceneData.BitmapID != 0)
         {
-            return queuedSceneData.BitmapID;
+            return queuedSpriteSceneData.BitmapID;
         }
         return -1;
     }
@@ -275,19 +275,19 @@ public class SpriteBatch
      */
     public int QueueSceneData(int scene, int timePhase, int percentage, int weather)
     {
-        queuedSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
+        queuedSpriteSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
 
-        if (queuedSceneData.BitmapID != currentBitmapID && queuedSceneData.BitmapID > 0 && currentBitmapID > 0)
+        if (queuedSpriteSceneData.BitmapID != currentBitmapID && queuedSpriteSceneData.BitmapID > 0 && currentBitmapID > 0)
         {
             return SceneSetter.FULL_FADE_TRANSITION;
         }
-        if (!Arrays.equals(queuedSceneData.Vertices, currentVertices) ||
-                !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices) ||
-                queuedSceneData.ZVertice != zVertice)
+        if (!Arrays.equals(queuedSpriteSceneData.Vertices, currentVertices) ||
+                !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices) ||
+                queuedSpriteSceneData.ZVertice != zVertice)
         {
             //todo: apply local z vertice
             return SceneSetter.PARTIAL_FADE_TRANSITION;
-        } else if (!Arrays.equals(queuedSceneData.Colors, colors))
+        } else if (!Arrays.equals(queuedSpriteSceneData.Colors, colors))
         {
             return SceneSetter.INSTANT_TRANSITION;
         }
@@ -296,20 +296,20 @@ public class SpriteBatch
 
     public void DequeueSceneData()
     {
-        if (queuedSceneData != null)
+        if (queuedSpriteSceneData != null)
         {
-            currentBitmapID = queuedSceneData.BitmapID;
-            zVertice = queuedSceneData.ZVertice;
-            this.setVertices(queuedSceneData.Vertices);
-            this.setTextureVertices(queuedSceneData.TextureVertices);
+            currentBitmapID = queuedSpriteSceneData.BitmapID;
+            zVertice = queuedSpriteSceneData.ZVertice;
+            this.setVertices(queuedSpriteSceneData.Vertices);
+            this.setTextureVertices(queuedSpriteSceneData.TextureVertices);
 
-            queuedSceneData = null;
+            queuedSpriteSceneData = null;
         }
     }
 
     public void DequeueColor(){
-        if(queuedSceneData.Colors != null){
-            this.setColor(queuedSceneData.Colors);
+        if(queuedSpriteSceneData.Colors != null){
+            this.setColor(queuedSpriteSceneData.Colors);
         }
     }
 
@@ -322,10 +322,10 @@ public class SpriteBatch
 
     public boolean TextureVerticeChange()
     {
-        if(currentTextureVertices == null || queuedSceneData == null || queuedSceneData.TextureVertices == null){
+        if(currentTextureVertices == null || queuedSpriteSceneData == null || queuedSpriteSceneData.TextureVertices == null){
             return false;
         }
-        return !Arrays.equals(queuedSceneData.TextureVertices, currentTextureVertices);
+        return !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices);
     }
 
     /*
@@ -339,10 +339,10 @@ public class SpriteBatch
 
     public boolean TextureSwapRequired()
     {
-        if(currentBitmapID == 0 || queuedSceneData == null || queuedSceneData.BitmapID == 0){
+        if(currentBitmapID == 0 || queuedSpriteSceneData == null || queuedSpriteSceneData.BitmapID == 0){
             return false;
         }
-        return currentBitmapID != queuedSceneData.BitmapID;
+        return currentBitmapID != queuedSpriteSceneData.BitmapID;
     }
 
     public void SetFadeOutRequired(boolean swapping)
