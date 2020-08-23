@@ -7,6 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class SkySprite extends SpriteData {
 
     public SkySprite() {
+        bitmapID = R.drawable.sky_1024_border;
         zVertice = 1.0f;
         essentialLayer = true;
         portraitVertices = new float[]{

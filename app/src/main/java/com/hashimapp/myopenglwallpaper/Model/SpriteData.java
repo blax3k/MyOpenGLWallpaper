@@ -30,6 +30,8 @@ public class SpriteData {
     protected float zVertice;
     protected boolean essentialLayer;
 
+    protected int bitmapID;
+
 
     public float[] getColor(int timeOfDay, int phasePercentage) {
         switch (timeOfDay) {
@@ -90,7 +92,7 @@ public class SpriteData {
     }
 
     public int GetBitmapID(int scene){
-        return -1;
+        return bitmapID;
     }
 
     public boolean IsEssentialLayer(){
@@ -101,6 +103,8 @@ public class SpriteData {
         return new SpriteSceneData(GetBitmapID(scene), GetTextureVertices(scene),
             portraitVertices, zVertice, getColor(timePhase, percentage));
     }
+
+
 
 
 }

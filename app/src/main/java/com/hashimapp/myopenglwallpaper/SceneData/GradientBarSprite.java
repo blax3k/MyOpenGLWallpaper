@@ -9,6 +9,7 @@ public class GradientBarSprite extends SpriteData
 
     public GradientBarSprite()
     {
+        bitmapID = R.drawable.desk_1024;
         zVertice = 0.0f;
         essentialLayer = false;
         portraitVertices = new float[]{

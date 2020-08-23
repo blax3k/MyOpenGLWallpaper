@@ -7,6 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class HouseSprite extends SpriteData {
 
     public HouseSprite() {
+        bitmapID = R.drawable.foregroundcitymap_1024;;
         zVertice = 1.0f;
         essentialLayer = true;
 
@@ -71,8 +72,6 @@ public class HouseSprite extends SpriteData {
                 0f, 0.07f, 0.17f, 1f,
                 0f, 0.07f, 0.17f, 1f,
                 0.1f, 0.17f, 0.37f, 1f,};
-
-
 
         textureVertices = new float[]{
                 0.0f, 0.0f,

@@ -10,6 +10,7 @@ public class DeskSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
+        bitmapID = R.drawable.desk_1024;
         zVertice = 0.2f;
         essentialLayer = true;
         portraitVertices = new float[]{

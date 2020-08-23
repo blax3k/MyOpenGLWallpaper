@@ -12,6 +12,7 @@ public class BunnySprite extends SpriteData
 
     public BunnySprite()
     {
+        bitmapID = R.drawable.rabbit_sheet;
         zVertice = 0.2f;
         essentialLayer = false;
         portraitVertices = new float[]{
@@ -83,21 +84,6 @@ public class BunnySprite extends SpriteData
         };
     }
 
-    @Override
-    public int GetBitmapID(int scene){
-        switch(scene){
-            case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.rabbit_sheet;
-        }
-//        if(currentBitmap == R.drawable.guy){
-//            currentBitmap = R.drawable.guy2;
-//        }else{
-//            currentBitmap = R.drawable.guy;
-//        }
-//        return currentBitmap;
-
-        return R.drawable.rabbit_sheet;
-    }
 
     @Override
     public float[] GetTextureVertices(int scene){

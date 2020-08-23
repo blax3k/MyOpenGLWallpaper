@@ -7,6 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class CupSprite extends SpriteData {
 
     public CupSprite() {
+        bitmapID = R.drawable.foregroundcitymap_1024;
         zVertice = 0.0f;
         essentialLayer = true;
         portraitVertices = new float[]{
