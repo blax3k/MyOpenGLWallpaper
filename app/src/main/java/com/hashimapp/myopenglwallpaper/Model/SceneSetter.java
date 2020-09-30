@@ -9,6 +9,11 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SceneData;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteDataParameters;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteDataStorage;
+import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
@@ -22,7 +27,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 /**
  * Created by Blake on 9/19/2015.
@@ -85,7 +89,7 @@ public class SceneSetter
 
     private GLParticleRenderer particleRenderer;
 
-    private WallpaperResourceReader wallpaperResourceReader;
+    private ResourceReader resourceReader;
 
     Date startDate;
 
@@ -106,7 +110,7 @@ public class SceneSetter
         bitmapTextureVerticesHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
         particleRenderer = new GLParticleRenderer(new RainParticle());
-        wallpaperResourceReader = new WallpaperResourceReader(context);
+        resourceReader = new ResourceReader(context);
     }
 
 
@@ -114,23 +118,63 @@ public class SceneSetter
     public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-//        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-//        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-//        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
-//        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
+        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
+        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
+        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
+        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
 //        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
 //        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
 
+        ArrayList<String[]> colorData = new ArrayList<>();
+        colorData.add(new String[]{"dawnStart", "dawnEnd", "dayStart", "dayEnd", "duskStart", "duskEnd", "nightStart", "nightEnd"});
+        colorData.add(new String[]{"dawnStart2", "dawnEnd2", "dayStart2", "dayEnd2", "duskStart2", "duskEnd2", "nightStart2", "nightEnd2"});
+        SpriteDataParameters spriteParms = new SpriteDataParameters("Bunny", "vertPos",1.0f, "texPos", colorData);
         SceneData sd = new SceneData();
-        sd.SceneKey = "tempKey";
-//        sd.SpriteDataList = spriteList.stream().map((s) -> s.spriteData).collect(Collectors.toCollection(ArrayList::new));
-//        wallpaperResourceReader.SaveSceneData(sd);
-        SceneData testSceneData = wallpaperResourceReader.LoadSceneData(sd.SceneKey);
+        sd.SpriteDataList.add(spriteParms);
+        sd.SceneKey = "SceneTestFile";
+        resourceReader.SaveSceneData(sd);
 
-        for(int i = 0; i < testSceneData.SpriteDataList.size(); i++)
-        {
-            spriteList.add(new Sprite(testSceneData.SpriteDataList.get(i), i, currentScene));
-        }
+        SpriteDataStorage sds = new SpriteDataStorage();
+        sds.Name = "Bunny";
+        sds.BitmapID = R.drawable.rabbit_sheet;
+        sds.ShapeVerticeStorage.put("vertPos", new float[]{ -0.8f, 0.3f, 0.0f, -0.8f, -2.0f, (0.0f), 0.8f, -2.0f, (0.0f), 0.8f, 0.3f, (0.0f)});
+        sds.TextureVerticeStorage.put("texPos", new float[]{ 0.0f, 0.0f,0.0f, 0.5f, 0.33f, 0.5f,0.33f, 0.0f });
+        sds.ColorValueStorage.put("dawnStart", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
+        sds.ColorValueStorage.put("dawnEnd", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
+        sds.ColorValueStorage.put("dayStart", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
+        sds.ColorValueStorage.put("dayEnd", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
+        sds.ColorValueStorage.put("duskStart", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
+        sds.ColorValueStorage.put("duskEnd", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+        sds.ColorValueStorage.put("nightStart", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+        sds.ColorValueStorage.put("nightEnd", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+
+        sds.ColorValueStorage.put("dawnStart1", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
+        sds.ColorValueStorage.put("dawnEnd1", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
+        sds.ColorValueStorage.put("dayStart1", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
+        sds.ColorValueStorage.put("dayEnd1", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
+        sds.ColorValueStorage.put("duskStart1", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
+        sds.ColorValueStorage.put("duskEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+        sds.ColorValueStorage.put("nightStart1", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+        sds.ColorValueStorage.put("nightEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+
+        resourceReader.SaveSpriteDataStorage(sds);
+
+        ArrayList<SpriteData> sprites =  resourceReader.GetSpriteDataList(sd.SceneKey);
+        spriteList.add(new Sprite(sprites.get(0), 4, currentScene));
+        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+
+
+
+
+
+
+
+//        for (int i = 0; i < spriteDataList.size(); i++)
+//        {
+//            spriteList.add(new Sprite(spriteDataList.get(i), i, currentScene));
+//        }
+
+
 
         for (Sprite sprite : spriteList)
         {

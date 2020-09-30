@@ -1,5 +1,6 @@
 package com.hashimapp.myopenglwallpaper.View;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.WallpaperManager;
@@ -8,11 +9,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -23,19 +26,23 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
 import com.hashimapp.myopenglwallpaper.R;
 import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SettingsActivityTest extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener
+public class SettingsActivityTest extends Activity
+        implements SharedPreferences.OnSharedPreferenceChangeListener,
+        View.OnClickListener, CompoundButton.OnCheckedChangeListener,
+        SeekBar.OnSeekBarChangeListener
 {
 
+    SceneManager sceneManager;
+
     private static Context context;
-    boolean rendererSet;
-    protected SensorManager sensorManager;
-    protected Sensor sensor;
     Display display;
     SharedPreferences prefs;
     SharedPreferences.Editor prefsEditor;
@@ -43,8 +50,6 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
 
     private Button setTimeButton;
     private SeekBar motionOffsetSeekbar;
-    int motionOffsetMax;
-    int motionOffsetDefault;
     private Switch invertMotionParallaxSwitch;
     private Switch touchOffsetParallaxSwitch;
     private Switch cameraZoomSwitch;
@@ -66,8 +71,18 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         prefs = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
         prefsEditor = prefs.edit();
+        sceneManager = new SceneManager(context);
         InitControls();
         SetupSettings();
+        RequestPermissions();
+    }
+
+    private void RequestPermissions()
+    {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
+        {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
     }
 
 
@@ -220,17 +235,22 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
         builder.setNegativeButton("Cancel", null);
 
         // add a radio button list
-        String[] sceneTitles = SceneManager.GetAllSceneTitles();
-        int scenePref = prefs.getInt(resources.getString(R.string.set_scene_key),
-                SceneManager.GetAllScenes()[1]);
-        List<Integer> sceneArray = Arrays.asList(SceneManager.GetAllScenes());
-        int selected = sceneArray.indexOf(scenePref);
-        builder.setSingleChoiceItems(sceneTitles, selected, (dialog, which) ->
+
+        ResourceReader reader = new ResourceReader(context);
+
+
+
+        ArrayList<String> sceneTitles = sceneManager.GetAllSceneTitles();
+//        String scenePref = prefs.getString(resources.getString(R.string.set_scene_key), sceneTitles.get(0));
+        String scenePref = prefs.getString("boogity", sceneTitles.get(0));
+        int selected = sceneTitles.indexOf(scenePref);
+        String[] sceneTitlesAsArray = sceneTitles.toArray(new String[sceneTitles.size()]);
+        builder.setSingleChoiceItems(sceneTitlesAsArray, selected, (dialog, which) ->
                 {
-                    if(which >= 0){
-                        prefsEditor.putInt(
-                                resources.getString(R.string.set_scene_key),
-                                SceneManager.GetAllScenes()[which]);
+                    if(which >= 0)
+                    {
+//                        prefsEditor.putString(resources.getString(R.string.set_scene_key),sceneTitles.get(which));
+                        prefsEditor.putString("boogity",sceneTitles.get(which));
 
                         prefsEditor.commit();
                         setTimeText.setText(resources.getTextArray(R.array.setTimePrefTitles)[which]);
@@ -238,8 +258,6 @@ public class SettingsActivityTest extends Activity implements SharedPreferences.
                     dialog.dismiss();
                 }
         );
-
-
         AlertDialog dialog = builder.create();
         dialog.show();
     }

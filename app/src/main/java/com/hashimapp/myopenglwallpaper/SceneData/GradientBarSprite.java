@@ -12,7 +12,7 @@ public class GradientBarSprite extends SpriteData
         bitmapID = R.drawable.desk_1024;
         zVertice = 0.0f;
         essentialLayer = false;
-        portraitVertices = new float[]{
+        shapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, 2.0f, 0.0f,   // bottom left
                 2.4f, 2.0f, 0.0f,   // bottom right
@@ -25,13 +25,13 @@ public class GradientBarSprite extends SpriteData
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDawnColor = new float[]{
+        dawnStartColor = new float[]{
                 0f, 0.27f, 0.37f, 1f,
                 0f, 0.17f, 0.27f, 1f,
                 0f, 0.17f, 0.27f, 1f,
                 0f, 0.17f, 0.27f, 1f,};
 
-        midDawnColor = new float[]{
+        dawnEndColor = new float[]{
                 1.0f, 0.8f, 0.8f, 1f,
                 0.8f, 0.8f, 1.0f, 1f,
                 0.8f, 0.8f, 1.0f, 1f,
@@ -49,13 +49,13 @@ public class GradientBarSprite extends SpriteData
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]
+        duskStartColor = new float[]
                 {1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f};
 
-        midDuskColor = new float[]{
+        duskEndColor = new float[]{
                 0f, 0.07f, 0.17f, 1f,
                 0f, 0.07f, 0.17f, 1f,
                 0.9f, 0.9f, 0.9f, 1f,

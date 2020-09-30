@@ -1,12 +1,17 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
+import android.content.Context;
+
 import com.hashimapp.myopenglwallpaper.Model.BlurBuilder;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
 import com.hashimapp.myopenglwallpaper.Model.TimeTracker;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class SceneManager
 {
+    private ResourceReader _reader;
     public static final int DEFAULT = 0;
     public static final int BROWN = 1;
     public static final int BLUE = 2;
@@ -21,17 +26,16 @@ public class SceneManager
     public static final String PINK_TITLE = "Pink";
     public static final String YELLOW_TITLE = "Yellow";
 
-
-
-
-
     Random randomGenerator;
 
-    public SceneManager(){
+    public SceneManager(Context context)
+    {
         randomGenerator = new Random();
+        _reader = new ResourceReader(context);
     }
 
-    public static int getScene(int timeOfDay){
+    public static int getScene(int timeOfDay)
+    {
 
         switch (timeOfDay)
         {
@@ -57,10 +61,10 @@ public class SceneManager
         };
     }
 
-    public static String[] GetAllSceneTitles(){
-        return new String[]{
-            DEFAULT_TITLE, BROWN_TITLE, BLUE_TITLE, GREEN_TITLE, PINK_TITLE, YELLOW_TITLE
-        };
+    public ArrayList<String> GetAllSceneTitles()
+    {
+        ArrayList<String> names = _reader.GetSceneNames();
+        return names;
     }
 
 

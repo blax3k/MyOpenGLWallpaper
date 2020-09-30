@@ -3,95 +3,95 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
 
-    <PreferenceCategory
-        android:title="@string/camera_settings_section_title">
+<!--    <PreferenceCategory-->
+<!--        android:title="@string/camera_settings_section_title">-->
 
-        <SeekBarPreference
-            android:key="@string/motion_parallax_strength_key"
-            android:title="@string/motion_parallax_strength_setting_title"
-            android:max="6"
-            android:defaultValue="3"/>
+<!--        <SeekBarPreference-->
+<!--            android:key="@string/motion_parallax_strength_key"-->
+<!--            android:title="@string/motion_parallax_strength_setting_title"-->
+<!--            android:max="6"-->
+<!--            android:defaultValue="3"/>-->
 
-        <SwitchPreference
-            android:key="@string/touch_offset_setting_key"
-            android:title="@string/touch_offset_setting_title"
-            android:defaultValue="@string/touch_offset_setting_default"/>
+<!--        <SwitchPreference-->
+<!--            android:key="@string/touch_offset_setting_key"-->
+<!--            android:title="@string/touch_offset_setting_title"-->
+<!--            android:defaultValue="@string/touch_offset_setting_default"/>-->
 
-        <SwitchPreference
-            android:key="@string/setting_zoom_camera_key"
-            android:title="@string/zoom_camera_title"
-            android:defaultValue="@string/default_true" />
+<!--        <SwitchPreference-->
+<!--            android:key="@string/setting_zoom_camera_key"-->
+<!--            android:title="@string/zoom_camera_title"-->
+<!--            android:defaultValue="@string/default_true" />-->
 
-        <SeekBarPreference
-            android:key="@string/blur_amount_key"
-            android:title="@string/blur_amount_title"
-            android:max="@string/blur_amount_max"
-            android:defaultValue="@string/blur_amount_default"
-            android:min="0"
-            />
+<!--        <SeekBarPreference-->
+<!--            android:key="@string/blur_amount_key"-->
+<!--            android:title="@string/blur_amount_title"-->
+<!--            android:max="@string/blur_amount_max"-->
+<!--            android:defaultValue="@string/blur_amount_default"-->
+<!--            android:min="0"-->
+<!--            />-->
 
-        <SwitchPreference
-            android:key="@string/rack_focus_enabled_key"
-            android:title="@string/rack_focus_enabled_title"
-            android:defaultValue="@string/default_true" />
+<!--        <SwitchPreference-->
+<!--            android:key="@string/rack_focus_enabled_key"-->
+<!--            android:title="@string/rack_focus_enabled_title"-->
+<!--            android:defaultValue="@string/default_true" />-->
 
-        <CheckBoxPreference
-            android:key="@string/invert_motion_parallax_key"
-            android:title="@string/invert_motion_parallax_setting_title"
-            android:defaultValue="@string/invert_motion_parallax_default"/>
+<!--        <CheckBoxPreference-->
+<!--            android:key="@string/invert_motion_parallax_key"-->
+<!--            android:title="@string/invert_motion_parallax_setting_title"-->
+<!--            android:defaultValue="@string/invert_motion_parallax_default"/>-->
 
-    </PreferenceCategory>
+<!--    </PreferenceCategory>-->
 
-    <PreferenceCategory
-        android:title="@string/weather_location_settings">
+<!--    <PreferenceCategory-->
+<!--        android:title="@string/weather_location_settings">-->
 
-        <ListPreference
-            android:entries="@array/setTimePrefTitles"
-            android:entryValues="@array/setTimePrefValues"
-            android:key="@string/time_phase_key"
-            android:title="@string/set_time_title"
-            android:summary="%s"
-            android:defaultValue="0"/>
+<!--        <ListPreference-->
+<!--            android:entries="@array/setTimePrefTitles"-->
+<!--            android:entryValues="@array/setTimePrefValues"-->
+<!--            android:key="@string/time_phase_key"-->
+<!--            android:title="@string/set_time_title"-->
+<!--            android:summary="%s"-->
+<!--            android:defaultValue="0"/>-->
 
-        <SwitchPreference
-            android:key="@string/location_setting_key"
-            android:title="@string/location_setting_title"
-            android:defaultValue="true"/>
-    </PreferenceCategory>
+<!--        <SwitchPreference-->
+<!--            android:key="@string/location_setting_key"-->
+<!--            android:title="@string/location_setting_title"-->
+<!--            android:defaultValue="true"/>-->
+<!--    </PreferenceCategory>-->
 
-    <PreferenceCategory
-        android:title="@string/weather_location_settings">
-
-
-</PreferenceCategory>
-
-    <!--<ListPreference-->
-        <!--android:defaultValue="0"-->
-        <!--android:entries="@array/girlArray"-->
-        <!--android:entryValues="@array/listValues"-->
-        <!--android:key="texture_model"-->
-        <!--android:title="@string/texture_choice" />-->
+<!--    <PreferenceCategory-->
+<!--        android:title="@string/weather_location_settings">-->
 
 
-    <!--<com.hashimapp.myopenglwallpaper.View.SeekbarPreference-->
-        <!--android:key="pref_max_volume"-->
-        <!--android:title="@string/max_volume_pref"-->
-        <!--android:summary="hoo haa"/>-->
+<!--</PreferenceCategory>-->
+
+<!--    &lt;!&ndash;<ListPreference&ndash;&gt;-->
+<!--        &lt;!&ndash;android:defaultValue="0"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:entries="@array/girlArray"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:entryValues="@array/listValues"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:key="texture_model"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:title="@string/texture_choice" />&ndash;&gt;-->
 
 
-    <Preference
-        android:key="view_artist"
-        android:onClick=""
-        android:title="Go to artists's website">
-        <intent
-            android:action="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest"
-            />
-    </Preference>
+<!--    &lt;!&ndash;<com.hashimapp.myopenglwallpaper.View.SeekbarPreference&ndash;&gt;-->
+<!--        &lt;!&ndash;android:key="pref_max_volume"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:title="@string/max_volume_pref"&ndash;&gt;-->
+<!--        &lt;!&ndash;android:summary="hoo haa"/>&ndash;&gt;-->
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="remove_layer"
-        android:summary="@string/remove_layer_summary"
-        android:title="@string/remove_layer" />
+
+<!--    <Preference-->
+<!--        android:key="view_artist"-->
+<!--        android:onClick=""-->
+<!--        android:title="Go to artists's website">-->
+<!--        <intent-->
+<!--            android:action="com.hashimapp.myopenglwallpaper.View.SettingsActivityTest"-->
+<!--            />-->
+<!--    </Preference>-->
+
+<!--    <SwitchPreference-->
+<!--        android:defaultValue="false"-->
+<!--        android:key="remove_layer"-->
+<!--        android:summary="@string/remove_layer_summary"-->
+<!--        android:title="@string/remove_layer" />-->
 
 </PreferenceScreen>

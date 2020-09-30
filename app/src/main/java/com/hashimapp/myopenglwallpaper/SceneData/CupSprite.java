@@ -1,16 +1,19 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteColorData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.Textures;
+import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 import com.hashimapp.myopenglwallpaper.R;
 
 public class CupSprite extends SpriteData {
 
     public CupSprite() {
+        SpriteName = "cupSprite";
         bitmapID = R.drawable.foregroundcitymap_1024;
         zVertice = 0.0f;
         essentialLayer = true;
-        portraitVertices = new float[]{
+        shapeVertices = new float[]{
                 -2.4f, 0.0f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -24,13 +27,13 @@ public class CupSprite extends SpriteData {
                         1f, 1f, 1f, 1f};
 
 
-        earlyDawnColor = new float[]{
+        dawnStartColor = new float[]{
                         0f, 0.27f, 0.37f, 1f,
                         0f, 0.17f, 0.27f, 1f,
                         0f, 0.17f, 0.27f, 1f,
                         0f, 0.17f, 0.27f, 1f,};
 
-        midDawnColor = new float[]{
+        dawnEndColor = new float[]{
                 1.0f, 0.8f, 0.8f, 1f,
                 0.8f, 0.8f, 1.0f, 1f,
                 0.8f, 0.8f, 1.0f, 1f,
@@ -48,13 +51,13 @@ public class CupSprite extends SpriteData {
                         1f, 1f, 1f, 1f,
                         1f, 1f, 1f, 1f};
 
-        earlyDuskColor = new float[]
+        duskStartColor = new float[]
                 {1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f,
                         1f, 0.933f, 0.78f, 1f};
 
-        midDuskColor = new float[]{
+        duskEndColor = new float[]{
                 0f, 0.14f, 0.60f, 1f,
                 0f, 0.08f, 0.40f, 1f,
                 0f, 0.07f, 0.30f, 1f,
@@ -79,6 +82,17 @@ public class CupSprite extends SpriteData {
                 1.0f, 1.0f,
                 1.0f, 0.5f
         };
+        float[][] colorSet = new float[SpriteColorData.DAY_PHASE_COUNT][];
+        colorSet[0] = dawnStartColor;
+        colorSet[1] = dawnEndColor;
+        colorSet[2] = dayStartColor;
+        colorSet[3] = dayEndColor;
+        colorSet[4] = duskStartColor;
+        colorSet[5] = duskEndColor;
+        colorSet[6] = nightStartColor;
+        colorSet[7] = nightEndColor;
+
+        spriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
     @Override
