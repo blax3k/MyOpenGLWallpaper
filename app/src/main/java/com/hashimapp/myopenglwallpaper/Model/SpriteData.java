@@ -26,14 +26,17 @@ public class SpriteData
 
     public int changeTextureVertices = NO_CHANGE;
 
-    public SpriteColorData spriteColorData;
+    public SpriteColorData SpriteColorData;
 
 
     public String SpriteName;
-    public float[] shapeVertices;
-    public float[] textureVertices;
-
+    public String BitmapName;
+    public int BitmapID;
+    public float[] ShapeVertices;
+    public float[] TextureVertices;
     protected short[] indices;
+    private float zVertice;
+    private float zVerticeInverse;
 
     public float[] defaultColor;
     public float[] dawnStartColor;
@@ -46,15 +49,13 @@ public class SpriteData
     public float[] nightEndColor;
 
 
-    public float zVertice;
     protected boolean essentialLayer;
 
-    public int bitmapID;
 
     public SpriteData()
     {
         indices = new short[]{0, 1, 2, 0, 2, 3};
-        spriteColorData = new SpriteColorData();
+        SpriteColorData = new SpriteColorData();
     }
 
 
@@ -62,7 +63,7 @@ public class SpriteData
     {
         if (dayStartColor == null || dayStartColor.length == 0)
         {
-            if (spriteColorData.GetColorSets().size() <= 0)
+            if (SpriteColorData.GetColorSets().size() <= 0)
             {
                 return new float[]{
                         1.0f, 1.0f, 1.0f, 1.0f,
@@ -70,7 +71,7 @@ public class SpriteData
                         1.0f, 1.0f, 1.0f, 1.0f,
                         0.9f, 0.9f, 0.9f, 1.0f };
             }
-            return spriteColorData.GetColor(WeatherManager.SUNNY_WEATHER, timeOfDay, phasePercentage);
+            return SpriteColorData.GetColor(WeatherManager.SUNNY_WEATHER, timeOfDay, phasePercentage);
         }
         switch (timeOfDay)
         {
@@ -119,10 +120,10 @@ public class SpriteData
     {
         if (portrait)
         {
-            return shapeVertices;
+            return ShapeVertices;
         } else
         {
-            return shapeVertices;
+            return ShapeVertices;
         }
     }
 
@@ -139,9 +140,9 @@ public class SpriteData
         dawnEndColor = colors.get(DAWN_END_INDEX);
     }
 
-    public float[] GetTextureVertices(int scene)
+    public float[] GetTextureVertices()
     {
-        return textureVertices;
+        return TextureVertices;
     }
 
     public short[] GetIndices()
@@ -149,9 +150,9 @@ public class SpriteData
         return indices;
     }
 
-    public int GetBitmapID(int scene)
+    public int GetBitmapID()
     {
-        return bitmapID;
+        return BitmapID;
     }
 
     public boolean IsEssentialLayer()
@@ -159,15 +160,30 @@ public class SpriteData
         return essentialLayer;
     }
 
-    public float getZVertice()
+    public float ZVertice()
     {
         return zVertice;
     }
 
-    public SpriteSceneData GetScene(int scene, int timePhase, int percentage, int weather)
+    public float ZVerticeInverse()
     {
-        return new SpriteSceneData(GetBitmapID(scene), GetTextureVertices(scene),
-                shapeVertices, zVertice, getColor(timePhase, percentage));
+        return zVerticeInverse;
+    }
+
+    public void SetZVertice(float z){
+        zVertice = z;
+        zVerticeInverse = CalculateInverse(z);
+    }
+
+    private float CalculateInverse(float z)
+    {
+        return (float) Math.abs(1.0 - z);
+    }
+
+    public SpriteSceneData GetScene(int timePhase, int percentage, int weather)
+    {
+        return new SpriteSceneData(GetBitmapID(), GetTextureVertices(),
+                ShapeVertices, zVertice, getColor(timePhase, percentage));
     }
 
 

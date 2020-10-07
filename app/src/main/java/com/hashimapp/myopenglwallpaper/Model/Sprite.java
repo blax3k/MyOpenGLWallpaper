@@ -60,20 +60,17 @@ public class Sprite
     float yOrientationOffset = 0;
     float xAccelOffset = 0;
     float yAccelOffset = 0;
-    private float zVertice = 0;
 
     float xZoomScale, xMotionScale, xTouchScale;
     float yZoomScale, yMotionScale, yTouchScale;
 
-    private SpriteSceneData queuedSpriteSceneData;
+    private SpriteData queuedSpriteData;
 
-
-    private int spriteKey;
 
     private float bias = 0.0f;
 
 
-    public Sprite(SpriteData mSpriteData, int spriteKey, int scene)
+    public Sprite(SpriteData mSpriteData)
     {
         xZoomScale = yZoomScale = 1.0f;
         alpha = 1.0f;
@@ -85,9 +82,8 @@ public class Sprite
 
         setColor(colors);
         setVertices(spriteData.getShapeVertices(true, false));
-        setTextureVertices(spriteData.GetTextureVertices(scene));
+        setTextureVertices(spriteData.GetTextureVertices());
         setIndices(indices);
-        this.spriteKey = spriteKey;
     }
 
 
@@ -98,7 +94,7 @@ public class Sprite
         {
             inversion = -1.0f;
         }
-        float offsetMultiplier = ((motionOffsetPivotPoint - zVertice)) * 2.0f; // z will be a vertice between 0.0 and -1.0f
+        float offsetMultiplier = ((motionOffsetPivotPoint - spriteData.ZVertice())) * 2.0f; // z will be a vertice between 0.0 and -1.0f
         xAccelOffset = xOffset * offsetMultiplier * inversion;
         yAccelOffset = yOffset * offsetMultiplier * inversion;
     }
@@ -121,7 +117,7 @@ public class Sprite
     public void SetXOffset(float xOffset)
     {
         //parallax motion determined by how "far" the sprite is from the camera
-        float offsetMultiplier = (GetZVerticeInverse(zVertice));// * 0.9f + 0.1f; //range between 0.1 and 1.0f
+        float offsetMultiplier = (spriteData.ZVerticeInverse());// * 0.9f + 0.1f; //range between 0.1 and 1.0f
 //        if (PortraitOrientation)
 //        {
         this.xScrollOffset = -1 //reverse movement
@@ -135,7 +131,7 @@ public class Sprite
 
     public void SetYOffset(float yOffset)
     {
-        float offsetMultiplier = (GetZVerticeInverse(zVertice));
+        float offsetMultiplier = (spriteData.ZVerticeInverse());
         yOrientationOffset = yOffset * offsetMultiplier;
     }
 
@@ -143,13 +139,13 @@ public class Sprite
     {
         GLTextureIndex = textureData.GLTextureIndex;
         textureName = textureData.textureName;
-        textureNameIndex = textureData.textureNameIndex;
+        textureNameIndex = textureData.TextureIndex;
     }
 
 
     public void SetOrientation(float spriteXPosOffset, float touchScale, float motionScale)
     {
-        float offsetMultiplier = (GetZVerticeInverse(zVertice)) * 0.9f + 0.1f;
+        float offsetMultiplier = (spriteData.ZVerticeInverse() * 0.9f + 0.1f);
         this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
         SetTouchScale(touchScale);
         SetMotionScale(motionScale);
@@ -157,12 +153,12 @@ public class Sprite
 
     public void SetTouchScale(float touchScale)
     {
-        xTouchScale = yTouchScale = touchScale * GetZVerticeInverse(zVertice);
+        xTouchScale = yTouchScale = touchScale * spriteData.ZVerticeInverse();
     }
 
     public void SetMotionScale(float motionScale)
     {
-        xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetPivotPoint - zVertice);
+        xMotionScale = yMotionScale = motionScale * Math.abs(motionOffsetPivotPoint - spriteData.ZVertice());
     }
 
     public void SetTime(int time, int phasePercentage)
@@ -174,7 +170,7 @@ public class Sprite
     public void SetFocalPoint(float currentFocalPoint)
     {
         //get character distance from the 'in focus' camera depth
-        float distanceFromFocalPoint = Math.abs(currentFocalPoint - zVertice);
+        float distanceFromFocalPoint = Math.abs(currentFocalPoint - spriteData.ZVertice());
         //translate that depth to the bias
         //todo: adjust bias based on screen resolution
         Log.d("blur", "max bias while setting: " + maxBias);
@@ -211,7 +207,7 @@ public class Sprite
             zoomPercent = 0.0f;
         }
 
-        float zPositionModifier = (GetZVerticeInverse(zVertice)) * 0.9f + 0.1f; //zoom less if further from camera
+        float zPositionModifier = (spriteData.ZVerticeInverse()) * 0.9f + 0.1f; //zoom less if further from camera
         float maxZoomPercent = (ZOOM_MAX - ZOOM_MIN) * zPositionModifier;
 
         float sineZoomPercentInverse = 1.0f - (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
@@ -224,10 +220,10 @@ public class Sprite
         float startPoint;
         if (fadingIn)
         {
-            startPoint = Math.abs(zVertice) * (1.0f - FADE_DURATION);
+            startPoint = Math.abs(spriteData.ZVertice()) * (1.0f - FADE_DURATION);
         } else
         {
-            startPoint = Math.abs(GetZVerticeInverse(zVertice)) * (1.0f - FADE_DURATION);
+            startPoint = Math.abs(spriteData.ZVerticeInverse()) * (1.0f - FADE_DURATION);
         }
         float endPoint = startPoint + FADE_DURATION;
 
@@ -264,55 +260,75 @@ public class Sprite
     /*
     Queues the next values for the next scene, and returns the 'severity' of the transition
      */
-    public int QueueSceneData(int scene, int timePhase, int percentage, int weather)
+    public int QueueSceneData(SpriteData nSpriteData, int timePhase, int percentage, int weather)
     {
-        queuedSpriteSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
+        if(nSpriteData == null)
+        {
+            queuedSpriteData = spriteData;
+        }
+        else
+        {
+            queuedSpriteData = nSpriteData;
+        }
 
-        if (queuedSpriteSceneData.BitmapID != currentBitmapID && queuedSpriteSceneData.BitmapID > 0 && currentBitmapID > 0)
+        if (queuedSpriteData.BitmapID != currentBitmapID && queuedSpriteData.BitmapID > 0 && currentBitmapID > 0)
         {
             return SceneSetter.FULL_FADE_TRANSITION;
         }
-        if (!Arrays.equals(queuedSpriteSceneData.Vertices, currentVertices) ||
-            !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices) ||
-             queuedSpriteSceneData.ZVertice != zVertice)
+        if (!Arrays.equals(queuedSpriteData.ShapeVertices, currentVertices) ||
+            !Arrays.equals(queuedSpriteData.TextureVertices, currentTextureVertices) ||
+             queuedSpriteData.ZVertice() != spriteData.ZVertice())
         {
             //todo: apply local z vertice
             return SceneSetter.PARTIAL_FADE_TRANSITION;
-        } else if (!Arrays.equals(queuedSpriteSceneData.Colors, colors))
-        {
-            return SceneSetter.INSTANT_TRANSITION;
         }
+//        else if (!Arrays.equals(queuedSpriteSceneData.SpriteColorData.SetColor();, colors))
+//        {
+//            return SceneSetter.INSTANT_TRANSITION;
+//        }
         return SceneSetter.NO_TRANSITION;
     }
 
     public int GetQueuedBitmapID()
     {
-        if (queuedSpriteSceneData != null &&
-                queuedSpriteSceneData.BitmapID != currentBitmapID &&
-                queuedSpriteSceneData.BitmapID != 0)
+        if (queuedSpriteData != null &&
+                queuedSpriteData.BitmapID != currentBitmapID &&
+                queuedSpriteData.BitmapID != 0)
         {
-            return queuedSpriteSceneData.BitmapID;
+            return queuedSpriteData.GetBitmapID();
         }
         return -1;
     }
 
+    public String GetQueuedBitmapName()
+    {
+        if (queuedSpriteData != null &&
+                queuedSpriteData.BitmapID != currentBitmapID &&
+                queuedSpriteData.BitmapID != 0)
+        {
+            return queuedSpriteData.BitmapName;
+        }
+        return "";
+    }
+
     public void DequeueSceneData()
     {
-        if (queuedSpriteSceneData != null)
+        if (queuedSpriteData != null)
         {
-            currentBitmapID = queuedSpriteSceneData.BitmapID;
-            zVertice = queuedSpriteSceneData.ZVertice;
-            this.setVertices(queuedSpriteSceneData.Vertices);
-            this.setTextureVertices(queuedSpriteSceneData.TextureVertices);
+            spriteData = queuedSpriteData;
+            currentBitmapID = spriteData.BitmapID;
+            this.setVertices(queuedSpriteData.ShapeVertices);
+            this.setTextureVertices(queuedSpriteData.TextureVertices);
 
-            queuedSpriteSceneData = null;
+
+            queuedSpriteData = null;
         }
     }
 
     public void DequeueColor(){
-        if(queuedSpriteSceneData.Colors != null){
-            this.setColor(queuedSpriteSceneData.Colors);
-        }
+//        if(queuedSpriteSceneData.Colors != null){
+//            this.setColor(queuedSpriteSceneData.Colors);
+//        }
     }
 
 
@@ -324,10 +340,10 @@ public class Sprite
 
     public boolean TextureVerticeChange()
     {
-        if(currentTextureVertices == null || queuedSpriteSceneData == null || queuedSpriteSceneData.TextureVertices == null){
+        if(currentTextureVertices == null || queuedSpriteData == null || queuedSpriteData.TextureVertices == null){
             return false;
         }
-        return !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices);
+        return !Arrays.equals(queuedSpriteData.TextureVertices, currentTextureVertices);
     }
 
     /*
@@ -341,10 +357,10 @@ public class Sprite
 
     public boolean TextureSwapRequired()
     {
-        if(currentBitmapID == 0 || queuedSpriteSceneData == null || queuedSpriteSceneData.BitmapID == 0){
+        if(currentBitmapID == 0 || queuedSpriteData == null || queuedSpriteData.BitmapID == 0){
             return false;
         }
-        return currentBitmapID != queuedSpriteSceneData.BitmapID;
+        return currentBitmapID != queuedSpriteData.BitmapID;
     }
 
     public void SetFadeOutRequired(boolean swapping)
@@ -352,7 +368,7 @@ public class Sprite
         fadeOutRequired = swapping;
     }
 
-    public boolean isFadeOutRequired(){
+    public boolean IsFadeOutRequired(){
         return fadeOutRequired;
     }
 
@@ -360,7 +376,6 @@ public class Sprite
     {
         return spriteData.IsEssentialLayer();
     }
-
 
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, float[] mMVPMatrix)
     {
@@ -381,7 +396,6 @@ public class Sprite
         GLES20.glEnableVertexAttribArray(mTexCoordLoc);
         GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT, false, 0, textureVerticeBuffer);
 
-
         // Set the sampler texture unit to x, where we have saved the texture.
         GLES20.glActiveTexture(GLTextureIndex);
         GLES20.glBindTexture(GLTextureIndex, textureName);
@@ -392,11 +406,7 @@ public class Sprite
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-
     }
-
-
-
 
     //region Private
     private void setColor(float[] textureColor)
@@ -449,9 +459,6 @@ public class Sprite
         }
     }
 
-    private float GetZVerticeInverse(float z)
-    {
-        return (float) Math.abs(1.0 - zVertice);
-    }
+
     //endregion
 }

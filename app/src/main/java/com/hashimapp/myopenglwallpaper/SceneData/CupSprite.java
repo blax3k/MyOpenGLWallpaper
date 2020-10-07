@@ -1,8 +1,6 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteColorData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
-import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 import com.hashimapp.myopenglwallpaper.R;
 
@@ -10,10 +8,10 @@ public class CupSprite extends SpriteData {
 
     public CupSprite() {
         SpriteName = "cupSprite";
-        bitmapID = R.drawable.foregroundcitymap_1024;
-        zVertice = 0.0f;
+        BitmapID = R.drawable.foregroundcitymap_1024;
+//        ZVertice = 0.0f;
         essentialLayer = true;
-        shapeVertices = new float[]{
+        ShapeVertices = new float[]{
                 -2.4f, 0.0f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -76,7 +74,7 @@ public class CupSprite extends SpriteData {
                 0f, 0.07f, 0.30f, 1f,
                 0f, 0.07f, 0.30f, 1f,};
 
-        textureVertices = new float[]{
+        TextureVertices = new float[]{
                 0.0f, 0.5f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -92,26 +90,11 @@ public class CupSprite extends SpriteData {
         colorSet[6] = nightStartColor;
         colorSet[7] = nightEndColor;
 
-        spriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
+        SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
     @Override
-    public int GetBitmapID(int scene){
-
-        switch(scene){
-            case Textures.IMAGE_SIZE_512:
-                return R.drawable.foregroundcitymap_1024;
-            case Textures.IMAGE_SIZE_1024:
-            case Textures.IMAGE_SIZE_2048:
-
-        }
-//        if(currentBitmap == R.drawable.layer0){
-//            currentBitmap = R.drawable.layer00;
-//            return currentBitmap;
-//        }
-//        currentBitmap = R.drawable.layer0;
-//        return currentBitmap;
-
+    public int GetBitmapID(){
         return R.drawable.foregroundcitymap_1024;
     }
 }

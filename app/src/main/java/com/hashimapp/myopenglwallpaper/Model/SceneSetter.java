@@ -10,19 +10,10 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SceneData;
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteDataParameters;
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteDataStorage;
-import com.hashimapp.myopenglwallpaper.R;
-import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
-import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
-import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,11 +70,9 @@ public class SceneSetter
     private int textureSwapStatus;
 
     private HashMap<Integer, Integer> bitmapIdTextureNameHashMap;
-    private HashMap<Integer, float[]> bitmapTextureVerticesHashMap;
 
     private long FadeResetTime;
     private long FadeTargetTime;
-    private int currentScene;
 
     private boolean _textureSwapRequired;
 
@@ -107,7 +96,6 @@ public class SceneSetter
 
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
-        bitmapTextureVerticesHashMap = new HashMap<>();
         textureSwapStatus = STATUS_DONE;
         particleRenderer = new GLParticleRenderer(new RainParticle());
         resourceReader = new ResourceReader(context);
@@ -118,72 +106,63 @@ public class SceneSetter
     public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
-        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
+//        spriteList.add(new Sprite(new SkySprite()));
+//        spriteList.add(new Sprite(new HouseSprite()));
+//        spriteList.add(new Sprite(new RoomSprite()));
+//        spriteList.add(new Sprite(new DeskSprite()));
 //        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
 //        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
 
-        ArrayList<String[]> colorData = new ArrayList<>();
-        colorData.add(new String[]{"dawnStart", "dawnEnd", "dayStart", "dayEnd", "duskStart", "duskEnd", "nightStart", "nightEnd"});
-        colorData.add(new String[]{"dawnStart2", "dawnEnd2", "dayStart2", "dayEnd2", "duskStart2", "duskEnd2", "nightStart2", "nightEnd2"});
-        SpriteDataParameters spriteParms = new SpriteDataParameters("Bunny", "vertPos",1.0f, "texPos", colorData);
-        SceneData sd = new SceneData();
-        sd.SpriteDataList.add(spriteParms);
-        sd.SceneKey = "SceneTestFile";
-        resourceReader.SaveSceneData(sd);
+//        ArrayList<String[]> colorData = new ArrayList<>();
+//        colorData.add(new String[]{"dawnStart", "dawnEnd", "dayStart", "dayEnd", "duskStart", "duskEnd", "nightStart", "nightEnd"});
+//        colorData.add(new String[]{"dawnStart2", "dawnEnd2", "dayStart2", "dayEnd2", "duskStart2", "duskEnd2", "nightStart2", "nightEnd2"});
+//        SpriteDataParameters spriteParms = new SpriteDataParameters("Bunny", "vertPos",1.0f, "texPos", colorData);
+//        SceneData sd = new SceneData();
+//        sd.SpriteDataList.add(spriteParms);
+//        sd.SceneKey = "SceneTestFile";
+//        resourceReader.SaveSceneData(sd);
+//
+//        SpriteDataStorage sds = new SpriteDataStorage();
+//        sds.Name = "Bunny";
+//        sds.BitmapID = R.drawable.rabbit_sheet;
+//        sds.ShapeVerticeStorage.put("vertPos", new float[]{ -0.8f, 0.3f, 0.0f, -0.8f, -2.0f, (0.0f), 0.8f, -2.0f, (0.0f), 0.8f, 0.3f, (0.0f)});
+//        sds.TextureVerticeStorage.put("texPos", new float[]{ 0.0f, 0.0f,0.0f, 0.5f, 0.33f, 0.5f,0.33f, 0.0f });
+//        sds.ColorValueStorage.put("dawnStart", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
+//        sds.ColorValueStorage.put("dawnEnd", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
+//        sds.ColorValueStorage.put("dayStart", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
+//        sds.ColorValueStorage.put("dayEnd", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
+//        sds.ColorValueStorage.put("duskStart", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
+//        sds.ColorValueStorage.put("duskEnd", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//        sds.ColorValueStorage.put("nightStart", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//        sds.ColorValueStorage.put("nightEnd", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//
+//        sds.ColorValueStorage.put("dawnStart1", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
+//        sds.ColorValueStorage.put("dawnEnd1", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
+//        sds.ColorValueStorage.put("dayStart1", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
+//        sds.ColorValueStorage.put("dayEnd1", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
+//        sds.ColorValueStorage.put("duskStart1", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
+//        sds.ColorValueStorage.put("duskEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//        sds.ColorValueStorage.put("nightStart1", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//        sds.ColorValueStorage.put("nightEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
 
-        SpriteDataStorage sds = new SpriteDataStorage();
-        sds.Name = "Bunny";
-        sds.BitmapID = R.drawable.rabbit_sheet;
-        sds.ShapeVerticeStorage.put("vertPos", new float[]{ -0.8f, 0.3f, 0.0f, -0.8f, -2.0f, (0.0f), 0.8f, -2.0f, (0.0f), 0.8f, 0.3f, (0.0f)});
-        sds.TextureVerticeStorage.put("texPos", new float[]{ 0.0f, 0.0f,0.0f, 0.5f, 0.33f, 0.5f,0.33f, 0.0f });
-        sds.ColorValueStorage.put("dawnStart", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
-        sds.ColorValueStorage.put("dawnEnd", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
-        sds.ColorValueStorage.put("dayStart", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
-        sds.ColorValueStorage.put("dayEnd", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
-        sds.ColorValueStorage.put("duskStart", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
-        sds.ColorValueStorage.put("duskEnd", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-        sds.ColorValueStorage.put("nightStart", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-        sds.ColorValueStorage.put("nightEnd", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
+//        resourceReader.SaveSpriteDataStorage(sds);
 
-        sds.ColorValueStorage.put("dawnStart1", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
-        sds.ColorValueStorage.put("dawnEnd1", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
-        sds.ColorValueStorage.put("dayStart1", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
-        sds.ColorValueStorage.put("dayEnd1", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
-        sds.ColorValueStorage.put("duskStart1", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
-        sds.ColorValueStorage.put("duskEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-        sds.ColorValueStorage.put("nightStart1", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-        sds.ColorValueStorage.put("nightEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-
-        resourceReader.SaveSpriteDataStorage(sds);
-
-        ArrayList<SpriteData> sprites =  resourceReader.GetSpriteDataList(sd.SceneKey);
-        spriteList.add(new Sprite(sprites.get(0), 4, currentScene));
-        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
-
-
-
-
-
-
-
-//        for (int i = 0; i < spriteDataList.size(); i++)
+//        ArrayList<SpriteData> spriteData =  resourceReader.GetSpriteDataList("WhiteBunny");
+//
+//        spriteList.clear();
+//        for(SpriteData sprite : spriteData)
 //        {
-//            spriteList.add(new Sprite(spriteDataList.get(i), i, currentScene));
+//            spriteList.add(new Sprite(sprite));
+//        }
+//        Collections.sort(spriteList, (s1, s2) -> Float.compare(s2.GetzVertice(), s1.GetzVertice()));
+
+//        for (Sprite sprite : spriteList)
+//        {
+//            sprite.SetMotionOffsetPivotPoint(motionOffsetPivotPoint);
 //        }
 
-
-
-        for (Sprite sprite : spriteList)
-        {
-            sprite.SetMotionOffsetPivotPoint(motionOffsetPivotPoint);
-        }
-
-        particleRenderer.onSurfaceCreated(currentScene);
+        particleRenderer.onSurfaceCreated();
         InitSpriteProgram();
-//        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
 
 
@@ -233,20 +212,31 @@ public class SceneSetter
         particleRenderer.SetTime(timePhase, percentage);
     }
 
-    public void InitScene(int scene, int timePhase, int percentage, int weather, int widthHeight)
+    /*
+    Load in textures and Queue
+     */
+    public void InitScene( int timePhase, int percentage, int weather, int widthHeight)
     {
+
+        if(spriteList.isEmpty())
+        {
+            return;
+        }
 //        QueueScene(scene, timePhase, percentage, weather);
 
         for (Sprite sprite : spriteList)
         {
-            sprite.QueueSceneData(scene, timePhase, percentage, weather);
+            sprite.QueueSceneData(null, timePhase, percentage, weather);
         }
 
         textures = new Textures(this.context, widthHeight);
         int i = 0;
         for (Sprite sprite : spriteList)
         {
-            int bitmapID = sprite.GetQueuedBitmapID();
+            String bitmapName = sprite.GetQueuedBitmapName();
+            int bitmapID = context.getResources().getIdentifier(bitmapName, "drawable", context.getPackageName());
+
+//            int bitmapID = sprite.GetQueuedBitmapID();
             TextureData textureData = textures.AddTexture(bitmapID, i);
             bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
             sprite.SetTextureData(textureData);
@@ -265,21 +255,67 @@ public class SceneSetter
         {
             sprite.DequeueSceneData();
         }
-
     }
 
-    public int QueueScene(int scene, int timePhase, int percentage, int weather)
+    public int QueueScene(String scene, int timePhase, int percentage, int weather)
     {
         int highestTransition = SceneSetter.NO_TRANSITION;
+        ArrayList<SpriteData> newSprites = resourceReader.GetSpriteDataList(scene);
 
-        currentScene = scene;
+        //keep track of the untouched sprites from both lists
+        ArrayList<Integer> untouchedNewSpriteIndexes = new ArrayList<>();
+        ArrayList<Integer> untouchedOldSpriteIndexes = new ArrayList<>();
+        for(int i = 0; i < newSprites.size(); i++){
+            untouchedNewSpriteIndexes.add(i);
+        }
+        for(int i = 0; i < spriteList.size(); i++){
+            untouchedOldSpriteIndexes.add(i);
+        }
+
+        for(int i = 0; i < untouchedNewSpriteIndexes.size(); i++)
+        {
+            for(int j = 0; j < spriteList.size(); j++)
+            {
+                if(spriteList.get(j).spriteData.SpriteName.equals(newSprites.get(i).SpriteName))
+                {
+                    //we've found a matching sprite name. insert the new sprite data there
+                    int result = spriteList.get(j).QueueSceneData(newSprites.get(i), timePhase, percentage, weather);
+                    if (result > highestTransition)
+                    {
+                        highestTransition = result;
+                    }
+                }
+            }
+        }
+
+        //insert the rest of our newsprites
+        for(int i = 0; i < untouchedNewSpriteIndexes.size(); i++)
+        {
+            SpriteData newSpriteData = newSprites.get(untouchedNewSpriteIndexes.get(i));
+            if (untouchedOldSpriteIndexes.size() > 0)
+            {
+                int index = untouchedOldSpriteIndexes.remove(0);
+                int result = spriteList.get(index).QueueSceneData(newSpriteData, timePhase, percentage, weather);
+                if (result > highestTransition)
+                {
+                    highestTransition = result;
+                }
+            } else
+            {
+                spriteList.add(new Sprite(newSpriteData));
+            }
+        }
+
+        //get rid of extraneous sprites
+        for (int i = 0; i < untouchedOldSpriteIndexes.size(); i++)
+        {
+            spriteList.remove(untouchedOldSpriteIndexes.get(i));
+        }
+        Collections.sort(spriteList, (s1, s2) -> Float.compare(s2.spriteData.ZVertice(), s1.spriteData.ZVertice()));
+
         for (Sprite sprite : spriteList)
         {
-            int result = sprite.QueueSceneData(scene, timePhase, percentage, weather);
-            if (result > highestTransition)
-            {
-                highestTransition = result;
-            }
+            sprite.SetMotionOffsetPivotPoint(motionOffsetPivotPoint);
         }
 
         return highestTransition;
@@ -342,8 +378,8 @@ public class SceneSetter
     public void InitSceneChange(int transition)
     {
         //get textures
-        bitmapIdTextureNameHashMap.clear();
-        bitmapTextureVerticesHashMap.clear();
+//        bitmapIdTextureNameHashMap.clear();
+//        bitmapTextureVerticesHashMap.clear();
 
         if (transition == SceneSetter.INSTANT_TRANSITION)
         {
@@ -366,7 +402,6 @@ public class SceneSetter
     {
         //get textures
         bitmapIdTextureNameHashMap.clear();
-        bitmapTextureVerticesHashMap.clear();
         boolean FadeAll = false;
         //decide which scene
 
@@ -435,10 +470,9 @@ public class SceneSetter
                 fadeProgress = 0.0f;
             }
 
-//            Log.d("alpha1", "fade progress:  " + fadeProgress);
             for (Sprite sprite : spriteList)
             {
-                if (sprite.isFadeOutRequired())
+                if (sprite.IsFadeOutRequired())
                 {
                     sprite.SetFade(fadeProgress, textureSwapStatus == STATUS_FADING_IN);
                 }
@@ -498,7 +532,6 @@ public class SceneSetter
             FadeTargetTime = FadeResetTime + FADE_IN_TRANSITION_DURATION;
         }
     }
-
 
     public void SetToTargetFocalPoint()
     {

@@ -80,6 +80,7 @@ public class GLParticleRenderer
 
     public int GetQueuedBitmapID()
     {
+        textureID = _particleData.GetBitmapID();
         return textureID;
     }
 
@@ -87,7 +88,7 @@ public class GLParticleRenderer
     {
         GLTextureIndex = texData.GLTextureIndex;
         textureName = texData.textureName;
-        textureNameIndex = texData.textureNameIndex;
+        textureNameIndex = texData.TextureIndex;
     }
 
     int GLTextureIndex;
@@ -97,9 +98,9 @@ public class GLParticleRenderer
     ///
     // Initialize the shader and program object
     //
-    public void onSurfaceCreated(int currentScene)
+    public void onSurfaceCreated()
     {
-        textureID = _particleData.GetBitmapID(currentScene);
+        textureID = _particleData.GetBitmapID();
         // Load the shaders and get a linked program object
 
         riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program

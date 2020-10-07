@@ -1,8 +1,6 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteColorData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
-import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 import com.hashimapp.myopenglwallpaper.R;
 
@@ -11,10 +9,10 @@ public class RoomSprite extends SpriteData {
     int currentBitmap = R.drawable.layer0;
     public RoomSprite() {
         SpriteName = "roomSprite";
-        bitmapID = R.drawable.room_1024;
-        zVertice = 0.7f;
+        BitmapID = R.drawable.room_1024;
+//        ZVertice = 0.7f;
         essentialLayer = true;
-        shapeVertices = new float[]{
+        ShapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -75,7 +73,7 @@ public class RoomSprite extends SpriteData {
                 0f, 0.17f, 0.27f, 1f,
                 0.1f, 0.27f, 0.37f, 1f,};
 
-        textureVertices = new float[]{
+        TextureVertices = new float[]{
                 0.0f, 0.0f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -91,22 +89,11 @@ public class RoomSprite extends SpriteData {
         colorSet[6] = nightStartColor;
         colorSet[7] = nightEndColor;
 
-        spriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
+        SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
     @Override
-    public int GetBitmapID(int scene){
-        switch(scene){
-            case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.room_1024;
-        }
-//        if(currentBitmap == R.drawable.layer0){
-//            currentBitmap = R.drawable.layer00;
-//            return currentBitmap;
-//        }
-//        currentBitmap = R.drawable.layer0;
-//        return currentBitmap;
-
+    public int GetBitmapID(){
         return R.drawable.room_1024;
     }
 }

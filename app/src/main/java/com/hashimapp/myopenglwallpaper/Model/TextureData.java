@@ -4,12 +4,14 @@ public class TextureData
 {
     public int GLTextureIndex;
     public int textureName;
-    public int textureNameIndex;
+    public int TextureIndex;
+    public int BitmapID;
 
-    public TextureData(int GLTextureIndex, int textureName, int textureNameIndex){
+    public TextureData(int GLTextureIndex, int textureName, int textureNameIndex, int bitmapID){
          this.GLTextureIndex = GLTextureIndex;
          this.textureName = textureName;
-         this.textureNameIndex = textureNameIndex;
+         this.TextureIndex = textureNameIndex;
+         this.BitmapID = bitmapID;
     }
 
 }

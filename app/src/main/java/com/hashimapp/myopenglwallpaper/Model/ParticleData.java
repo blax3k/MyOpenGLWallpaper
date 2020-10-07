@@ -1,5 +1,7 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
+import com.hashimapp.myopenglwallpaper.R;
+
 public class ParticleData
 {
 
@@ -66,8 +68,8 @@ public class ParticleData
         return result;
     }
 
-    public int GetBitmapID(int scene){
-        return -1;
+    public int GetBitmapID(){
+        return R.drawable.guy;
     }
 
     public float[] GetParticleData(){

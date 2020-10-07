@@ -10,6 +10,7 @@ public class SpriteDataStorage
 {
     public String Name;
     public int BitmapID;
+    public String BitmapName;
     public Map<String, float[]> ShapeVerticeStorage;
     public Map<String, float[]> TextureVerticeStorage;
     public Map<String, float[]> ColorValueStorage;
@@ -17,6 +18,7 @@ public class SpriteDataStorage
     public SpriteDataStorage()
     {
         BitmapID = 0;
+        BitmapName = "";
         Name = "";
         ShapeVerticeStorage = new HashMap<>();
         TextureVerticeStorage = new HashMap<>();
@@ -29,9 +31,11 @@ public class SpriteDataStorage
         SpriteData sd = new SpriteData();
 
         sd.SpriteName = Name;
-        sd.textureVertices = TextureVerticeStorage.get(parms.TexturePosition);
-        sd.shapeVertices = ShapeVerticeStorage.get(parms.VerticePosition);
-        sd.bitmapID = BitmapID;
+        sd.TextureVertices = TextureVerticeStorage.get(parms.TexturePosition);
+        sd.ShapeVertices = ShapeVerticeStorage.get(parms.VerticePosition);
+        sd.BitmapID = BitmapID;
+        sd.BitmapName = BitmapName;
+        sd.SetZVertice(parms.ZVertice);
         ArrayList<float[][]> colors = new ArrayList<>();
 
         for(String[] colorKeyArray : parms.ColorData)
@@ -45,7 +49,7 @@ public class SpriteDataStorage
             colors.add(colorSet);
         }
 
-        sd.spriteColorData.SetColors(colors);
+        sd.SpriteColorData.SetColors(colors);
 
         return sd;
     }

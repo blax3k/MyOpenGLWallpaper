@@ -1,7 +1,6 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
-import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;
 
 public class GradientBarSprite extends SpriteData
@@ -9,10 +8,10 @@ public class GradientBarSprite extends SpriteData
 
     public GradientBarSprite()
     {
-        bitmapID = R.drawable.desk_1024;
-        zVertice = 0.0f;
+        BitmapID = R.drawable.desk_1024;
+//        ZVertice = 0.0f;
         essentialLayer = false;
-        shapeVertices = new float[]{
+        ShapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, 2.0f, 0.0f,   // bottom left
                 2.4f, 2.0f, 0.0f,   // bottom right
@@ -73,7 +72,7 @@ public class GradientBarSprite extends SpriteData
                 0.9f, 0.9f, 0.9f, 1f,
                 1f, 1f, 1f, 1f,};
 
-        textureVertices = new float[]{
+        TextureVertices = new float[]{
                 0.0f, 0.08f,
                 0.0f, 0.0f,
                 1.0f, 0.0f,
@@ -82,18 +81,7 @@ public class GradientBarSprite extends SpriteData
     }
 
     @Override
-    public int GetBitmapID( int scene){
-        switch(scene){
-            case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.desk_1024;
-        }
-//        if(currentBitmap == R.drawable.guy){
-//            currentBitmap = R.drawable.guy2;
-//        }else{
-//            currentBitmap = R.drawable.guy;
-//        }
-//        return currentBitmap;
-
+    public int GetBitmapID(){
         return R.drawable.desk_1024;
     }
 }

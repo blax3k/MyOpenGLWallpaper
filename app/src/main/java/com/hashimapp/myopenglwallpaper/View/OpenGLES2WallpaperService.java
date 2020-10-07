@@ -134,11 +134,12 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
             renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
-            renderer.SetScene(prefs.getInt(resources.getString(R.string.set_scene_key),0));
             renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
             renderer.SetCameraBlurAmount(prefs.getInt(resources.getString(R.string.blur_amount_key), 5));
             renderer.SetZoomCameraEnabled(prefs.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true));
             renderer.SetParticlesEnabled(prefs.getBoolean(resources.getString(R.string.particle_enabled_key), true));
+            //always set the scene last
+            renderer.SetScene(prefs.getString(resources.getString(R.string.set_scene_key),""));
         }
 
         @Override
@@ -245,7 +246,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                 boolean motionOffsetInverted = sharedPreferences.getBoolean(resources.getString(R.string.invert_motion_parallax_key), false);
                 renderer.SetMotionOffsetInverted(motionOffsetInverted);
             }else if(key.equals(resources.getString(R.string.set_scene_key))){
-                int scene = sharedPreferences.getInt(resources.getString(R.string.set_scene_key), 0);
+                String scene = sharedPreferences.getString(resources.getString(R.string.set_scene_key), "");
                 renderer.SetScene(scene);
             }else if(key.equals(resources.getString(R.string.particle_enabled_key)))
             {

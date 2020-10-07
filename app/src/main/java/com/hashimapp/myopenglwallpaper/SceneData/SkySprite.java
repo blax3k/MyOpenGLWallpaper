@@ -1,8 +1,6 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteColorData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
-import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 import com.hashimapp.myopenglwallpaper.R;
 
@@ -10,10 +8,10 @@ public class SkySprite extends SpriteData {
 
     public SkySprite() {
         SpriteName = "skySprite";
-        bitmapID = R.drawable.sky_1024_border;
-        zVertice = 1.0f;
+        BitmapID = R.drawable.sky_1024_border;
+//        ZVertice = 1.0f;
         essentialLayer = true;
-        shapeVertices = new float[]{
+        ShapeVertices = new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -74,7 +72,7 @@ public class SkySprite extends SpriteData {
                 0f, 0.07f, 0.17f, 1f,
                 0.1f, 0.17f, 0.37f, 1f,};
 
-        textureVertices = new float[]{
+        TextureVertices = new float[]{
                 0.0f, 0.0f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -90,20 +88,12 @@ public class SkySprite extends SpriteData {
         colorSet[6] = nightStartColor;
         colorSet[7] = nightEndColor;
 
-        spriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
+        SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
     @Override
-    public int GetBitmapID( int scene)
+    public int GetBitmapID()
     {
-        switch(scene){
-            case Textures.IMAGE_SIZE_512:
-                return R.drawable.sky_1024_border;
-            case Textures.IMAGE_SIZE_1024:
-                break;
-            case Textures.IMAGE_SIZE_2048:
-                break;
-        }
         return R.drawable.sky_1024_border;
     }
 

@@ -10,7 +10,9 @@ import android.content.res.Resources;
 import android.hardware.SensorEvent;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
+import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.R;
@@ -55,6 +57,47 @@ public class GLRenderer implements Renderer
         timePhaseSelected = resources.getString(R.string.time_key_day);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config)
+    {
+        Log.d("textures", "surface created");
+        startTime = System.currentTimeMillis();
+        if (sceneSetter == null)
+        {
+            sceneSetter = new SceneSetter(this.context);
+        }
+        // Set the clear color to white
+        GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+
+        sceneSetter.OnSurfaceCreated();
+        sceneSetter.SetMaxBlurAmount(camera.maxBlur);
+    }
+
+    @Override
+    public void onSurfaceChanged(GL10 gl, int width, int height)
+    {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glFlush();
+
+        mScreenHeight = width;
+        mScreenHeight = height;
+        int newWidthHeight = Math.max(width, height);
+
+        if(!_created){
+            _created = true;
+            widthHeight = newWidthHeight;
+//            sceneSetter.InitTextures(widthHeight);
+            sceneSetter.InitScene(timeOfDay, percentage, 0, widthHeight);
+        }
+
+        GLES20.glViewport(0, 0, width, height);
+
+        camera.OnSurfaceChanged(width, height);
+        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition(),
+                camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale(), mScreenWidth, mScreenHeight);
+    }
+
     public boolean OnOffsetChanged(float xOffset, float yOffset)
     {
         if (camera.TouchOffsetEnabled())
@@ -76,48 +119,6 @@ public class GLRenderer implements Renderer
         }
     }
 
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config)
-    {
-        Log.d("textures", "surface created");
-        startTime = System.currentTimeMillis();
-        if (sceneSetter == null)
-        {
-            sceneSetter = new SceneSetter(this.context);
-        }
-        // Set the clear color to white
-        GLES20.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-
-        sceneSetter.OnSurfaceCreated();
-        sceneSetter.SetMaxBlurAmount(camera.maxBlur);
-    }
-
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height)
-    {
-        Log.d("textures", "surface changed. width: " + width + " height: " + height);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glFlush();
-
-        mScreenHeight = width;
-        mScreenHeight = height;
-        int newWidthHeight = Math.max(width, height);
-
-        Log.d("textures", "surface changed. widthHeight: " + newWidthHeight + " widthHeight: " + widthHeight);
-
-        if(!_created){
-            _created = true;
-            widthHeight = newWidthHeight;
-//            sceneSetter.InitTextures(widthHeight);
-            sceneSetter.InitScene(SceneManager.DEFAULT, timeOfDay, percentage, 0, widthHeight);
-        }
-
-        GLES20.glViewport(0, 0, width, height);
-
-        camera.OnSurfaceChanged(width, height);
-        sceneSetter.SurfaceChanged(camera.IsPortrait(), camera.GetXOffsetPosition(),
-                camera.GetTouchOffsetScale(), camera.GetMotionOffsetScale(), mScreenWidth, mScreenHeight);
-    }
 
 
 
@@ -161,7 +162,9 @@ public class GLRenderer implements Renderer
         }
     }
 
-    public void SetScene(int scene){
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void SetScene(String scene)
+    {
         int transition = sceneSetter.QueueScene(scene, timeOfDay, percentage, 0);
         sceneSetter.InitSceneChange(transition);
     }

@@ -235,22 +235,15 @@ public class SettingsActivityTest extends Activity
         builder.setNegativeButton("Cancel", null);
 
         // add a radio button list
-
-        ResourceReader reader = new ResourceReader(context);
-
-
-
         ArrayList<String> sceneTitles = sceneManager.GetAllSceneTitles();
-//        String scenePref = prefs.getString(resources.getString(R.string.set_scene_key), sceneTitles.get(0));
-        String scenePref = prefs.getString("boogity", sceneTitles.get(0));
+        String scenePref = prefs.getString(resources.getString(R.string.set_scene_key), sceneTitles.get(0));
         int selected = sceneTitles.indexOf(scenePref);
         String[] sceneTitlesAsArray = sceneTitles.toArray(new String[sceneTitles.size()]);
         builder.setSingleChoiceItems(sceneTitlesAsArray, selected, (dialog, which) ->
                 {
-                    if(which >= 0)
+                    if (which >= 0)
                     {
-//                        prefsEditor.putString(resources.getString(R.string.set_scene_key),sceneTitles.get(which));
-                        prefsEditor.putString("boogity",sceneTitles.get(which));
+                        prefsEditor.putString(resources.getString(R.string.set_scene_key), sceneTitles.get(which));
 
                         prefsEditor.commit();
                         setTimeText.setText(resources.getTextArray(R.array.setTimePrefTitles)[which]);

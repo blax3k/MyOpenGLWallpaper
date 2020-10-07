@@ -1,6 +1,5 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteColorData;
 import com.hashimapp.myopenglwallpaper.Model.SpriteData;
 import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 import com.hashimapp.myopenglwallpaper.R;
@@ -14,10 +13,10 @@ public class BunnySprite extends SpriteData
     public BunnySprite()
     {
         SpriteName = "BunnySprite";
-        bitmapID = R.drawable.rabbit_sheet;
-        zVertice = 0.2f;
+        BitmapID = R.drawable.rabbit_sheet;
+        SetZVertice(.2f);
         essentialLayer = false;
-        shapeVertices = new float[]{
+        ShapeVertices = new float[]{
                 -0.8f, 0.3f, 0.0f,   // top left
                 -0.8f, -2.0f, (0.0f),   // bottom left
                 0.8f, -2.0f, (0.0f),   // bottom right
@@ -78,7 +77,7 @@ public class BunnySprite extends SpriteData
                 0.9f, 0.9f, 0.9f, 1f,
                 1f, 1f, 1f, 1f,};
 
-        textureVertices = new float[]{
+        TextureVertices = new float[]{
                 0.0f, 0.0f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -95,66 +94,72 @@ public class BunnySprite extends SpriteData
         colorSet[6] = nightStartColor;
         colorSet[7] = nightEndColor;
 
-        spriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
+        SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
 
     @Override
-    public float[] GetTextureVertices(int scene)
+    public float[] GetTextureVertices()
     {
-        changeTextureVertices = CHANGE_NOW;
-        switch (scene)
-        {
-            case SceneManager.DEFAULT:
-                textureVertices = new float[]{
+                TextureVertices = new float[]{
                         0.0f, 0.0f,
                         0.0f, 0.5f,
                         0.33f, 0.5f,
                         0.33f, 0.0f
                 };
-                break;
-            case SceneManager.BROWN:
-                textureVertices = new float[]{
-                        0.33f, 0.0f,
-                        0.33f, 0.5f,
-                        0.66f, 0.5f,
-                        0.66f, 0.0f
-                };
-                break;
-            case SceneManager.BLUE:
-                textureVertices = new float[]{
-                        0.66f, 0.0f,
-                        0.66f, 0.5f,
-                        1.0f, 0.5f,
-                        1.0f, 0.0f
-                };
-                break;
-            case SceneManager.GREEN:
-                textureVertices = new float[]{
-                        0.0f, 0.5f,
-                        0.0f, 1.0f,
-                        0.33f, 1.0f,
-                        0.33f, 0.5f
-                };
-                break;
-            case SceneManager.PINK:
-                textureVertices = new float[]{
-                        0.33f, 0.5f,
-                        0.33f, 1.0f,
-                        0.66f, 1.0f,
-                        0.66f, 0.5f
-                };
-                break;
-            case SceneManager.YELLOW:
-                textureVertices = new float[]{
-                        0.66f, 0.5f,
-                        0.66f, 1.0f,
-                        1.0f, 1.0f,
-                        1.0f, 0.5f
-                };
-                break;
-        }
-        return textureVertices;
+//        changeTextureVertices = CHANGE_NOW;
+//        switch (scene)
+//        {
+//            case SceneManager.DEFAULT:
+//                textureVertices = new float[]{
+//                        0.0f, 0.0f,
+//                        0.0f, 0.5f,
+//                        0.33f, 0.5f,
+//                        0.33f, 0.0f
+//                };
+//                break;
+//            case SceneManager.BROWN:
+//                textureVertices = new float[]{
+//                        0.33f, 0.0f,
+//                        0.33f, 0.5f,
+//                        0.66f, 0.5f,
+//                        0.66f, 0.0f
+//                };
+//                break;
+//            case SceneManager.BLUE:
+//                textureVertices = new float[]{
+//                        0.66f, 0.0f,
+//                        0.66f, 0.5f,
+//                        1.0f, 0.5f,
+//                        1.0f, 0.0f
+//                };
+//                break;
+//            case SceneManager.GREEN:
+//                textureVertices = new float[]{
+//                        0.0f, 0.5f,
+//                        0.0f, 1.0f,
+//                        0.33f, 1.0f,
+//                        0.33f, 0.5f
+//                };
+//                break;
+//            case SceneManager.PINK:
+//                textureVertices = new float[]{
+//                        0.33f, 0.5f,
+//                        0.33f, 1.0f,
+//                        0.66f, 1.0f,
+//                        0.66f, 0.5f
+//                };
+//                break;
+//            case SceneManager.YELLOW:
+//                textureVertices = new float[]{
+//                        0.66f, 0.5f,
+//                        0.66f, 1.0f,
+//                        1.0f, 1.0f,
+//                        1.0f, 0.5f
+//                };
+//                break;
+//        }
+        return TextureVertices;
     }
 }
 
