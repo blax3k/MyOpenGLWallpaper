@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class SpriteDataParameters
 {
+    public String SpriteName; //the unique name of the sprite
     public String SpriteFileName;
     public String VerticePosition;
     public String TexturePosition;
@@ -12,8 +13,9 @@ public class SpriteDataParameters
     public boolean EssentialLayer;
 
 
-    public SpriteDataParameters(String spriteFileName, String verticePosition, float zVertice, String texturePosition, ArrayList<String[]> colorData)
+    public SpriteDataParameters(String spriteName, String spriteFileName, String verticePosition, float zVertice, String texturePosition, ArrayList<String[]> colorData)
     {
+        SpriteName = spriteName;
         SpriteFileName = spriteFileName;
         VerticePosition = verticePosition;
         ZVertice = zVertice;

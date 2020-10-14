@@ -51,7 +51,7 @@ public class GLParticleRenderer
             xTouchScale, xMotionScale, yZoomScale, yTouchScale, yMotionScale;
     float motionOffsetFocalPoint;
     // Texture handle
-    private int textureID;
+    private String bitmapName;
 
     // Update time
     private float mTime;
@@ -78,10 +78,10 @@ public class GLParticleRenderer
         _particleData = pData;
     }
 
-    public int GetQueuedBitmapID()
+    public String GetQueuedBitmapID()
     {
-        textureID = _particleData.GetBitmapID();
-        return textureID;
+        bitmapName = _particleData.GetBitmapID();
+        return bitmapName;
     }
 
     public void SetTextureData(TextureData texData)
@@ -100,7 +100,7 @@ public class GLParticleRenderer
     //
     public void onSurfaceCreated()
     {
-        textureID = _particleData.GetBitmapID();
+        bitmapName = _particleData.GetBitmapID();
         // Load the shaders and get a linked program object
 
         riGraphicTools.sp_Particle = GLES20.glCreateProgram();             // create empty OpenGL ES Program

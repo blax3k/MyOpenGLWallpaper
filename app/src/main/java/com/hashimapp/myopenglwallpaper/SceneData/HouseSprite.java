@@ -8,7 +8,6 @@ public class HouseSprite extends SpriteData {
 
     public HouseSprite() {
         SpriteName = "houseSprite";
-        BitmapID = R.drawable.foregroundcitymap_1024;;
 //        ZVertice = 1.0f;
         essentialLayer = true;
 
@@ -93,7 +92,6 @@ public class HouseSprite extends SpriteData {
         SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
-    @Override
     public int GetBitmapID(){
         return R.drawable.foregroundcitymap_1024;
     }

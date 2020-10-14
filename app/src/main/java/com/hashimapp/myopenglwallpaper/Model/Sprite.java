@@ -45,17 +45,15 @@ public class Sprite
     private int alphaHandle;
 
     private float spriteXPosOffset;
-
     private float motionOffsetPivotPoint;
 
     private boolean fadeOutRequired;
 
     private int textureName;
     private int textureNameIndex;
-    private int currentBitmapID;
     private float[] currentTextureVertices;
     private float[] currentVertices;
-    public SpriteData spriteData;
+
     float xScrollOffset = 0;
     float yOrientationOffset = 0;
     float xAccelOffset = 0;
@@ -64,6 +62,7 @@ public class Sprite
     float xZoomScale, xMotionScale, xTouchScale;
     float yZoomScale, yMotionScale, yTouchScale;
 
+    public SpriteData spriteData;
     private SpriteData queuedSpriteData;
 
 
@@ -271,7 +270,7 @@ public class Sprite
             queuedSpriteData = nSpriteData;
         }
 
-        if (queuedSpriteData.BitmapID != currentBitmapID && queuedSpriteData.BitmapID > 0 && currentBitmapID > 0)
+        if (queuedSpriteData.BitmapName != spriteData.BitmapName && queuedSpriteData.BitmapName != "" && spriteData.BitmapName != "")
         {
             return SceneSetter.FULL_FADE_TRANSITION;
         }
@@ -289,34 +288,21 @@ public class Sprite
         return SceneSetter.NO_TRANSITION;
     }
 
-    public int GetQueuedBitmapID()
+    public String GetQueuedBitmapID()
     {
-        if (queuedSpriteData != null &&
-                queuedSpriteData.BitmapID != currentBitmapID &&
-                queuedSpriteData.BitmapID != 0)
+        if (queuedSpriteData != null)
         {
-            return queuedSpriteData.GetBitmapID();
-        }
-        return -1;
-    }
-
-    public String GetQueuedBitmapName()
-    {
-        if (queuedSpriteData != null &&
-                queuedSpriteData.BitmapID != currentBitmapID &&
-                queuedSpriteData.BitmapID != 0)
-        {
-            return queuedSpriteData.BitmapName;
+            return queuedSpriteData.GetBitmapName();
         }
         return "";
     }
+
 
     public void DequeueSceneData()
     {
         if (queuedSpriteData != null)
         {
             spriteData = queuedSpriteData;
-            currentBitmapID = spriteData.BitmapID;
             this.setVertices(queuedSpriteData.ShapeVertices);
             this.setTextureVertices(queuedSpriteData.TextureVertices);
 
@@ -354,14 +340,6 @@ public class Sprite
         setTextureVertices(currentTextureVertices);
     }
 
-
-    public boolean TextureSwapRequired()
-    {
-        if(currentBitmapID == 0 || queuedSpriteData == null || queuedSpriteData.BitmapID == 0){
-            return false;
-        }
-        return currentBitmapID != queuedSpriteData.BitmapID;
-    }
 
     public void SetFadeOutRequired(boolean swapping)
     {

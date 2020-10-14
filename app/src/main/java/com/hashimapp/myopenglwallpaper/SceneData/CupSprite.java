@@ -8,7 +8,6 @@ public class CupSprite extends SpriteData {
 
     public CupSprite() {
         SpriteName = "cupSprite";
-        BitmapID = R.drawable.foregroundcitymap_1024;
 //        ZVertice = 0.0f;
         essentialLayer = true;
         ShapeVertices = new float[]{
@@ -93,8 +92,4 @@ public class CupSprite extends SpriteData {
         SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
-    @Override
-    public int GetBitmapID(){
-        return R.drawable.foregroundcitymap_1024;
-    }
 }

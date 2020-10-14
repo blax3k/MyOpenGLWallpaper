@@ -9,7 +9,6 @@ public class DeskSprite extends SpriteData {
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
         SpriteName = "deskSprite";
-        BitmapID = R.drawable.desk_1024;
 //        ZVertice = 0.2f;
         essentialLayer = true;
         ShapeVertices = new float[]{
@@ -94,7 +93,6 @@ public class DeskSprite extends SpriteData {
 
     }
 
-    @Override
     public int GetBitmapID(){
         return R.drawable.desk_1024;
     }

@@ -16,7 +16,6 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.R;
-import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 
@@ -233,14 +232,6 @@ public class GLRenderer implements Renderer
         sceneSetter.SetParticlesEnabled(enabled);
     }
 
-    public void SwapTextures()
-    {
-        //only swap if the scene setter is not already swapping
-        if (sceneSetter.GetTextureSwapStatus() == SceneSetter.STATUS_DONE)
-        {
-            sceneSetter.InitTextureSwap();
-        }
-    }
 
     public void SetTimePhase(String phaseOfDay)
     {
@@ -282,7 +273,7 @@ public class GLRenderer implements Renderer
             mFPSCounter++;
         }
 
-        if (sceneSetter.GetTextureSwapStatus() > 0)
+        if (sceneSetter.TransitioningScene())
         {
             sceneSetter.UpdateFade();
         }

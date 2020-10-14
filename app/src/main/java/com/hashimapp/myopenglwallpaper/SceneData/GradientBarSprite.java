@@ -8,7 +8,6 @@ public class GradientBarSprite extends SpriteData
 
     public GradientBarSprite()
     {
-        BitmapID = R.drawable.desk_1024;
 //        ZVertice = 0.0f;
         essentialLayer = false;
         ShapeVertices = new float[]{
@@ -80,7 +79,6 @@ public class GradientBarSprite extends SpriteData
         };
     }
 
-    @Override
     public int GetBitmapID(){
         return R.drawable.desk_1024;
     }

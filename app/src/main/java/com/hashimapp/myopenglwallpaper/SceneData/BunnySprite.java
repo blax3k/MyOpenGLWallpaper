@@ -13,7 +13,6 @@ public class BunnySprite extends SpriteData
     public BunnySprite()
     {
         SpriteName = "BunnySprite";
-        BitmapID = R.drawable.rabbit_sheet;
         SetZVertice(.2f);
         essentialLayer = false;
         ShapeVertices = new float[]{

@@ -8,7 +8,6 @@ public class SkySprite extends SpriteData {
 
     public SkySprite() {
         SpriteName = "skySprite";
-        BitmapID = R.drawable.sky_1024_border;
 //        ZVertice = 1.0f;
         essentialLayer = true;
         ShapeVertices = new float[]{
@@ -78,6 +77,7 @@ public class SkySprite extends SpriteData {
                 1.0f, 1.0f,
                 1.0f, 0.0f
         };
+
         float[][] colorSet = new float[SpriteColorData.DAY_PHASE_COUNT][];
         colorSet[0] = dawnStartColor;
         colorSet[1] = dawnEndColor;
@@ -91,7 +91,6 @@ public class SkySprite extends SpriteData {
         SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
-    @Override
     public int GetBitmapID()
     {
         return R.drawable.sky_1024_border;

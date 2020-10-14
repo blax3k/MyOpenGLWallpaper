@@ -31,7 +31,6 @@ public class SpriteData
 
     public String SpriteName;
     public String BitmapName;
-    public int BitmapID;
     public float[] ShapeVertices;
     public float[] TextureVertices;
     protected short[] indices;
@@ -150,9 +149,9 @@ public class SpriteData
         return indices;
     }
 
-    public int GetBitmapID()
+    public String GetBitmapName()
     {
-        return BitmapID;
+        return BitmapName;
     }
 
     public boolean IsEssentialLayer()
@@ -180,11 +179,6 @@ public class SpriteData
         return (float) Math.abs(1.0 - z);
     }
 
-    public SpriteSceneData GetScene(int timePhase, int percentage, int weather)
-    {
-        return new SpriteSceneData(GetBitmapID(), GetTextureVertices(),
-                ShapeVertices, zVertice, getColor(timePhase, percentage));
-    }
 
 
 }

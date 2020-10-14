@@ -15,12 +15,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class ResourceReader
 {
@@ -98,7 +96,7 @@ public class ResourceReader
 
                 if(spriteDataStorage != null)
                 {
-                    SpriteData spriteData = spriteDataStorage.GetSpriteData(spriteParm);
+                    SpriteData spriteData = spriteDataStorage.GetSpriteData(spriteParm, _context);
                     spriteDataList.add(spriteData);
                 }
             }

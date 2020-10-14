@@ -1,6 +1,7 @@
 package com.hashimapp.myopenglwallpaper.Model;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
@@ -21,15 +22,15 @@ public class Textures
     {
         Bitmap Bitmap;
         int TextureIndex;
-        int BitmapID;
-        int DisposeBitmapID;
+        String BitmapName;
+        String DisposeBitmapName;
 
-        public TextureUploadData(Bitmap bitmap, int name, int bitmapID, int removeBitmap)
+        public TextureUploadData(Bitmap bitmap, int textureIndex, String bitmapName, String removeBitmapName)
         {
             Bitmap = bitmap;
-            TextureIndex = name;
-            BitmapID = bitmapID;
-            DisposeBitmapID = removeBitmap;
+            TextureIndex = textureIndex;
+            BitmapName = bitmapName;
+            DisposeBitmapName = removeBitmapName;
         }
     }
 
@@ -70,8 +71,10 @@ public class Textures
     private int widthHeight;
 
     private Deque<TextureUploadData> textureUploadDataDeque;
-    public Map<Integer, TextureData> BitmapTextureDataMap; //the bitmaps in memory
-    public Deque<Integer> DisposableBitmpapIdQueue;
+    private Map<String, TextureData> BitmapTextureDataMap; //the bitmaps in memory
+    public Deque<String> DisposableBitmpapIdQueue;
+    public Deque<String> UploadBitmapIdQueue;
+
 
 
     public int[] textureNames;
@@ -81,6 +84,7 @@ public class Textures
 
     Context context;
     Date startDate;
+    private Resources resources;
 
     public static final int[] GL_TEXTURE_IDS = new int[]{
             GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1, GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
@@ -109,6 +113,9 @@ public class Textures
         BitmapTextureDataMap = new HashMap<>();
         textureUploadDataDeque = new ArrayDeque<>();
         DisposableBitmpapIdQueue = new ArrayDeque<>();
+        UploadBitmapIdQueue = new ArrayDeque<>();
+
+        resources = context.getResources();
 
         for (int i = 0; i < GL_TEXTURE_IDS.length; i++)
         {
@@ -117,64 +124,71 @@ public class Textures
     }
 
 
-    public TextureData AddTexture(int bitmapID, int textureNameIndex)
+//    public TextureData AddTexture(int bitmapID, int textureNameIndex)
+//    {
+//        int glTextureID = GL_TEXTURE_IDS[GetNextGLTextureIDIndex()];
+//
+//        TextureData textureData = new TextureData(glTextureID, textureNames[textureNameIndex], textureNameIndex, bitmapID);
+//        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
+//
+//        GLES20.glActiveTexture(textureData.GLTextureIndex);
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
+//        //clamp texture to edge of shape
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//        // Set filtering
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+//
+//        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bmp, 0);
+//
+//        GenerateBlurredTextures(bmp);
+//
+//        return textureData;
+//    }
+
+    /*
+
+     */
+    public void QueueTextures(ArrayList<String> bitmapNameList)
     {
-        int glTextureID = GL_TEXTURE_IDS[GetNextGLTextureIDIndex()];
-
-        TextureData textureData = new TextureData(glTextureID, textureNames[textureNameIndex], textureNameIndex, bitmapID);
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
-
-        GLES20.glActiveTexture(textureData.GLTextureIndex);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
-        //clamp texture to edge of shape
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-        // Set filtering
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bmp, 0);
-
-        GenerateBlurredTextures(bmp);
-
-        return textureData;
-    }
-
-    public void QueueTextures(ArrayList<Integer> bitmapIDList)
-    {
+        Loaded = false;
         //figure out which textures need to be replaced/removed
-        for(Map.Entry<Integer, TextureData> entry : BitmapTextureDataMap.entrySet())
+        for(Map.Entry<String, TextureData> entry : BitmapTextureDataMap.entrySet())
         {
-            if(!bitmapIDList.contains(entry.getKey()))
+            if(!bitmapNameList.contains(entry.getKey()))
             {
                 DisposableBitmpapIdQueue.add(entry.getKey());
             }
         }
 
         Integer index;
-        int disposeBitmapId = 0;
+        String disposeBitmapName = "";
         //Queue the new textures into any available slots
-        for(Integer bitmapID: bitmapIDList)
+        for(String bitmapName: bitmapNameList)
         {
-            if(BitmapTextureDataMap.containsKey(bitmapID))
+            if(BitmapTextureDataMap.containsKey(bitmapName) || bitmapName.isEmpty())
             {
                 continue; //bitmap is already loaded
             }
 
-            disposeBitmapId = 0;
+            disposeBitmapName = "";
+            int disposeBitmapID = 0;
             if(DisposableBitmpapIdQueue.size() > 0)
             {   //load into disposable index
-                disposeBitmapId = DisposableBitmpapIdQueue.removeFirst();
-                index = BitmapTextureDataMap.get(disposeBitmapId).TextureIndex;
+                disposeBitmapName = DisposableBitmpapIdQueue.removeFirst();
+                index = BitmapTextureDataMap.get(disposeBitmapName).TextureIndex;
             }
             else
             {   //no more disposable slots. get a new one
                 index = GetNextGLTextureIDIndex();
             }
 
+            int bitmapID = resources.getIdentifier(bitmapName, "drawable", context.getPackageName());
             Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
-            textureUploadDataDeque.add(new TextureUploadData(bmp, index, bitmapID, disposeBitmapId));
+            textureUploadDataDeque.add(new TextureUploadData(bmp, index, bitmapName, disposeBitmapName));
         }
+        Loaded = true;
     }
 
     public void DequeTextures()
@@ -182,22 +196,28 @@ public class Textures
         while(textureUploadDataDeque.size() > 0)
         {
             TextureUploadData uploadData = textureUploadDataDeque.pop();
-            TextureData data = AddTexture(uploadData); //upload bmp to GPU
+            TextureData data = UploadTexture(uploadData); //upload bmp to GPU
 
-            BitmapTextureDataMap.put(data.BitmapID, data);
-            if(uploadData.DisposeBitmapID != 0)
+            BitmapTextureDataMap.put(data.BitmapName, data);
+            if(!uploadData.DisposeBitmapName.isEmpty())
             {
-                BitmapTextureDataMap.remove(uploadData.DisposeBitmapID);
+                BitmapTextureDataMap.remove(uploadData.DisposeBitmapName);
             }
         }
+    }
+
+
+    public TextureData GetTextureData(String bitmapName)
+    {
+        return BitmapTextureDataMap.get(bitmapName);
     }
 
     /*
     Upload bitmap to GPU
      */
-    public TextureData AddTexture(TextureUploadData data)
+    public TextureData UploadTexture(TextureUploadData data)
     {
-        TextureData textureData = new TextureData(GL_TEXTURE_IDS[data.TextureIndex], textureNames[data.TextureIndex], data.TextureIndex, data.BitmapID);
+        TextureData textureData = new TextureData(GL_TEXTURE_IDS[data.TextureIndex], textureNames[data.TextureIndex], data.TextureIndex, data.BitmapName);
 
         GLES20.glActiveTexture(textureData.GLTextureIndex);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
@@ -236,29 +256,27 @@ public class Textures
     ///load textures from storage into memory
     public void LoadTextures(HashMap<Integer, Integer> bitmapIdTextureNameHashMap)
     {
-        Loaded = false;
-
-        for (Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet())
-        {
-            int bitmapId = data.getKey();
-            int texName = data.getValue();
-            BitmapFactory.Options op = new BitmapFactory.Options();
-            op.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapId, op);
-            TextureUploadData uploadData = new TextureUploadData(bmp, texName, bitmapId,0);
-
-            textureUploadDataDeque.add(uploadData);
-            if (InterruptLoading)
-            {
-                textureUploadDataDeque.clear();
-                Loaded = true;
-                InterruptLoading = false;
-                return;
-            }
-
-
-        }
-        Loaded = true;
+//        Loaded = false;
+//
+//        for (Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet())
+//        {
+//            int bitmapId = data.getKey();
+//            int texName = data.getValue();
+//            BitmapFactory.Options op = new BitmapFactory.Options();
+//            op.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapId, op);
+//            TextureUploadData uploadData = new TextureUploadData(bmp, texName, bitmapId,0);
+//
+//            textureUploadDataDeque.add(uploadData);
+//            if (InterruptLoading)
+//            {
+//                textureUploadDataDeque.clear();
+//                Loaded = true;
+//                InterruptLoading = false;
+//                return;
+//            }
+//        }
+//        Loaded = true;
     }
 
 
@@ -274,7 +292,7 @@ public class Textures
     /*
     Loads textures from memory into the GPU
     */
-    public void UploadTextures()
+    public void UploadTexturesOriignal()
     {
         int currentSize = textureUploadDataDeque.size();
         for (int i = 0; i < currentSize; i++)

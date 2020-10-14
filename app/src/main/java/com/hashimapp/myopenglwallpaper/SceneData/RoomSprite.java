@@ -9,7 +9,6 @@ public class RoomSprite extends SpriteData {
     int currentBitmap = R.drawable.layer0;
     public RoomSprite() {
         SpriteName = "roomSprite";
-        BitmapID = R.drawable.room_1024;
 //        ZVertice = 0.7f;
         essentialLayer = true;
         ShapeVertices = new float[]{
@@ -92,7 +91,6 @@ public class RoomSprite extends SpriteData {
         SpriteColorData.SetColor(WeatherManager.SUNNY_WEATHER, colorSet);
     }
 
-    @Override
     public int GetBitmapID(){
         return R.drawable.room_1024;
     }

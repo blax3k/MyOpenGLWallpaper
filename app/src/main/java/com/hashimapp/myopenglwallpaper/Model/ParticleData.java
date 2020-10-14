@@ -68,8 +68,8 @@ public class ParticleData
         return result;
     }
 
-    public int GetBitmapID(){
-        return R.drawable.guy;
+    public String GetBitmapID(){
+        return "guy";
     }
 
     public float[] GetParticleData(){
