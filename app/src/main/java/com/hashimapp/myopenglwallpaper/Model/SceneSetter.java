@@ -15,7 +15,6 @@ import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -76,7 +75,6 @@ public class SceneSetter
     private boolean _textureSwapRequired;
 
     private GLParticleRenderer particleRenderer;
-
     private ResourceReader resourceReader;
 
     Date startDate;
@@ -104,60 +102,6 @@ public class SceneSetter
     public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-//        spriteList.add(new Sprite(new SkySprite()));
-//        spriteList.add(new Sprite(new HouseSprite()));
-//        spriteList.add(new Sprite(new RoomSprite()));
-//        spriteList.add(new Sprite(new DeskSprite()));
-//        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
-//        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
-
-//        ArrayList<String[]> colorData = new ArrayList<>();
-//        colorData.add(new String[]{"dawnStart", "dawnEnd", "dayStart", "dayEnd", "duskStart", "duskEnd", "nightStart", "nightEnd"});
-//        colorData.add(new String[]{"dawnStart2", "dawnEnd2", "dayStart2", "dayEnd2", "duskStart2", "duskEnd2", "nightStart2", "nightEnd2"});
-//        SpriteDataParameters spriteParms = new SpriteDataParameters("Bunny", "vertPos",1.0f, "texPos", colorData);
-//        SceneData sd = new SceneData();
-//        sd.SpriteDataList.add(spriteParms);
-//        sd.SceneKey = "SceneTestFile";
-//        resourceReader.SaveSceneData(sd);
-//
-//        SpriteDataStorage sds = new SpriteDataStorage();
-//        sds.Name = "Bunny";
-//        sds.BitmapID = R.drawable.rabbit_sheet;
-//        sds.ShapeVerticeStorage.put("vertPos", new float[]{ -0.8f, 0.3f, 0.0f, -0.8f, -2.0f, (0.0f), 0.8f, -2.0f, (0.0f), 0.8f, 0.3f, (0.0f)});
-//        sds.TextureVerticeStorage.put("texPos", new float[]{ 0.0f, 0.0f,0.0f, 0.5f, 0.33f, 0.5f,0.33f, 0.0f });
-//        sds.ColorValueStorage.put("dawnStart", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
-//        sds.ColorValueStorage.put("dawnEnd", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
-//        sds.ColorValueStorage.put("dayStart", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
-//        sds.ColorValueStorage.put("dayEnd", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
-//        sds.ColorValueStorage.put("duskStart", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
-//        sds.ColorValueStorage.put("duskEnd", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-//        sds.ColorValueStorage.put("nightStart", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-//        sds.ColorValueStorage.put("nightEnd", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-//
-//        sds.ColorValueStorage.put("dawnStart1", new float[]{0f, 0.27f, 0.37f, 1f,0f, 0.17f, 0.27f, 1f,0f, 0.17f, 0.27f, 1f, 0f, 0.17f, 0.27f, 1f,});
-//        sds.ColorValueStorage.put("dawnEnd1", new float[]{1.0f, 0.8f, 0.8f, 1f,0.8f, 0.8f, 1.0f, 1f,0.8f, 0.8f, 1.0f, 1f, 0.8f, 0.8f, 1.0f, 1f,});
-//        sds.ColorValueStorage.put("dayStart1", new float[]{1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,1f, 1f, 1f, 1f,0.9f, 0.9f, 0.9f, 1f});
-//        sds.ColorValueStorage.put("dayEnd1", new float[]{0.9f, 0.9f, 0.9f, 1f,1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,1f, 1f, 1f, 1f});
-//        sds.ColorValueStorage.put("duskStart1", new float[]{1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f,  1f, 0.933f, 0.78f, 1f, 1f, 0.933f, 0.78f, 1f});
-//        sds.ColorValueStorage.put("duskEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-//        sds.ColorValueStorage.put("nightStart1", new float[]{0f, 0.07f, 0.17f, 1f, 0f, 0.07f, 0.17f, 1f,  0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-//        sds.ColorValueStorage.put("nightEnd1", new float[]{ 0f, 0.07f, 0.17f, 1f,0f, 0.07f, 0.17f, 1f, 0.9f, 0.9f, 0.9f, 1f, 1f, 1f, 1f, 1f,});
-
-//        resourceReader.SaveSpriteDataStorage(sds);
-
-//        ArrayList<SpriteData> spriteData =  resourceReader.GetSpriteDataList("WhiteBunny");
-//
-//        spriteList.clear();
-//        for(SpriteData sprite : spriteData)
-//        {
-//            spriteList.add(new Sprite(sprite));
-//        }
-//        Collections.sort(spriteList, (s1, s2) -> Float.compare(s2.GetzVertice(), s1.GetzVertice()));
-
-//        for (Sprite sprite : spriteList)
-//        {
-//            sprite.SetMotionOffsetPivotPoint(motionOffsetPivotPoint);
-//        }
 
         particleRenderer.onSurfaceCreated();
         InitSpriteProgram();
@@ -340,19 +284,6 @@ public class SceneSetter
         particleRenderer.SetXOffset(xOffset);
     }
 
-    public void SensorChanged(float xOffset, float yOffset, boolean invert)
-    {
-        Log.d("ConcurrentModification", "SensorChanged Start");
-        for(int i = 0; i < 1000; i++){
-            for (Sprite sprite : spriteList)
-            {
-                sprite.SensorChanged(xOffset, yOffset, invert);
-            }
-
-        }
-        Log.d("ConcurrentModification", "SensorChanged End");
-    }
-
     public void SurfaceChanged(boolean portrait, float spriteXPosOffset, float touchScale, float motionScale,
                                int width, int height)
     {
@@ -462,7 +393,7 @@ public class SceneSetter
                 sprite.SetFadeOutRequired(true);
             }
         }
-        textures.QueueTextures(bitmapNameList);
+        new Thread(() -> textures.QueueTextures(bitmapNameList)).start();
 
         ResetFadePoint(STATUS_FADING_OUT);
 
@@ -691,7 +622,7 @@ public class SceneSetter
     }
 
 
-    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
+    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, SceneCamera sceneCamera)
     {
         Log.d("ConcurrentModification", "spriteList Size = " + spriteList.size());
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -702,6 +633,7 @@ public class SceneSetter
         {
             for (Sprite sprite : spriteList)
             {
+                 sprite.SetSensorData(sceneCamera.GetSensorData());
                 sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
             }
         }

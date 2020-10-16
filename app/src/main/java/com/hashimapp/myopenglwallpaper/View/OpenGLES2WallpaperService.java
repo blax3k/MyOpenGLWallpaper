@@ -108,8 +108,8 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
 
             if (supportsEs2)
             {
-                setEGLContextClientVersion(2);
-                setPreserveEGLContextOnPause(true);
+                glSurfaceView.setEGLContextClientVersion(2);
+                glSurfaceView.setPreserveEGLContextOnPause(true);
                 if (renderer == null)
                 {
                     setRenderer(new GLRenderer(context));

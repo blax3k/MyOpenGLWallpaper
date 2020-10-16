@@ -16,8 +16,6 @@ import java.util.Map;
 
 public class Textures
 {
-
-
     class TextureUploadData
     {
         Bitmap Bitmap;
@@ -253,32 +251,6 @@ public class Textures
     }
 
 
-    ///load textures from storage into memory
-    public void LoadTextures(HashMap<Integer, Integer> bitmapIdTextureNameHashMap)
-    {
-//        Loaded = false;
-//
-//        for (Map.Entry<Integer, Integer> data : bitmapIdTextureNameHashMap.entrySet())
-//        {
-//            int bitmapId = data.getKey();
-//            int texName = data.getValue();
-//            BitmapFactory.Options op = new BitmapFactory.Options();
-//            op.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapId, op);
-//            TextureUploadData uploadData = new TextureUploadData(bmp, texName, bitmapId,0);
-//
-//            textureUploadDataDeque.add(uploadData);
-//            if (InterruptLoading)
-//            {
-//                textureUploadDataDeque.clear();
-//                Loaded = true;
-//                InterruptLoading = false;
-//                return;
-//            }
-//        }
-//        Loaded = true;
-    }
-
 
     private void StopLoading()
     {
@@ -289,23 +261,6 @@ public class Textures
         InterruptLoading = true;
     }
 
-    /*
-    Loads textures from memory into the GPU
-    */
-    public void UploadTexturesOriignal()
-    {
-        int currentSize = textureUploadDataDeque.size();
-        for (int i = 0; i < currentSize; i++)
-        {
-            TextureUploadData data = textureUploadDataDeque.pop();
-            if (data == null)
-            {
-                return;
-            }
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, data.TextureIndex);
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, data.Bitmap, 0);
-        }
-    }
 
     /*
     Generate Blurred textures in mipmap for currently selected GL Texture

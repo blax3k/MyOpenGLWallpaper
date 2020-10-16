@@ -86,16 +86,16 @@ public class Sprite
     }
 
 
-    public void SensorChanged(float xOffset, float yOffset, boolean inverted)
+    public void SetSensorData(SceneCamera.SensorData sensorData)
     {
         float inversion = 1.0f;
-        if (inverted)
+        if (sensorData.Inverted)
         {
             inversion = -1.0f;
         }
         float offsetMultiplier = ((motionOffsetPivotPoint - spriteData.ZVertice())) * 2.0f; // z will be a vertice between 0.0 and -1.0f
-        xAccelOffset = xOffset * offsetMultiplier * inversion;
-        yAccelOffset = yOffset * offsetMultiplier * inversion;
+        xAccelOffset = sensorData.xOffset * offsetMultiplier * inversion;
+        yAccelOffset = sensorData.yOffset * offsetMultiplier * inversion;
     }
 
 
@@ -211,7 +211,6 @@ public class Sprite
 
         float sineZoomPercentInverse = 1.0f - (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
         xZoomScale = yZoomScale = (ZOOM_MIN + maxZoomPercent * sineZoomPercentInverse);
-        Log.d("zoom", "xscale: " + xZoomScale + " " + yZoomScale);
     }
 
     public void SetFade(float progress, boolean fadingIn)
@@ -247,7 +246,6 @@ public class Sprite
         {
             newAlpha = 1.0f - spriteProgress;
         }
-        Log.d("alpha", "new alpha: " + newAlpha);
 
         alpha = newAlpha;
     }
