@@ -142,6 +142,9 @@ public class SettingsActivityTest extends Activity
         } else if (key.equals(resources.getString(R.string.setting_zoom_camera_key)))
         {
             boolean zoomCameraEnabled = sharedPreferences.getBoolean(resources.getString(R.string.setting_zoom_camera_key), true);
+        } else if(key.equals(resources.getString(R.string.touch_offset_setting_key)))
+        {
+
         }
     }
 
@@ -176,7 +179,7 @@ public class SettingsActivityTest extends Activity
         invertMotionParallaxSwitch.setOnCheckedChangeListener(this);
 
         touchOffsetParallaxSwitch = findViewById(R.id.touch_offset);
-        touchOffsetParallaxSwitch.setOnClickListener(this);
+        touchOffsetParallaxSwitch.setOnCheckedChangeListener(this);
 
         cameraZoomSwitch = findViewById(R.id.camera_zoom);
         cameraZoomSwitch.setOnCheckedChangeListener(this);
@@ -220,8 +223,6 @@ public class SettingsActivityTest extends Activity
                     dialog.dismiss();
                 }
         );
-
-
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -266,7 +267,6 @@ public class SettingsActivityTest extends Activity
         useCurrentLocationSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.location_setting_key), false));
         enableParticleSwitch.setChecked(prefs.getBoolean(resources.getString(R.string.particle_enabled_key), true));
         setTimeText.setText(GetTimeTitle());
-
     }
 
     private String getResourceString(int id){

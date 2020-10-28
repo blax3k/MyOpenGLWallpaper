@@ -44,6 +44,8 @@ public class Sprite
     private int biasHandle;
     private int alphaHandle;
 
+    private int currentTime, currentTimePhasePercentage;
+
     private float spriteXPosOffset;
     private float motionOffsetPivotPoint;
 
@@ -86,7 +88,7 @@ public class Sprite
     }
 
 
-    public void SetSensorData(SceneCamera.SensorData sensorData)
+    public void SetSensorData(GLCamera.SensorData sensorData)
     {
         float inversion = 1.0f;
         if (sensorData.Inverted)
@@ -162,7 +164,9 @@ public class Sprite
 
     public void SetTime(int time, int phasePercentage)
     {
-        colors = spriteData.getColor(time, phasePercentage);
+        currentTime = time;
+        currentTimePhasePercentage = phasePercentage;
+        colors = spriteData.getColor(currentTime, currentTimePhasePercentage);
         setColor(colors);
     }
 
@@ -303,6 +307,7 @@ public class Sprite
             spriteData = queuedSpriteData;
             this.setVertices(queuedSpriteData.ShapeVertices);
             this.setTextureVertices(queuedSpriteData.TextureVertices);
+            this.setColor(queuedSpriteData.getColor(currentTime, currentTimePhasePercentage));
 
 
             queuedSpriteData = null;

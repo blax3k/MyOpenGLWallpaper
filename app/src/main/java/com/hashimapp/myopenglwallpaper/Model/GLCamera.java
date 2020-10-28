@@ -6,13 +6,26 @@ import android.util.Log;
 import android.view.Surface;
 
 public class GLCamera {
+
+    public class SensorData
+    {
+        public float xOffset, yOffset;
+        boolean Inverted;
+
+        public SensorData()
+        {
+            xOffset = 0;
+            yOffset = 0;
+            Inverted = false;
+        }
+    }
+
     float[] mModelMatrix;
     float[] mtrxProjection;
     float[] mtrxView;
 
     private static float TEXTURE_WIDTH = 4.8f;
 
-    private static float X_OFFSET_STEP_PORTRAIT = 2.1F;
     private static float X_OFFSET_STEP_LANDSCAPE = 0.3F;
     private static float MOTION_OFFSET_0 = 0.0f;
     private static float MOTION_OFFSET_1 = 0.1f;
@@ -52,6 +65,11 @@ public class GLCamera {
     float relativeScreenWidth = 0;
     float screenWidthDiff = 0;
     private float xPositionOffset;
+    public boolean SensorUpdated;
+    private SensorData sensorData;
+
+    private boolean xOffsetUpdated;
+    private float xOffset;
 
     public boolean isMotionOffsetInverted(){
         return motionOffsetInverted;
@@ -61,6 +79,7 @@ public class GLCamera {
         mModelMatrix = new float[16];
         mtrxProjection = new float[16];
         mtrxView = new float[16];
+        sensorData = new SensorData();
     }
 
     public void OnSurfaceChanged(int width, int height) {
@@ -94,22 +113,33 @@ public class GLCamera {
     }
 
 
-    public float GetXOffset(float xOffsetM) {
-        float xOffset = xOffsetM;
-        if (xOffsetM > 1.0f) {
-            xOffset = 1.0f;
+    public void SetXOffset(float xOffsetM) {
+        if(xOffsetUpdated)
+        {
+            return;
+        }
+        float newOffset = xOffsetM;
+        if (newOffset > 1.0f) {
+            newOffset = 1.0f;
 
-        } else if (xOffsetM < 0.0f) {
-            xOffset = 0.0f;
+        } else if (newOffset < 0.0f) {
+            newOffset = 0.0f;
         }
         float result;
 
         if(portraitOrientation) {
-            result = xOffset * screenWidthDiff;
+            result = newOffset * screenWidthDiff;
         }else{
-            result = xOffset * X_OFFSET_STEP_LANDSCAPE;
+            result = newOffset * X_OFFSET_STEP_LANDSCAPE;
         }
-        return result;
+
+        this.xOffset = result;
+    }
+
+    public float GetXOffset()
+    {
+        xOffsetUpdated = false;
+        return xOffset;
     }
 
     /*
@@ -124,7 +154,6 @@ public class GLCamera {
             xPositionOffset =  screenWidthDiff/2;
         }else{
             xPositionOffset =  X_OFFSET_STEP_LANDSCAPE/2;
-
         }
         return  xPositionOffset;
     }
@@ -144,7 +173,7 @@ public class GLCamera {
 
 
     public void SetMotionOffsetInverted(boolean inverted){
-        motionOffsetInverted = inverted;
+        sensorData.Inverted = inverted;
     }
 
     float[] finalValues = new float[3];
@@ -153,7 +182,13 @@ public class GLCamera {
     /*
     handle user tilting and rotating device
      */
-    public float[] SensorChanged(SensorEvent event, int rotation) {
+    public void SensorChanged(SensorEvent event, int rotation) {
+
+        if(SensorUpdated)
+        {
+            return;
+        }
+
         float[] rawSensorData = new float[3];
         switch (rotation)
         {
@@ -198,7 +233,16 @@ public class GLCamera {
             finalValues[1] = -motionOffsetLimit;
         }
 
-        return finalValues;
+        sensorData.xOffset = finalValues[0];
+        sensorData.yOffset = finalValues[1];
+        SensorUpdated = true;
+    }
+
+
+    public SensorData GetSensorData()
+    {
+        SensorUpdated = false;
+        return sensorData;
     }
 
     public boolean MotionOffsetEnabled(){
@@ -251,13 +295,9 @@ public class GLCamera {
                 break;
         }
 
-        motionOffsetLimit = 0.22f * motionOffsetStrength;
+        motionOffsetLimit =  motionOffsetStrength * 0.25f;
     }
 
-
-    public boolean IsPortraitOrientation() {
-        return portraitOrientation;
-    }
 
     /*
     smooths the data in the input array and returns the smoothed data in the output
@@ -269,14 +309,5 @@ public class GLCamera {
             prev[i] = prev[i] + 0.00001f * (input[i] - prev[i]);
         }
         return prev;
-    }
-
-
-    public float GetEyeX() {
-        return eyeX;
-    }
-
-    public float getEyeY() {
-        return eyeY;
     }
 }

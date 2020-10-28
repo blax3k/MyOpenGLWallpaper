@@ -34,7 +34,6 @@ public class GLRenderer implements Renderer
     Resources resources;
     TimeTracker timeTracker;
     GLCamera camera;
-    private SceneCamera sceneCamera;
 
     private String timePhaseSelected;
     private boolean _cameraBlurEnabled;
@@ -51,18 +50,15 @@ public class GLRenderer implements Renderer
 
         dateCreated = new Date();
         camera = new GLCamera();
-        sceneCamera = new SceneCamera();
         sceneSetter = new SceneSetter(context);
         location = new Location(47.760012, -122.307209);
         timeTracker = new TimeTracker(resources);
         timePhaseSelected = resources.getString(R.string.time_key_day);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
     {
-        Log.d("textures", "surface created");
         startTime = System.currentTimeMillis();
         if (sceneSetter == null)
         {
@@ -88,7 +84,6 @@ public class GLRenderer implements Renderer
         if(!_created){
             _created = true;
             widthHeight = newWidthHeight;
-//            sceneSetter.InitTextures(widthHeight);
             sceneSetter.InitScene(timeOfDay, percentage, 0, widthHeight);
         }
 
@@ -103,25 +98,19 @@ public class GLRenderer implements Renderer
     {
         if (camera.TouchOffsetEnabled())
         {
-            float newXOffset = camera.GetXOffset(xOffset);
-            sceneSetter.OffsetChanged(newXOffset);
+            camera.SetXOffset(xOffset);
             return true;
         }
         return false;
     }
 
-
     public void OnSensorChanged(SensorEvent event, int rotation)
     {
         if (camera.MotionOffsetEnabled())
         {
-            float[] newSensorValues = camera.SensorChanged(event, rotation);
-            sceneCamera.SetSensorData(newSensorValues[0], newSensorValues[1], camera.isMotionOffsetInverted());
+            camera.SensorChanged(event, rotation);
         }
     }
-
-
-
 
     public void UpdateVisibility(boolean visible)
     {
@@ -152,14 +141,9 @@ public class GLRenderer implements Renderer
                 sceneSetter.ResetZoomPercent();
             }
 
-//            if(_zoomCameraEnabled){
-//                sceneSetter.SetTarget
-//            }
-
         } else
         {
             camera.ResetSensorOffset();
-            sceneCamera.SetSensorData(0, 0, camera.isMotionOffsetInverted());
         }
     }
 
@@ -180,7 +164,7 @@ public class GLRenderer implements Renderer
         camera.SetMotionOffsetInverted(inverted);
     }
 
-    public void SetTouchOffset(boolean touchOffsetOn)
+    public void SetTouchOffsetEnabled(boolean touchOffsetOn)
     {
         if (!touchOffsetOn)
         {
@@ -190,12 +174,15 @@ public class GLRenderer implements Renderer
         camera.EnableTouchOffset(touchOffsetOn);
     }
 
-    public void SetCameraBlurAmount(int amount){
+    public void SetCameraBlurAmount(int amount)
+    {
         camera.maxBlur = amount;
-        if(amount == 0){
+        if (amount == 0)
+        {
             _cameraBlurEnabled = false;
             sceneSetter.TurnOffBlur();
-        }else{
+        } else
+        {
             _cameraBlurEnabled = true;
             sceneSetter.SetMaxBlurAmount(amount);
         }
@@ -292,7 +279,7 @@ public class GLRenderer implements Renderer
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix, sceneCamera);
+        sceneSetter.DrawSprites(camera);
 
 
 

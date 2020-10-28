@@ -1,6 +1,5 @@
 package com.hashimapp.myopenglwallpaper.View;
 
-import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,9 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.opengl.GLSurfaceView;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -20,16 +17,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-import com.hashimapp.myopenglwallpaper.Model.GLParticleRenderer;
 import com.hashimapp.myopenglwallpaper.Model.GLRenderer;
 import com.hashimapp.myopenglwallpaper.Model.MyLocation;
 import com.hashimapp.myopenglwallpaper.R;
-import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.io.IOException;
 import java.util.Date;
-
-import static java.lang.System.currentTimeMillis;
 
 /**
  * Created by Blake Hashimoto on 8/14/2015.
@@ -132,7 +125,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         private void InitRendererPrefs()
         {
             renderer.SetMotionOffsetStrength(prefs.getInt(resources.getString(R.string.motion_parallax_strength_key), 6));
-            renderer.SetTouchOffset(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
+            renderer.SetTouchOffsetEnabled(prefs.getBoolean(resources.getString(R.string.touch_offset_setting_key), true));
             renderer.SetTimePhase(prefs.getString(resources.getString(R.string.time_phase_key), resources.getString(R.string.time_key_automatic)));
             renderer.SetRackFocusEnabled(prefs.getBoolean(resources.getString(R.string.rack_focus_enabled_key), true));
             renderer.SetCameraBlurAmount(prefs.getInt(resources.getString(R.string.blur_amount_key), 5));
@@ -222,7 +215,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             {
                 boolean touchOffsetEnabled = sharedPreferences.getBoolean(resources.getString(R.string.touch_offset_setting_key), true);
                 Log.d("touch", "touch offset enabled: " + touchOffsetEnabled);
-                renderer.SetTouchOffset(touchOffsetEnabled);
+                renderer.SetTouchOffsetEnabled(touchOffsetEnabled);
             } else if (key.equals(resources.getString(R.string.blur_amount_key)))
             {
                 int blurAmount = sharedPreferences.getInt(resources.getString(R.string.blur_amount_key), 5);

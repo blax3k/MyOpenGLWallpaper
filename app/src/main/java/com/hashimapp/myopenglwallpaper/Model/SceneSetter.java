@@ -40,7 +40,7 @@ public class SceneSetter
     private static float MIN_PROGRESS = 0.0f;
     private static float MAX_PROGRESS = 1.0f;
     private static float LANDSCAPE_Y_OFFSET_ADJUST = 0.8f;
-    private float motionOffsetPivotPoint = 0.3f;
+    private float motionOffsetPivotPoint = 0.0f;
 
 
     Textures textures;
@@ -147,11 +147,13 @@ public class SceneSetter
 
     public void SetTimeOfDay(int timePhase, int percentage)
     {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.SetTime(timePhase, percentage);
-            }
+        spriteListLocked = true;
+        for (Sprite sprite : spriteList)
+        {
+            sprite.SetTime(timePhase, percentage);
+        }
         particleRenderer.SetTime(timePhase, percentage);
+        spriteListLocked = false;
     }
 
     /*
@@ -274,16 +276,6 @@ public class SceneSetter
         return highestTransition;
     }
 
-
-    public void OffsetChanged(float xOffset)
-    {
-        for (Sprite sprite : spriteList)
-        {
-            sprite.SetXOffset(xOffset);
-        }
-        particleRenderer.SetXOffset(xOffset);
-    }
-
     public void SurfaceChanged(boolean portrait, float spriteXPosOffset, float touchScale, float motionScale,
                                int width, int height)
     {
@@ -338,10 +330,6 @@ public class SceneSetter
         } else if (transition == SceneSetter.PARTIAL_FADE_TRANSITION ||
                 transition == SceneSetter.FULL_FADE_TRANSITION)
         {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.DequeueColor();
-            }
             InitTextureSwap();
         }
         Log.d("ConcurrentModification", "InitSceneChange End");
@@ -457,7 +445,6 @@ public class SceneSetter
             if (_textureSwapRequired)
             {
                 textures.DequeTextures();
-//                textures.DequeTextures();
                 TextureSwapStatus = STATUS_LOADING_TEXTURES;
             } else
             {
@@ -475,7 +462,6 @@ public class SceneSetter
 
     private void AssignTexturesToSprites()
     {
-        Log.d("ConcurrentModification", "AssignTexturesToSprites Start");
         for(Sprite sprite : spriteList)
         {
             TextureData data = textures.GetTextureData(sprite.spriteData.BitmapName);
@@ -485,7 +471,6 @@ public class SceneSetter
             }
         }
         Collections.sort(spriteList, (s1, s2) -> Float.compare(s2.spriteData.ZVertice(), s1.spriteData.ZVertice()));
-        Log.d("ConcurrentModification", "AssignTexturesToSprites End");
     }
     private void ResetFadePoint(int swapStatus)
     {
@@ -502,7 +487,6 @@ public class SceneSetter
 
     public void SetToTargetFocalPoint()
     {
-        Log.d("focal", "setting target focal point");
         rackingFocus = false;
         focalPoint = focalPointEndingPoint;
         for (Sprite sprite : spriteList)
@@ -562,7 +546,6 @@ public class SceneSetter
         float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
         float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI / 2);
         focalPoint = sinCurveProgression * (focalPointEndingPoint - focalPointStartingPoint) + focalPointStartingPoint;
-        Log.d("focal", "focal point: " + focalPoint);
 
         for (Sprite sprite : spriteList)
         {
@@ -575,7 +558,6 @@ public class SceneSetter
             rackingFocus = false;
         }
     }
-
 
     public void SetToMaxZoomPercent()
     {
@@ -622,7 +604,7 @@ public class SceneSetter
     }
 
 
-    public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, SceneCamera sceneCamera)
+    public void DrawSprites(GLCamera camera)
     {
         Log.d("ConcurrentModification", "spriteList Size = " + spriteList.size());
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -633,13 +615,15 @@ public class SceneSetter
         {
             for (Sprite sprite : spriteList)
             {
-                 sprite.SetSensorData(sceneCamera.GetSensorData());
-                sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+                sprite.SetXOffset(camera.GetXOffset());
+                sprite.SetSensorData(camera.GetSensorData());
+                sprite.draw(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix, mvpMatrix);
             }
         }
         if (particlesEnabled)
         {
-            particleRenderer.onDrawFrame(null, mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+            particleRenderer.SetXOffset(camera.GetXOffset());
+            particleRenderer.onDrawFrame(null, camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix, mvpMatrix);
         }
         Log.d("ConcurrentModification", "DrawSprites End");
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Textures
@@ -22,10 +23,12 @@ public class Textures
         int TextureIndex;
         String BitmapName;
         String DisposeBitmapName;
+        ArrayList<Bitmap> MipMapList;
 
-        public TextureUploadData(Bitmap bitmap, int textureIndex, String bitmapName, String removeBitmapName)
+        public TextureUploadData(Bitmap bitmap, ArrayList<Bitmap> mipMaps, int textureIndex, String bitmapName, String removeBitmapName)
         {
             Bitmap = bitmap;
+            MipMapList = mipMaps;
             TextureIndex = textureIndex;
             BitmapName = bitmapName;
             DisposeBitmapName = removeBitmapName;
@@ -184,7 +187,8 @@ public class Textures
 
             int bitmapID = resources.getIdentifier(bitmapName, "drawable", context.getPackageName());
             Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
-            textureUploadDataDeque.add(new TextureUploadData(bmp, index, bitmapName, disposeBitmapName));
+            ArrayList mipMaps = GetBlurredMipMaps(bmp);
+            textureUploadDataDeque.add(new TextureUploadData(bmp,mipMaps, index, bitmapName, disposeBitmapName));
         }
         Loaded = true;
     }
@@ -228,7 +232,7 @@ public class Textures
 
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, data.Bitmap, 0);
 
-        GenerateBlurredTextures(data.Bitmap);
+        ApplyMipMaps(data.MipMapList);
 
         return textureData;
     }
@@ -265,16 +269,31 @@ public class Textures
     /*
     Generate Blurred textures in mipmap for currently selected GL Texture
      */
-    private void GenerateBlurredTextures(Bitmap bmp)
+    private void ApplyMipMaps(ArrayList<Bitmap> mipMaps)
+    {
+        int index = 1;
+
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D); //generate mipmap for the current texture
+
+        for(Bitmap bitmap : mipMaps)
+        {
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, index, bitmap, 0);
+            index++;
+        }
+    }
+
+
+    /*
+    Generate Blurred textures in mipmap for currently selected GL Texture
+     */
+    private ArrayList<Bitmap> GetBlurredMipMaps(Bitmap bmp)
     {
         int originalWidth, bmpWidth;
         originalWidth = bmpWidth = bmp.getWidth();
         int originalHeight, bmpHeight;
         originalHeight = bmpHeight = bmp.getHeight();
 
-        int index = 1;
-
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D); //generate mipmap for the current texture
+        ArrayList<Bitmap> mipMaps = new ArrayList<>();
 
         while (bmpWidth > 32 && bmpHeight > 32)
         {
@@ -284,10 +303,10 @@ public class Textures
 
             //blur current image
             Bitmap blurredFull = BlurBuilder.blur(context, bmp, (float) bmpWidth / originalWidth, (float) bmpHeight / originalHeight, BLUR_RADIUS);
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, index, blurredFull, 0);
-            index++;
-
+            mipMaps.add(blurredFull);
         }
+
+        return mipMaps;
     }
 }
 
