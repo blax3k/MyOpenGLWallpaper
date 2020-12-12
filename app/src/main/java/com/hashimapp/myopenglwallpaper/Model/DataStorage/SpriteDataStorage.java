@@ -26,7 +26,7 @@ public class SpriteDataStorage
     }
 
 
-    public SpriteData GetSpriteData(SpriteDataParameters parms, Context context)
+    public SpriteData GetSpriteData(SpriteDataParameters parms, ColorData colorData)
     {
         SpriteData sd = new SpriteData();
 

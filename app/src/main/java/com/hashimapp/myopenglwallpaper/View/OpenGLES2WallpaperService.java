@@ -2,6 +2,7 @@ package com.hashimapp.myopenglwallpaper.View;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ConfigurationInfo;
 import android.content.res.Resources;
@@ -37,7 +38,6 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
     MyLocation locationManager;
     private boolean _useCurrentLocation;
 
-
     @Override
     public void onCreate()
     {
@@ -61,6 +61,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         _useCurrentLocation = prefs.getBoolean(resources.getString(R.string.location_setting_key), false);
 
     }
+
 
 
     @Override
@@ -188,6 +189,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
                     sensorManager.unregisterListener(this);
                     renderer.UpdateVisibility(visible);
                     locationManager.cancelTimer();
+                    glSurfaceView.requestRender();
                 }
             }
             super.onVisibilityChanged(visible);

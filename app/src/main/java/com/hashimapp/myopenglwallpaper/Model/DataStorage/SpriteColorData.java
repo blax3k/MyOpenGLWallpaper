@@ -7,6 +7,7 @@ import com.hashimapp.myopenglwallpaper.Model.WeatherManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 /*
 Holds and handles data for a single color day/weather set
@@ -25,6 +26,8 @@ public class SpriteColorData
     public static final int DAY_PHASE_COUNT = 8;
 
     private ArrayList<float[][]> ColorSets;
+
+    public Map<String, float[]> AllColors;
 
     public SpriteColorData()
     {

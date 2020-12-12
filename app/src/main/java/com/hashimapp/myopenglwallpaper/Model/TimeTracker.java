@@ -3,11 +3,13 @@ package com.hashimapp.myopenglwallpaper.Model;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.TimeUtils;
 
 import com.hashimapp.myopenglwallpaper.R;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -30,6 +32,8 @@ public class TimeTracker
     public static final double DEFAULT_LONGITUDE = -122.332183;
     public static final String DEFAULT_TIMEZONE = "GMT+5:00";
 
+    private final long SCENE_CHANGE_INTERVAL = 60 * 1000;
+
     public static final int TIME_PHASE_INDEX = 0;
     public static final int TIME_PHASE_PROGRESSION_INDEX = 1;
 
@@ -50,12 +54,15 @@ public class TimeTracker
     Location location;
     TimeZone timeZone;
 
+    private Date lastSceneChange;
+
 
     public TimeTracker(Resources resources)
     {
         location = new Location(DEFAULT_LATITTUDE, DEFAULT_LONGITUDE);
         timeZone = Calendar.getInstance().getTimeZone();
         calculator = new SunriseSunsetCalculator(location, timeZone);
+        lastSceneChange = Calendar.getInstance().getTime();
         this.resources = resources;
     }
 
@@ -171,12 +178,22 @@ public class TimeTracker
         return timeInfo;
     }
 
-    public void SignalSceneChanged(){
-
-    }
 
     public boolean SceneChangeRequired(){
-        return true;
+        Date currentTime = Calendar.getInstance().getTime();
+        long diff = currentTime.getTime() - lastSceneChange.getTime();
+        if(diff > SCENE_CHANGE_INTERVAL)
+        {
+            lastSceneChange = Calendar.getInstance().getTime();
+            return true;
+        }
+
+        return false;
+    }
+
+    public void SignalSceneChange()
+    {
+        lastSceneChange = Calendar.getInstance().getTime();
     }
 
     private int CalculateCurrentProgress(long currentTime, long currentPhase, long nextPhase)
@@ -190,32 +207,6 @@ public class TimeTracker
         return returnValue;
     }
 
-//    public int GetTimePhaseProgress(Calendar calendar, int timePhase){
-//
-//        UpdateSunriseSunsetTimes(calendar);
-//
-//        switch(timePhase){
-//            case EARLY_DAWN:
-//                break;
-//            case MID_DAWN:
-//                break;
-//            case DAY:
-//                break;
-//            case EARLY_DUSK:
-//                break;
-//            case MID_DUSK:
-//                break;
-//            case NIGHT:
-//                break;
-//        }
-//
-//        return 0;
-//    }
-
-    private int GetProgress(long phaseStart, long phaseEnd, long currentTime)
-    {
-        return 0;
-    }
 
     public void UpdateSunriseSunsetTimes(Date date)
     {

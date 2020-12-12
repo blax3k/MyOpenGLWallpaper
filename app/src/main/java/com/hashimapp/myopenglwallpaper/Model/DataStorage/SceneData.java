@@ -14,5 +14,4 @@ public class SceneData
     {
         SpriteDataList = new ArrayList<>();
     }
-
 }

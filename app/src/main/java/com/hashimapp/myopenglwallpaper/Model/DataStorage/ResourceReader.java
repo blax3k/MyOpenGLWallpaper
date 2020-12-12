@@ -28,6 +28,8 @@ public class ResourceReader
 
     private final String SPRITE_DATA_STORAGE_FOLDER = "Sprite Data Storage/";
     private final String SCENE_DATA_FOLDER = "Scene Data Storage/";
+    private final String SCENE_SCHEDULE_FOLDER = "Scene Schedule Folder/";
+    private final String COLOR_DATA_FOLDER = "Color Data Folder/";
 
 
     public ResourceReader(Context context)
@@ -61,7 +63,6 @@ public class ResourceReader
         ArrayList<String> fileNames = new ArrayList<>();
         for(int i = 0; i < files.length; i++)
         {
-
             String name = files[i].getName();
             name = name.substring(0, name.lastIndexOf('.'));
             fileNames.add(name);
@@ -71,7 +72,7 @@ public class ResourceReader
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public ArrayList<SpriteData> GetSpriteDataList(String SceneDataKey)
+    public ArrayList<SpriteData> GetSpriteDataList(String SceneDataKey, ColorData colorData)
     {
         try
         {
@@ -96,7 +97,7 @@ public class ResourceReader
 
                 if(spriteDataStorage != null)
                 {
-                    SpriteData spriteData = spriteDataStorage.GetSpriteData(spriteParm, _context);
+                    SpriteData spriteData = spriteDataStorage.GetSpriteData(spriteParm, colorData);
                     spriteDataList.add(spriteData);
                 }
             }
@@ -106,6 +107,27 @@ public class ResourceReader
         {
             Log.d("json", "couldn't read file");
             return new ArrayList<>();
+        }
+    }
+
+
+
+    public ColorData GetColorData(String colorDataName)
+    {
+        String cdName = colorDataName;
+        if(cdName.isEmpty())
+        {
+            cdName = "DefaultColor";
+        }
+        try
+        {
+            Reader fileReader = GetFileReader(COLOR_DATA_FOLDER, cdName);
+            ColorData colorData = _gson.fromJson(fileReader, ColorData.class);
+            return colorData;
+
+        } catch (Exception e)
+        {
+            return new ColorData();
         }
     }
 
@@ -136,6 +158,20 @@ public class ResourceReader
         } catch (Exception e)
         {
             Log.d("json", "couldn't create new file" + e.getMessage());
+        }
+    }
+
+    public SceneSchedule GetSceneSchedule()
+    {
+        try
+        {
+            Reader fileReader = GetFileReader(SCENE_DATA_FOLDER, "SceneSchedule");
+            SceneSchedule sceneData = _gson.fromJson(fileReader, SceneSchedule.class);
+            return sceneData;
+        } catch (Exception e)
+        {
+            Log.d("json", "couldn't read file");
+            return new SceneSchedule();
         }
     }
 

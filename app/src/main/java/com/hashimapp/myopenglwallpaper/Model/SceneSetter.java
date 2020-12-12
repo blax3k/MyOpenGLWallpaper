@@ -9,7 +9,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.ColorData;
 import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SceneData;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 
 import java.util.ArrayList;
@@ -165,7 +167,6 @@ public class SceneSetter
         {
             return;
         }
-//        QueueScene(scene, timePhase, percentage, weather);
 
         for (Sprite sprite : spriteList)
         {
@@ -199,7 +200,8 @@ public class SceneSetter
         Log.d("ConcurrentModification", "queueScene Start");
         spriteListLocked = true;
         int highestTransition = SceneSetter.NO_TRANSITION;
-        ArrayList<SpriteData> newSpriteDataList = resourceReader.GetSpriteDataList(scene);
+        ColorData colorData = resourceReader.GetColorData("");
+        ArrayList<SpriteData> newSpriteDataList = resourceReader.GetSpriteDataList(scene, colorData);
 
         //keep track of the untouched sprites from both lists
         ArrayList<Integer> untouchedNewSpriteIndexes = new ArrayList<>();
@@ -637,6 +639,5 @@ public class SceneSetter
             sprite.SetSpriteMembers(colorHandle, positionHandle, texCoordLoc, mtrxHandle, samplerLoc, biasHandle, alphaHandle);
         }
     }
-
 
 }

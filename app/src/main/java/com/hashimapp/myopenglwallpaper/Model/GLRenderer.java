@@ -15,7 +15,9 @@ import android.os.SystemClock;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SceneIndex;
 import com.hashimapp.myopenglwallpaper.R;
+import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 
@@ -34,6 +36,7 @@ public class GLRenderer implements Renderer
     Resources resources;
     TimeTracker timeTracker;
     GLCamera camera;
+    SceneManager sceneManager;
 
     private String timePhaseSelected;
     private boolean _cameraBlurEnabled;
@@ -54,6 +57,7 @@ public class GLRenderer implements Renderer
         location = new Location(47.760012, -122.307209);
         timeTracker = new TimeTracker(resources);
         timePhaseSelected = resources.getString(R.string.time_key_day);
+        sceneManager = new SceneManager(context);
     }
 
     @Override
@@ -120,8 +124,9 @@ public class GLRenderer implements Renderer
             UpdateTime();
             if (timeTracker.SceneChangeRequired())
             {
-//                sceneSetter.InitTextureSwap();
-                timeTracker.SignalSceneChanged();
+                timeTracker.SignalSceneChange();
+                int transition = sceneSetter.QueueScene(sceneManager.GetNextScene(), timeOfDay, percentage, 0);
+                sceneSetter.InitSceneChange(transition);
             }
 
             if (_cameraBlurEnabled)
@@ -143,6 +148,9 @@ public class GLRenderer implements Renderer
 
         } else
         {
+//            if(_cameraZoomEnabled){
+//                sceneSetter.ResetZoomPercent();
+//            }
             camera.ResetSensorOffset();
         }
     }
@@ -216,7 +224,6 @@ public class GLRenderer implements Renderer
         }
     }
 
-
     public void SetParticlesEnabled(boolean enabled){
         sceneSetter.SetParticlesEnabled(enabled);
     }
@@ -280,11 +287,6 @@ public class GLRenderer implements Renderer
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         sceneSetter.DrawSprites(camera);
-
-
-
-//        }
-
     }
 
 }
