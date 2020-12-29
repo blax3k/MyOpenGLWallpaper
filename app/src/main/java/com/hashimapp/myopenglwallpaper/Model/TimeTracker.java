@@ -32,7 +32,7 @@ public class TimeTracker
     public static final double DEFAULT_LONGITUDE = -122.332183;
     public static final String DEFAULT_TIMEZONE = "GMT+5:00";
 
-    private final long SCENE_CHANGE_INTERVAL = 60 * 1000;
+    private final long SCENE_CHANGE_INTERVAL = 5 * 1000;
 
     public static final int TIME_PHASE_INDEX = 0;
     public static final int TIME_PHASE_PROGRESSION_INDEX = 1;

@@ -5,6 +5,8 @@ import android.opengl.Matrix;
 import android.support.annotation.FloatRange;
 import android.util.Log;
 
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteData;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;

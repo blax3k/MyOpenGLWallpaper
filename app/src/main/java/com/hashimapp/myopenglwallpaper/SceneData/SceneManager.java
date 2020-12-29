@@ -16,12 +16,14 @@ public class SceneManager
 
     Random randomGenerator;
     private ArrayList<String> SceneNames;
+    int lastIndex;
 
     public SceneManager(Context context)
     {
         randomGenerator = new Random();
         _reader = new ResourceReader(context);
         SceneNames = _reader.GetSceneNames();
+        lastIndex = 0;
     }
 
 
@@ -30,10 +32,21 @@ public class SceneManager
         return SceneNames;
     }
 
+
     public String GetNextScene()
     {
         Random random = new Random();
-        int index = random.nextInt(SceneNames.size());
+//        int index = random.nextInt(SceneNames.size());
+        int index;
+        if(lastIndex == 0)
+        {
+            index = SceneNames.size() - 1;
+        }
+        else
+        {
+            index = 0;
+        }
+        lastIndex = index;
         return SceneNames.get(index);
     }
 

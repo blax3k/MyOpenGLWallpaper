@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.Model.DataStorage.ColorData;
 import com.hashimapp.myopenglwallpaper.Model.DataStorage.ResourceReader;
-import com.hashimapp.myopenglwallpaper.Model.DataStorage.SceneData;
+import com.hashimapp.myopenglwallpaper.Model.DataStorage.SpriteData;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 
 import java.util.ArrayList;

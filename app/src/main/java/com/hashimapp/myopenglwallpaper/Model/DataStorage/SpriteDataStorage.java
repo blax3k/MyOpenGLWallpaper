@@ -1,9 +1,5 @@
 package com.hashimapp.myopenglwallpaper.Model.DataStorage;
 
-import android.content.Context;
-
-import com.hashimapp.myopenglwallpaper.Model.SpriteData;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
