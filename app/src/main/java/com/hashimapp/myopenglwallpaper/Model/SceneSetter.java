@@ -114,23 +114,23 @@ public class SceneSetter
     public void OnSurfaceCreated()
     {
         //todo: add sprite key generator
-//        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-//        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-//        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
-//        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
-//        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
-//        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
+        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
+        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
+        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
+        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
+        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
 
-        SceneData sd = new SceneData();
-        sd.SceneKey = "tempKey";
-//        sd.SpriteDataList = spriteList.stream().map((s) -> s.spriteData).collect(Collectors.toCollection(ArrayList::new));
-//        wallpaperResourceReader.SaveSceneData(sd);
-        SceneData testSceneData = wallpaperResourceReader.LoadSceneData(sd.SceneKey);
-
-        for(int i = 0; i < testSceneData.SpriteDataList.size(); i++)
-        {
-            spriteList.add(new Sprite(testSceneData.SpriteDataList.get(i), i, currentScene));
-        }
+//        SceneData sd = new SceneData();
+//        sd.SceneKey = "tempKey";
+////        sd.SpriteDataList = spriteList.stream().map((s) -> s.spriteData).collect(Collectors.toCollection(ArrayList::new));
+////        wallpaperResourceReader.SaveSceneData(sd);
+//        SceneData testSceneData = wallpaperResourceReader.LoadSceneData(sd.SceneKey);
+//
+//        for(int i = 0; i < testSceneData.SpriteDataList.size(); i++)
+//        {
+//            spriteList.add(new Sprite(testSceneData.SpriteDataList.get(i), i, currentScene));
+//        }
 
         for (Sprite sprite : spriteList)
         {
