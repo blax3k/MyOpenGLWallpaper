@@ -10,7 +10,7 @@ public class DeskSprite extends SpriteData {
 
     int currentBitmap = R.drawable.layer1;
     public DeskSprite() {
-        bitmapID = R.drawable.desk_1024;
+        bitmapID = R.drawable.layer00;
         zVertice = 0.2f;
         essentialLayer = true;
         portraitVertices = new float[]{
@@ -88,7 +88,7 @@ public class DeskSprite extends SpriteData {
     public int GetBitmapID(int scene){
         switch(scene){
             case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.desk_1024;
+                return  R.drawable.layer00;
         }
 //        if(currentBitmap == R.drawable.layer1){
 //            currentBitmap = R.drawable.layer1_flipped;
@@ -97,7 +97,7 @@ public class DeskSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer1;
 //        return currentBitmap;
 
-        return R.drawable.desk_1024;
+        return R.drawable.layer00;
     }
 
 }

@@ -5,11 +5,11 @@ import com.hashimapp.myopenglwallpaper.Model.Textures;
 import com.hashimapp.myopenglwallpaper.R;
 
 public class GradientBarSprite extends SpriteData
-{ int currentBitmap = R.drawable.guy;
+{
 
     public GradientBarSprite()
     {
-        bitmapID = R.drawable.desk_1024;
+        bitmapID = R.drawable.layer00;
         zVertice = 0.0f;
         essentialLayer = false;
         portraitVertices = new float[]{
@@ -85,7 +85,7 @@ public class GradientBarSprite extends SpriteData
     public int GetBitmapID( int scene){
         switch(scene){
             case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.desk_1024;
+                return  R.drawable.layer00;
         }
 //        if(currentBitmap == R.drawable.guy){
 //            currentBitmap = R.drawable.guy2;
@@ -94,6 +94,6 @@ public class GradientBarSprite extends SpriteData
 //        }
 //        return currentBitmap;
 
-        return R.drawable.desk_1024;
+        return R.drawable.layer00;
     }
 }

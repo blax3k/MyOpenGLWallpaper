@@ -7,7 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class SkySprite extends SpriteData {
 
     public SkySprite() {
-        bitmapID = R.drawable.sky_1024_border;
+        bitmapID = R.drawable.layer00;
         zVertice = 1.0f;
         essentialLayer = true;
         portraitVertices = new float[]{
@@ -84,13 +84,13 @@ public class SkySprite extends SpriteData {
     {
         switch(scene){
             case Textures.IMAGE_SIZE_512:
-                return R.drawable.sky_1024_border;
+                return R.drawable.layer00;
             case Textures.IMAGE_SIZE_1024:
                 break;
             case Textures.IMAGE_SIZE_2048:
                 break;
         }
-        return R.drawable.sky_1024_border;
+        return R.drawable.layer00;
     }
 
 }

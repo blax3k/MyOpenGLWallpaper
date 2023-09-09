@@ -7,7 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class CupSprite extends SpriteData {
 
     public CupSprite() {
-        bitmapID = R.drawable.foregroundcitymap_1024;
+        bitmapID = R.drawable.layer00;
         zVertice = 0.0f;
         essentialLayer = true;
         portraitVertices = new float[]{
@@ -86,7 +86,7 @@ public class CupSprite extends SpriteData {
 
         switch(scene){
             case Textures.IMAGE_SIZE_512:
-                return R.drawable.foregroundcitymap_1024;
+                return R.drawable.layer00;
             case Textures.IMAGE_SIZE_1024:
             case Textures.IMAGE_SIZE_2048:
 
@@ -98,6 +98,6 @@ public class CupSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer0;
 //        return currentBitmap;
 
-        return R.drawable.foregroundcitymap_1024;
+        return R.drawable.layer00;
     }
 }

@@ -7,7 +7,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class HouseSprite extends SpriteData {
 
     public HouseSprite() {
-        bitmapID = R.drawable.foregroundcitymap_1024;;
+        bitmapID = R.drawable.layer00;;
         zVertice = 1.0f;
         essentialLayer = true;
 
@@ -85,7 +85,7 @@ public class HouseSprite extends SpriteData {
     public int GetBitmapID( int scene){
         switch(scene){
             case Textures.IMAGE_SIZE_1024:
-                return  R.drawable.foregroundcitymap_1024;
+                return  R.drawable.layer00;
         }
 //        if(currentBitmap == R.drawable.layer0){
 //            currentBitmap = R.drawable.layer00;
@@ -94,6 +94,6 @@ public class HouseSprite extends SpriteData {
 //        currentBitmap = R.drawable.layer0;
 //        return currentBitmap;
 
-        return R.drawable.foregroundcitymap_1024;
+        return R.drawable.layer00;
     }
 }

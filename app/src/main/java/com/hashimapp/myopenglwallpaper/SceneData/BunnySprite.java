@@ -8,7 +8,7 @@ import com.hashimapp.myopenglwallpaper.R;
 public class BunnySprite extends SpriteData
 {
 
-    int currentBitmap = R.drawable.guy;
+    int currentBitmap = R.drawable.layer00;
 
     public BunnySprite()
     {
