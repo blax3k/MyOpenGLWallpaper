@@ -7,5 +7,9 @@ public class SceneData
 {
     public String SceneKey;
 
-    public ArrayList<SpriteData> SpriteDataList;
+    public List<SpriteData> SpriteDataList;
+
+    public SceneData(){
+        SpriteDataList = new ArrayList<>();
+    }
 }

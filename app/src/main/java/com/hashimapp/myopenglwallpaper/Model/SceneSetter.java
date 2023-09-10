@@ -9,20 +9,14 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.hashimapp.myopenglwallpaper.SceneData.CupSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.DeskSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.HouseSprite;
+import com.hashimapp.myopenglwallpaper.SceneData.GirlSittingScene;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
-import com.hashimapp.myopenglwallpaper.SceneData.RoomSprite;
-import com.hashimapp.myopenglwallpaper.SceneData.SkySprite;
-import com.hashimapp.myopenglwallpaper.SceneData.BunnySprite;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 /**
  * Created by Blake on 9/19/2015.
@@ -113,13 +107,12 @@ public class SceneSetter
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void OnSurfaceCreated()
     {
+
         //todo: add sprite key generator
-        spriteList.add(new Sprite(new SkySprite(), 0, currentScene));
-        spriteList.add(new Sprite(new HouseSprite(), 1, currentScene));
-        spriteList.add(new Sprite(new RoomSprite(), 2, currentScene));
-        spriteList.add(new Sprite(new DeskSprite(), 3, currentScene));
-        spriteList.add(new Sprite(new BunnySprite(), 4, currentScene));
-        spriteList.add(new Sprite(new CupSprite(), 5, currentScene));
+        SceneData sceneData = new GirlSittingScene();
+        for(int i = 0; i < sceneData.SpriteDataList.size(); i ++){
+            spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), i, currentScene));
+        }
 
 //        SceneData sd = new SceneData();
 //        sd.SceneKey = "tempKey";
@@ -139,7 +132,6 @@ public class SceneSetter
 
         particleRenderer.onSurfaceCreated(currentScene);
         InitSpriteProgram();
-//        spriteList.add(new Sprite(new GradientBarSprite(), 6, currentScene));
     }
 
 

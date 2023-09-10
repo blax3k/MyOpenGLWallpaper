@@ -9,14 +9,15 @@ public class SpriteData {
 
     public static final int NO_CHANGE = 0;
     public static final int CHANGE_NOW = 1;
-    public static final int CHANGE_ON_FADE = 2;
 
     public int changeTextureVertices = NO_CHANGE;
 
-    protected float[] portraitVertices;
+    protected float[] positionVertices;
     protected float[] textureVertices;
-
     protected short[] indices;
+    protected float zVertice;
+    protected boolean essentialLayer;
+    protected int bitmapID;
 
     protected float[] defaultColor;
     protected float[] earlyDawnColor;
@@ -27,10 +28,29 @@ public class SpriteData {
     protected float[] midDuskColor;
     protected float[] nightStartColor;
     protected float[] nightEndColor;
-    protected float zVertice;
-    protected boolean essentialLayer;
 
-    protected int bitmapID;
+    public SpriteData(){
+
+    }
+
+    public SpriteData(int bitmapID, float[] positionVertices, float[] textureVertices, float zVertice, float[][] colors, boolean essentialLayer ){
+        this.bitmapID = bitmapID;
+        this.positionVertices = positionVertices;
+        this.textureVertices = textureVertices;
+        this.zVertice = zVertice;
+        this.essentialLayer = essentialLayer;
+
+        earlyDawnColor = colors[TimeTracker.EARLY_DAWN];
+        midDawnColor = colors[TimeTracker.EARLY_DAWN];
+        dayStartColor = colors[TimeTracker.EARLY_DAWN];
+        dayEndColor = colors[TimeTracker.EARLY_DAWN];
+        earlyDuskColor = colors[TimeTracker.EARLY_DAWN];
+        midDuskColor = colors[TimeTracker.EARLY_DAWN];
+        nightStartColor = colors[TimeTracker.EARLY_DAWN];
+        nightEndColor = colors[TimeTracker.EARLY_DAWN];
+
+        indices =  new short[]{0, 1, 2, 0, 2, 3};
+    }
 
 
     public float[] getColor(int timeOfDay, int phasePercentage) {
@@ -59,7 +79,7 @@ public class SpriteData {
     private float[] MultiplyColors(int phasePercent, float[] current, float[] next){
         float[] result = new float[current.length];
         for(int i = 0; i < current.length; i++){
-            if(i +1 % 4 == 0){
+            if(i +1 % 4 != 0){
                 //don't mess with the alpha channels
             }else{
                 //get the current difference between the current phase and the next phase
@@ -75,10 +95,10 @@ public class SpriteData {
     public float[] getShapeVertices(boolean portrait, boolean motionOffset) {
         if (portrait)
         {
-                return portraitVertices;
+                return positionVertices;
         } else
         {
-            return portraitVertices;
+            return positionVertices;
         }
     }
 
@@ -101,7 +121,7 @@ public class SpriteData {
 
     public SpriteSceneData GetScene(int scene, int timePhase, int percentage, int weather){
         return new SpriteSceneData(GetBitmapID(scene), GetTextureVertices(scene),
-            portraitVertices, zVertice, getColor(timePhase, percentage));
+                positionVertices, zVertice, getColor(timePhase, percentage));
     }
 
 
