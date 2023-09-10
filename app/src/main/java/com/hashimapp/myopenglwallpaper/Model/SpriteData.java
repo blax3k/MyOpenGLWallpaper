@@ -79,7 +79,7 @@ public class SpriteData {
     private float[] MultiplyColors(int phasePercent, float[] current, float[] next){
         float[] result = new float[current.length];
         for(int i = 0; i < current.length; i++){
-            if(i +1 % 4 != 0){
+            if(i +1 % 4 == 0){
                 //don't mess with the alpha channels
             }else{
                 //get the current difference between the current phase and the next phase

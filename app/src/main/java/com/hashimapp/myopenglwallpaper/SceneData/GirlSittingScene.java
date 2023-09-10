@@ -68,7 +68,7 @@ public class GirlSittingScene extends SceneData
                 0.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 0.0f
-        }, 0.5f, colors, true);
+        }, 1.0f, colors, true);
         SpriteData tower = new SpriteData(R.drawable.tower, new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -79,23 +79,23 @@ public class GirlSittingScene extends SceneData
                         0.0f, 1.0f,
                         1.0f, 1.0f,
                         1.0f, 0.0f
-                }, 0.0f, colors, true);
+                }, 0.1f, colors, true);
         SpriteData girl = new SpriteData(R.drawable.girlspritesheet1, new float[]{
-                -0.4f, 0.8f, 0.0f,   // top left
-                -0.4f, -0.8f, 0.0f,   // bottom left
-                0.4f, -0.8f, 0.0f,   // bottom right
-                0.4f, 0.8f, 0.0f},
+                -0.6f, 0.6f, 0.0f,   // top left
+                -0.6f, -1.0f, 0.0f,   // bottom left
+                -0.2f, -1.0f, 0.0f,   // bottom right
+                -0.2f, 0.6f, 0.0f},
                 new float[]{
                         0.0f, 0.0f,
                         0.0f, 1.0f,
                         0.4f, 1.0f,
                         0.4f, 0.0f
-                }, 0.0f, colors, true);
+                }, 0.1f, colors, true);
         SpriteData hill = new SpriteData(R.drawable.hill, new float[]{
-                -2.6f, 0.0f, 0.0f,   // top left
-                -2.6f, -2.4f, 0.0f,   // bottom left
-                2.6f, -2.4f, 0.0f,   // bottom right
-                2.6f, 0.0f, 0.0f},
+                -3.0f, 0.0f, 0.0f,   // top left
+                -3.0f, -2.4f, 0.0f,   // bottom left
+                3.0f, -2.4f, 0.0f,   // bottom right
+                3.0f, 0.0f, 0.0f},
                 new float[]{
                         0.0f, 0.0f,
                         0.0f, 1.0f,
