@@ -1,6 +1,7 @@
 package com.hashimapp.myopenglwallpaper.SceneData;
 
 import com.hashimapp.myopenglwallpaper.Model.BlurBuilder;
+import com.hashimapp.myopenglwallpaper.Model.SceneData;
 import com.hashimapp.myopenglwallpaper.Model.TimeTracker;
 
 import java.util.Random;
@@ -21,48 +22,42 @@ public class SceneManager
     public static final String PINK_TITLE = "Pink";
     public static final String YELLOW_TITLE = "Yellow";
 
-
-
+    public static final int GIRL_SITTING = 0;
+    public static final int GIRL_STANDING = 1;
 
 
     Random randomGenerator;
 
-    public SceneManager(){
+    public SceneManager()
+    {
         randomGenerator = new Random();
     }
 
-    public static int getScene(int timeOfDay){
 
-        switch (timeOfDay)
+    public SceneData getScene(int scene)
+    {
+        switch (scene)
         {
-            case TimeTracker.DAY:
-                return PINK;
-            case TimeTracker.NIGHT:
-                return BLUE;
-            case TimeTracker.EARLY_DAWN:
-            case TimeTracker.MID_DAWN:
-            case TimeTracker.LATE_DAWN:
-                return GREEN;
-            case TimeTracker.EARLY_DUSK:
-            case TimeTracker.MID_DUSK:
-            case TimeTracker.LATE_DUSK:
-                return YELLOW;
+            case GIRL_SITTING:
+                return new GirlSittingScene();
+            default:
+                return new GirlStandingScene();
         }
-        return DEFAULT;
     }
 
-    public static Integer[] GetAllScenes(){
+    public static Integer[] GetAllScenes()
+    {
         return new Integer[]{
                 DEFAULT, BROWN, BLUE, GREEN, PINK, YELLOW
         };
     }
 
-    public static String[] GetAllSceneTitles(){
+    public static String[] GetAllSceneTitles()
+    {
         return new String[]{
-            DEFAULT_TITLE, BROWN_TITLE, BLUE_TITLE, GREEN_TITLE, PINK_TITLE, YELLOW_TITLE
+                DEFAULT_TITLE, BROWN_TITLE, BLUE_TITLE, GREEN_TITLE, PINK_TITLE, YELLOW_TITLE
         };
     }
-
 
 
 }

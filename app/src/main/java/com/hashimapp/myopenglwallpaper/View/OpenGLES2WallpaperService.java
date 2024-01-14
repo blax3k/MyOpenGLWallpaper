@@ -145,6 +145,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
         public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
                                      float yStep, int xPixels, int yPixels)
         {
+            System.out.println("xOffset: " + xOffset + " | xStep: " + xStep );
             if (renderer.OnOffsetChanged(xOffset, yOffset))
             {
                 glSurfaceView.requestRender();
@@ -314,7 +315,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             @Override
             public boolean onDoubleTap(MotionEvent e)
             {
-                renderer.SwapTextures();
+//                renderer.SwapTextures();
 //                renderer.ZoomCamera();
 ////                if(temp){
 ////                    renderer.SetTimeSetting(resources.getString(R.string.time_day));

@@ -150,8 +150,6 @@ public class GLParticleRenderer
                 * (xOffset) * offsetMultiplier  //screen offset position (0.0-1.0) multiplied by Z position parallax effect
                 + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
 
-        Log.d("Set offset", "x: " + xScrollOffset);
-
     }
 
 

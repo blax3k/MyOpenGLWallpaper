@@ -52,7 +52,6 @@ public class Sprite
 
     private int textureName;
     private int textureNameIndex;
-    private int currentBitmapID;
     private float[] currentTextureVertices;
     private float[] currentVertices;
     public SpriteData spriteData;
@@ -65,31 +64,24 @@ public class Sprite
     float xZoomScale, xMotionScale, xTouchScale;
     float yZoomScale, yMotionScale, yTouchScale;
 
-    private SpriteSceneData queuedSpriteSceneData;
-
-
-    private int spriteKey;
+    private SpriteData queuedSpriteData;
 
     private float bias = 0.0f;
 
 
-    public Sprite(SpriteData mSpriteData, int spriteKey, int scene)
+    public Sprite(SpriteData mSpriteData, int scene)
     {
         xZoomScale = yZoomScale = 1.0f;
         alpha = 1.0f;
         spriteData = mSpriteData;
-//        mvpMatrix = new float[16];
         colors = spriteData.getColor(TimeTracker.DAY, 100);
         indices = spriteData.GetIndices();
-//        currentBitmapID = spriteData.GetBitmapID();
 
         setColor(colors);
         setVertices(spriteData.getShapeVertices(true, false));
         setTextureVertices(spriteData.GetTextureVertices(scene));
         setIndices(indices);
-        this.spriteKey = spriteKey;
     }
-
 
     public void SensorChanged(float xOffset, float yOffset, boolean inverted)
     {
@@ -177,7 +169,6 @@ public class Sprite
         float distanceFromFocalPoint = Math.abs(currentFocalPoint - zVertice);
         //translate that depth to the bias
         //todo: adjust bias based on screen resolution
-        Log.d("blur", "max bias while setting: " + maxBias);
         bias = (distanceFromFocalPoint * maxBias + DEFAULT_BIAS);
     }
 
@@ -201,8 +192,6 @@ public class Sprite
     public void SetZoomPoint(float zoomPercent)
     {
         //figure out how much the size is going to be modified
-        Log.d("zoom", "zoomPercent: " + zoomPercent);
-
         if (zoomPercent > 1.0f)
         {
             zoomPercent = 1.0f;
@@ -216,7 +205,6 @@ public class Sprite
 
         float sineZoomPercentInverse = 1.0f - (float) Math.sin((zoomPercent * Math.PI / 2)); //convert to sine curve
         xZoomScale = yZoomScale = (ZOOM_MIN + maxZoomPercent * sineZoomPercentInverse);
-        Log.d("zoom", "xscale: " + xZoomScale + " " + yZoomScale);
     }
 
     public void SetFade(float progress, boolean fadingIn)
@@ -252,7 +240,6 @@ public class Sprite
         {
             newAlpha = 1.0f - spriteProgress;
         }
-        Log.d("alpha", "new alpha: " + newAlpha);
 
         alpha = newAlpha;
     }
@@ -264,54 +251,41 @@ public class Sprite
     /*
     Queues the next values for the next scene, and returns the 'severity' of the transition
      */
-    public int QueueSceneData(int scene, int timePhase, int percentage, int weather)
+    public void QueueSceneData(SpriteData nextSpriteData)
     {
-        queuedSpriteSceneData = spriteData.GetScene(scene, timePhase, percentage, weather);
-
-        if (queuedSpriteSceneData.BitmapID != currentBitmapID && queuedSpriteSceneData.BitmapID > 0 && currentBitmapID > 0)
-        {
-            return SceneSetter.FULL_FADE_TRANSITION;
-        }
-        if (!Arrays.equals(queuedSpriteSceneData.Vertices, currentVertices) ||
-            !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices) ||
-             queuedSpriteSceneData.ZVertice != zVertice)
-        {
-            //todo: apply local z vertice
-            return SceneSetter.PARTIAL_FADE_TRANSITION;
-        } else if (!Arrays.equals(queuedSpriteSceneData.Colors, colors))
-        {
-            return SceneSetter.INSTANT_TRANSITION;
-        }
-        return SceneSetter.NO_TRANSITION;
+        queuedSpriteData = nextSpriteData;
+        Log.d("stuff", "queued sprite bitmap has been set to " + queuedSpriteData.bitmapID);
     }
 
     public int GetQueuedBitmapID()
     {
-        if (queuedSpriteSceneData != null &&
-                queuedSpriteSceneData.BitmapID != currentBitmapID &&
-                queuedSpriteSceneData.BitmapID != 0)
+        Log.d("stuff",  "GetQueuedBitmapId queuedSpriteData: " + queuedSpriteData);
+        if (queuedSpriteData != null &&
+                queuedSpriteData.bitmapID > 0)
         {
-            return queuedSpriteSceneData.BitmapID;
+            Log.d("stuff",  "GetQueuedBitmapId" + queuedSpriteData.bitmapID);
+            return queuedSpriteData.bitmapID;
         }
         return -1;
     }
 
     public void DequeueSceneData()
     {
-        if (queuedSpriteSceneData != null)
+        if (queuedSpriteData != null)
         {
-            currentBitmapID = queuedSpriteSceneData.BitmapID;
-            zVertice = queuedSpriteSceneData.ZVertice;
-            this.setVertices(queuedSpriteSceneData.Vertices);
-            this.setTextureVertices(queuedSpriteSceneData.TextureVertices);
+            this.spriteData = queuedSpriteData;
+            zVertice = queuedSpriteData.zVertice;
+            this.setVertices(queuedSpriteData.positionVertices);
+            this.setTextureVertices(queuedSpriteData.textureVertices);
 
-            queuedSpriteSceneData = null;
+            Log.d("stuff", "queuedSpriteData set to null");
+            queuedSpriteData = null;
         }
     }
 
     public void DequeueColor(){
-        if(queuedSpriteSceneData.Colors != null){
-            this.setColor(queuedSpriteSceneData.Colors);
+        if(queuedSpriteData.defaultColor != null){
+            this.setColor(queuedSpriteData.defaultColor);
         }
     }
 
@@ -324,10 +298,10 @@ public class Sprite
 
     public boolean TextureVerticeChange()
     {
-        if(currentTextureVertices == null || queuedSpriteSceneData == null || queuedSpriteSceneData.TextureVertices == null){
+        if(currentTextureVertices == null || queuedSpriteData == null || queuedSpriteData.textureVertices == null){
             return false;
         }
-        return !Arrays.equals(queuedSpriteSceneData.TextureVertices, currentTextureVertices);
+        return !Arrays.equals(queuedSpriteData.textureVertices, currentTextureVertices);
     }
 
     /*
@@ -339,13 +313,6 @@ public class Sprite
     }
 
 
-    public boolean TextureSwapRequired()
-    {
-        if(currentBitmapID == 0 || queuedSpriteSceneData == null || queuedSpriteSceneData.BitmapID == 0){
-            return false;
-        }
-        return currentBitmapID != queuedSpriteSceneData.BitmapID;
-    }
 
     public void SetFadeOutRequired(boolean swapping)
     {
@@ -353,7 +320,7 @@ public class Sprite
     }
 
     public boolean isFadeOutRequired(){
-        return fadeOutRequired;
+        return true;
     }
 
     public boolean IsEssentialLayer()

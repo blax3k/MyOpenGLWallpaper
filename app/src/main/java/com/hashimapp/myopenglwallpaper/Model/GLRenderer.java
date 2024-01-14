@@ -55,8 +55,22 @@ public class GLRenderer implements Renderer
         timePhaseSelected = resources.getString(R.string.time_key_day);
     }
 
+    double getFPS(long newTime){
+        long delta = newTime - oldTime;
+        if(delta == 0){
+            delta = 1;
+        }
+        long fps = 1000/(delta);
+        oldTime = newTime;
+        return fps;
+    }
+
+    private long oldTime = 0;
     public boolean OnOffsetChanged(float xOffset, float yOffset)
     {
+        double fps = getFPS(System.currentTimeMillis());
+//        System.out.println("fps: " + fps);
+
         if (camera.TouchOffsetEnabled())
         {
             float newXOffset = camera.GetXOffset(xOffset);
@@ -65,6 +79,8 @@ public class GLRenderer implements Renderer
         }
         return false;
     }
+
+
 
 
     public void OnSensorChanged(SensorEvent event, int rotation)
@@ -108,7 +124,6 @@ public class GLRenderer implements Renderer
         if(!_created){
             _created = true;
             widthHeight = newWidthHeight;
-//            sceneSetter.InitTextures(widthHeight);
             sceneSetter.InitScene(SceneManager.DEFAULT, timeOfDay, percentage, 0, widthHeight);
         }
 
@@ -123,7 +138,6 @@ public class GLRenderer implements Renderer
 
     public void UpdateVisibility(boolean visible)
     {
-        Log.d("rotate", "visibility changed. visible: " + visible);
         if (visible)
         {
             UpdateTime();
@@ -162,8 +176,12 @@ public class GLRenderer implements Renderer
     }
 
     public void SetScene(int scene){
-        int transition = sceneSetter.QueueScene(scene, timeOfDay, percentage, 0);
-        sceneSetter.InitSceneChange(transition);
+        if(_created){
+            sceneSetter.QueueScene(scene, timeOfDay, percentage, 0);
+//            sceneSetter.SetScene(scene, timeOfDay, percentage, 0);
+//            int transition = sceneSetter.QueueScene(scene, timeOfDay, percentage, 0);
+//            sceneSetter.InitSceneChange(transition);
+        }
     }
 
     public void SetMotionOffsetStrength(int offsetStrength)
@@ -230,14 +248,6 @@ public class GLRenderer implements Renderer
         sceneSetter.SetParticlesEnabled(enabled);
     }
 
-    public void SwapTextures()
-    {
-        //only swap if the scene setter is not already swapping
-        if (sceneSetter.GetTextureSwapStatus() == SceneSetter.STATUS_DONE)
-        {
-            sceneSetter.InitTextureSwap();
-        }
-    }
 
     public void SetTimePhase(String phaseOfDay)
     {
@@ -279,7 +289,7 @@ public class GLRenderer implements Renderer
             mFPSCounter++;
         }
 
-        if (sceneSetter.GetTextureSwapStatus() > 0)
+        if (sceneSetter.GetTextureSwapStatus() != SceneSetter.TextureSwapStatus.DONE)
         {
             sceneSetter.UpdateFade();
         }
@@ -298,9 +308,6 @@ public class GLRenderer implements Renderer
 
         sceneSetter.DrawSprites(camera.mtrxView, camera.mtrxProjection, camera.mModelMatrix);
 
-
-
-//        }
 
     }
 

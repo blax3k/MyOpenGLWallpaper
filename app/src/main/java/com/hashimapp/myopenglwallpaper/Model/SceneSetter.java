@@ -11,18 +11,24 @@ import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSittingScene;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
+import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Created by Blake on 9/19/2015.
  */
 public class SceneSetter
 {
+
+    public enum TextureSwapStatus {
+        DONE, FADING_OUT, LOADING_TEXTURES, SWAPPING, FADING_IN
+    }
     public static final int STATUS_DONE = 0;
     public static final int STATUS_FADING_OUT = 1;
     public static final int STATUS_READY_TO_SWAP = 2;
@@ -66,7 +72,7 @@ public class SceneSetter
 
     private boolean particlesEnabled;
 
-    private int textureSwapStatus;
+    private TextureSwapStatus textureSwapStatus;
 
     private HashMap<Integer, Integer> bitmapIdTextureNameHashMap;
     private HashMap<Integer, float[]> bitmapTextureVerticesHashMap;
@@ -80,6 +86,7 @@ public class SceneSetter
     private GLParticleRenderer particleRenderer;
 
     private WallpaperResourceReader wallpaperResourceReader;
+    private SceneManager sceneManager = new SceneManager();
 
     Date startDate;
 
@@ -98,7 +105,7 @@ public class SceneSetter
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
         bitmapTextureVerticesHashMap = new HashMap<>();
-        textureSwapStatus = STATUS_DONE;
+        textureSwapStatus = TextureSwapStatus.DONE;
         particleRenderer = new GLParticleRenderer(new RainParticle());
         wallpaperResourceReader = new WallpaperResourceReader(context);
     }
@@ -109,10 +116,10 @@ public class SceneSetter
     {
 
         //todo: add sprite key generator
-        SceneData sceneData = new GirlSittingScene();
-        for(int i = 0; i < sceneData.SpriteDataList.size(); i ++){
-            spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), i, currentScene));
-        }
+//        SceneData sceneData = new GirlSittingScene();
+//        for(int i = 0; i < sceneData.SpriteDataList.size(); i ++){
+//            spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), i, currentScene));
+//        }
 
 //        SceneData sd = new SceneData();
 //        sd.SceneKey = "tempKey";
@@ -130,7 +137,7 @@ public class SceneSetter
             sprite.SetMotionOffsetPivotPoint(motionOffsetPivotPoint);
         }
 
-        particleRenderer.onSurfaceCreated(currentScene);
+//        particleRenderer.onSurfaceCreated(currentScene);
         InitSpriteProgram();
     }
 
@@ -183,52 +190,60 @@ public class SceneSetter
 
     public void InitScene(int scene, int timePhase, int percentage, int weather, int widthHeight)
     {
-//        QueueScene(scene, timePhase, percentage, weather);
-
-        for (Sprite sprite : spriteList)
-        {
-            sprite.QueueSceneData(scene, timePhase, percentage, weather);
+        SceneData sceneData = new GirlSittingScene();
+        for(int i = 0; i < sceneData.SpriteDataList.size(); i ++){
+            spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), currentScene));
+            spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
         }
+        InitSpriteProgram();
 
-        textures = new Textures(this.context, widthHeight);
-        int i = 0;
+        if(textures == null){
+            textures = new Textures(this.context);
+        }
         for (Sprite sprite : spriteList)
         {
             int bitmapID = sprite.GetQueuedBitmapID();
-            TextureData textureData = textures.AddTexture(bitmapID, i);
-            bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
+            TextureData textureData = textures.AddTexture(bitmapID);
             sprite.SetTextureData(textureData);
             sprite.TextureVerticeChange();
             sprite.SetNextTextureVertices();
-
-            i++;
         }
-
-        int bitmapID = particleRenderer.GetQueuedBitmapID();
-        TextureData textureData = textures.AddTexture(bitmapID, i);
-        bitmapIdTextureNameHashMap.put(bitmapID, textures.textureNames[i]);
-        particleRenderer.SetTextureData(textureData);
 
         for (Sprite sprite : spriteList)
         {
             sprite.DequeueSceneData();
         }
-
     }
+
 
     public int QueueScene(int scene, int timePhase, int percentage, int weather)
     {
         int highestTransition = SceneSetter.NO_TRANSITION;
 
         currentScene = scene;
-        for (Sprite sprite : spriteList)
-        {
-            int result = sprite.QueueSceneData(scene, timePhase, percentage, weather);
-            if (result > highestTransition)
+        SceneData sceneData = sceneManager.getScene(scene);
+
+        if(sceneData.SpriteDataList.size() > spriteList.size()){
+            spriteList.subList(sceneData.SpriteDataList.size() - 1, spriteList.size() - 1).clear();
+        }
+
+        for(int i = 0; i < sceneData.SpriteDataList.size(); i++){
+            if(i >= spriteList.size()) //need to add more sprites to the sprite list
             {
-                highestTransition = result;
+                spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), currentScene));
+                spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
+            }else{ //queue sprite data in the sprite list
+                spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
             }
         }
+        for(Sprite sprite : spriteList)
+        {
+            Log.d("stuff", "sprite queued bitmapId: " + sprite.GetQueuedBitmapID());
+        }
+
+        textures.QueueTextures(spriteList.stream().map(sprite -> sprite.GetQueuedBitmapID()).collect(Collectors.toList()));
+        textureSwapStatus = TextureSwapStatus.FADING_OUT;
+
 
         return highestTransition;
     }
@@ -261,7 +276,6 @@ public class SceneSetter
         // check if textures need to be swapped
         // Get textures and corresponding sprites that need to be swapped
         // tell textures class which textures to load
-        Log.d("offset", "sprite x pos offset: " + spriteXPosOffset);
 
         for (Sprite sprite : spriteList)
         {
@@ -287,79 +301,8 @@ public class SceneSetter
         }
     }
 
-    public void InitSceneChange(int transition)
-    {
-        //get textures
-        bitmapIdTextureNameHashMap.clear();
-        bitmapTextureVerticesHashMap.clear();
 
-        if (transition == SceneSetter.INSTANT_TRANSITION)
-        {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.DequeueSceneData();
-            }
-        } else if (transition == SceneSetter.PARTIAL_FADE_TRANSITION ||
-                transition == SceneSetter.FULL_FADE_TRANSITION)
-        {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.DequeueColor();
-            }
-            InitTextureSwap();
-        }
-    }
-
-    public void InitTextureSwap()
-    {
-        //get textures
-        bitmapIdTextureNameHashMap.clear();
-        bitmapTextureVerticesHashMap.clear();
-        boolean FadeAll = false;
-        //decide which scene
-
-        for (Sprite sprite : spriteList)
-        {
-            int bitmapID = sprite.GetQueuedBitmapID();
-
-            if (bitmapID >= 0)
-            { //valid bitmap
-                //check if bitmap is already on list
-                if (!bitmapIdTextureNameHashMap.containsKey(bitmapID))
-                {
-                    _textureSwapRequired = true;
-                    bitmapIdTextureNameHashMap.put(bitmapID, sprite.getTextureName());
-                    sprite.SetFadeOutRequired(true);
-                    if (sprite.IsEssentialLayer())
-                    {
-                        FadeAll = true;
-                    }
-                }
-            }
-
-            if (sprite.TextureVerticeChange())
-            {
-                sprite.SetFadeOutRequired(true);
-                if (sprite.IsEssentialLayer())
-                {
-                    FadeAll = true;
-                }
-            }
-        }
-        if (FadeAll)
-        {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.SetFadeOutRequired(true);
-            }
-        }
-
-        textureSwapStatus = STATUS_FADING_OUT;
-        ResetFadePoint();
-    }
-
-
-    public int GetTextureSwapStatus()
+    public TextureSwapStatus GetTextureSwapStatus()
     {
         return textureSwapStatus;
     }
@@ -367,70 +310,76 @@ public class SceneSetter
     ///always called from the main thread
     public void UpdateFade()
     {
-        if (textureSwapStatus == STATUS_FADING_IN || textureSwapStatus == STATUS_FADING_OUT)
+        System.out.println("UpdateFade");
+        if (textureSwapStatus == TextureSwapStatus.FADING_IN || textureSwapStatus == TextureSwapStatus.FADING_OUT)
         {
-            long currentTime = System.currentTimeMillis();
-
-            //get current progress for fade
-            float fadeProgress = (float) (currentTime - FadeResetTime) / (FadeTargetTime - FadeResetTime);
-
-            //don't have alpha exceed max or min
-            if (fadeProgress >= 1.0f)
-            {
-                fadeProgress = 1.0f;
-            } else if (fadeProgress <= 0.0f)
-            {
-                fadeProgress = 0.0f;
-            }
-
-//            Log.d("alpha1", "fade progress:  " + fadeProgress);
-            for (Sprite sprite : spriteList)
-            {
-                if (sprite.isFadeOutRequired())
-                {
-                    sprite.SetFade(fadeProgress, textureSwapStatus == STATUS_FADING_IN);
-                }
-            }
-
-            //fade complete
-            if (fadeProgress >= 1.0f || fadeProgress <= 0.0f)
-            {
-                if (textureSwapStatus == STATUS_FADING_OUT)
-                { //finished fading out. load textures
-                    textureSwapStatus = STATUS_READY_TO_SWAP;
-                } else
-                {  //finshed fading in. stop
-                    for (Sprite sprite : spriteList)
-                    {
-                        sprite.SetFadeOutRequired(false);
-                    }
-                    textureSwapStatus = STATUS_DONE;
-                }
-            }
-        } else if (textureSwapStatus == STATUS_READY_TO_SWAP)
+//            fadeStuff();
+            textureSwapStatus = TextureSwapStatus.SWAPPING;
+        } else if (textureSwapStatus == TextureSwapStatus.SWAPPING)
         {
-            for (Sprite sprite : spriteList)
-            {
-                sprite.DequeueSceneData();
+            Log.d("stuff", "textureSwapStatus: SWAPPING");
+            textures.UploadTextures();
+            if(textures.Loading){
+                textureSwapStatus = TextureSwapStatus.LOADING_TEXTURES;
             }
-            if (_textureSwapRequired)
-            {
-                new Thread(() -> textures.LoadTextures(bitmapIdTextureNameHashMap)).start();
-                textureSwapStatus = STATUS_LOADING_TEXTURES;
-            } else
-            {
-                textureSwapStatus = STATUS_FADING_IN;
-                ResetFadePoint();
-            }
-        } else if (textureSwapStatus == STATUS_LOADING_TEXTURES)
+        } else if (textureSwapStatus == TextureSwapStatus.LOADING_TEXTURES)
         {
             if (!textures.UploadComplete())
             {
-                textures.UploadTextures();
+                // do nothing.
             } else
             { //loaded. fade textures back in
-                textureSwapStatus = STATUS_FADING_IN;
+
+                Log.d("stuff", "textureSwapStatus: SWAPPING");
+                for (Sprite sprite : spriteList)
+                {
+                    sprite.DequeueSceneData();
+                    sprite.SetTextureData(textures.getTextureData(sprite.spriteData.bitmapID));
+                    sprite.TextureVerticeChange();
+                    sprite.SetNextTextureVertices();
+                }
+                textureSwapStatus = TextureSwapStatus.DONE;
                 ResetFadePoint();
+            }
+        }
+    }
+
+    private void fadeStuff(){
+        long currentTime = System.currentTimeMillis();
+
+        //get current progress for fade
+        float fadeProgress = (float) (currentTime - FadeResetTime) / (FadeTargetTime - FadeResetTime);
+
+        //don't have alpha exceed max or min
+        if (fadeProgress >= 1.0f)
+        {
+            fadeProgress = 1.0f;
+        } else if (fadeProgress <= 0.0f)
+        {
+            fadeProgress = 0.0f;
+        }
+
+        for (Sprite sprite : spriteList)
+        {
+            if (sprite.isFadeOutRequired())
+            {
+                sprite.SetFade(fadeProgress, textureSwapStatus == TextureSwapStatus.FADING_IN);
+            }
+        }
+
+        //fade complete
+        if (fadeProgress >= 1.0f || fadeProgress <= 0.0f)
+        {
+            if (textureSwapStatus == TextureSwapStatus.FADING_OUT)
+            { //finished fading out. load textures
+                textureSwapStatus = TextureSwapStatus.SWAPPING;
+            } else
+            {  //finshed fading in. stop
+                for (Sprite sprite : spriteList)
+                {
+                    sprite.SetFadeOutRequired(false);
+                }
+                textureSwapStatus = TextureSwapStatus.DONE;
             }
         }
     }
@@ -438,7 +387,7 @@ public class SceneSetter
     private void ResetFadePoint()
     {
         FadeResetTime = System.currentTimeMillis();
-        if (textureSwapStatus == STATUS_FADING_OUT)
+        if (textureSwapStatus == TextureSwapStatus.FADING_OUT)
         {
             FadeTargetTime = FadeResetTime + FADE_OUT_TRANSITION_DURATION;
         } else
@@ -450,7 +399,6 @@ public class SceneSetter
 
     public void SetToTargetFocalPoint()
     {
-        Log.d("focal", "setting target focal point");
         rackingFocus = false;
         focalPoint = focalPointEndingPoint;
         for (Sprite sprite : spriteList)
@@ -529,7 +477,6 @@ public class SceneSetter
     {
         zoomingCamera = false;
         zoomPercent = MAX_PROGRESS;
-        Log.d("zoom", "target zoom : " + zoomPercent);
         for (Sprite sprite : spriteList)
         {
             sprite.SetZoomPoint(zoomPercent);
@@ -572,6 +519,9 @@ public class SceneSetter
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
+        if(textureSwapStatus != TextureSwapStatus.DONE){
+            return;
+        }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 
