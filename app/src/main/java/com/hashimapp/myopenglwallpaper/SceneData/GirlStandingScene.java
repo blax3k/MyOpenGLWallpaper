@@ -94,21 +94,21 @@ public class GirlStandingScene extends SceneData
 //                        0.65f, 1.0f,
 //                        0.65f, 0.0f
 //                }, 0.1f, colors, true);
-//        SpriteData hill = new SpriteData(R.drawable.hill, new float[]{
-//                -3.0f, 0.0f, 0.0f,   // top left
-//                -3.0f, -2.4f, 0.0f,   // bottom left
-//                3.0f, -2.4f, 0.0f,   // bottom right
-//                3.0f, 0.0f, 0.0f},
-//                new float[]{
-//                        0.0f, 0.0f,
-//                        0.0f, 1.0f,
-//                        1.0f, 1.0f,
-//                        1.0f, 0.0f
-//                }, -0.5f, colors, true);
+        SpriteData hill = new SpriteData(R.drawable.hill, new float[]{
+                -3.0f, 0.0f, 0.0f,   // top left
+                -3.0f, -2.4f, 0.0f,   // bottom left
+                3.0f, -2.4f, 0.0f,   // bottom right
+                3.0f, 0.0f, 0.0f},
+                new float[]{
+                        0.0f, 0.0f,
+                        0.0f, 1.0f,
+                        1.0f, 1.0f,
+                        1.0f, 0.0f
+                }, -0.5f, colors, true);
 
 //        this.SpriteDataList.add(background);
         this.SpriteDataList.add(tower);
 //        this.SpriteDataList.add(girl);
-//        this.SpriteDataList.add(hill);
+        this.SpriteDataList.add(hill);
     }
 }

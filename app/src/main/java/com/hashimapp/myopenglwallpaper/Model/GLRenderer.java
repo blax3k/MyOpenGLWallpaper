@@ -238,7 +238,6 @@ public class GLRenderer implements Renderer
     public void SetZoomCameraEnabled(boolean enabled){
         _cameraZoomEnabled = enabled;
         if(!enabled){
-            Log.d("zoom", "set to target zoom point");
             sceneSetter.SetToMaxZoomPercent();
         }
     }

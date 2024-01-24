@@ -241,7 +241,10 @@ public class SceneSetter
             Log.d("stuff", "sprite queued bitmapId: " + sprite.GetQueuedBitmapID());
         }
 
-        textures.QueueTextures(spriteList.stream().map(sprite -> sprite.GetQueuedBitmapID()).collect(Collectors.toList()));
+        new Thread(() -> {
+            textures.QueueTextures(spriteList.stream().map(sprite -> sprite.GetQueuedBitmapID()).collect(Collectors.toList()));
+        }).start();
+        ResetFadePoint();
         textureSwapStatus = TextureSwapStatus.FADING_OUT;
 
 
@@ -310,16 +313,17 @@ public class SceneSetter
     ///always called from the main thread
     public void UpdateFade()
     {
-        System.out.println("UpdateFade");
         if (textureSwapStatus == TextureSwapStatus.FADING_IN || textureSwapStatus == TextureSwapStatus.FADING_OUT)
         {
-//            fadeStuff();
-            textureSwapStatus = TextureSwapStatus.SWAPPING;
+            fadeStuff();
+//            if(textures.Loading)
+//            {
+//                textureSwapStatus = TextureSwapStatus.SWAPPING;
+//            }
         } else if (textureSwapStatus == TextureSwapStatus.SWAPPING)
         {
-            Log.d("stuff", "textureSwapStatus: SWAPPING");
             textures.UploadTextures();
-            if(textures.Loading){
+            if(textures.Loading || textures.UploadComplete()){
                 textureSwapStatus = TextureSwapStatus.LOADING_TEXTURES;
             }
         } else if (textureSwapStatus == TextureSwapStatus.LOADING_TEXTURES)
@@ -329,8 +333,6 @@ public class SceneSetter
                 // do nothing.
             } else
             { //loaded. fade textures back in
-
-                Log.d("stuff", "textureSwapStatus: SWAPPING");
                 for (Sprite sprite : spriteList)
                 {
                     sprite.DequeueSceneData();
@@ -338,8 +340,8 @@ public class SceneSetter
                     sprite.TextureVerticeChange();
                     sprite.SetNextTextureVertices();
                 }
-                textureSwapStatus = TextureSwapStatus.DONE;
                 ResetFadePoint();
+                textureSwapStatus = TextureSwapStatus.FADING_IN;
             }
         }
     }
@@ -458,7 +460,6 @@ public class SceneSetter
         float focalPointProgression = (float) (currentTime - FocalPointResetTime) / (FocalPointTargetTime - FocalPointResetTime);
         float sinCurveProgression = (float) Math.sin(focalPointProgression * Math.PI / 2);
         focalPoint = sinCurveProgression * (focalPointEndingPoint - focalPointStartingPoint) + focalPointStartingPoint;
-        Log.d("focal", "focal point: " + focalPoint);
 
         for (Sprite sprite : spriteList)
         {
@@ -519,9 +520,7 @@ public class SceneSetter
 
     public void DrawSprites(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix)
     {
-        if(textureSwapStatus != TextureSwapStatus.DONE){
-            return;
-        }
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 

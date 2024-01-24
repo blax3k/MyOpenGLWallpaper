@@ -129,7 +129,7 @@ public class Textures
 
     public boolean UploadComplete()
     {
-        if (textureUploadDataDeque.size() > 0)
+        if (textureUploadDataDeque.size() > 0 || Loading == true)
         {
             return false;
         }
@@ -160,8 +160,6 @@ public class Textures
                 .filter(bitmapId -> !bitmapIds.contains(bitmapId))
                 .collect(Collectors.toList());
         Loading = true;
-
-        Log.d("stuff", "textureUploadDataDeque.size(): " + textureUploadDataDeque.size());
     }
 
 
@@ -171,7 +169,6 @@ public class Textures
         if(!Loading){
             return;
         }
-
 
         while (!textureUploadDataDeque.isEmpty())
         {
@@ -214,6 +211,7 @@ public class Textures
         for(int bitmapId : textureDataMap.keySet()){
             Log.d("stuff", "textureDataMap.values: " + bitmapId);
         }
+        Loading = false;
     }
 
     private void UploadTextureThread(){

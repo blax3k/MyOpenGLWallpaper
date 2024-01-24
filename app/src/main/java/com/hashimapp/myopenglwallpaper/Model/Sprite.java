@@ -217,30 +217,36 @@ public class Sprite
         {
             startPoint = Math.abs(GetZVerticeInverse(zVertice)) * (1.0f - FADE_DURATION);
         }
+//        Log.d("stuff", "startPoint: " + startPoint);
         float endPoint = startPoint + FADE_DURATION;
 
         float spriteProgress;
         if (progress <= startPoint)
         {
+//            Log.d("stuff", "spriteProgress = 0.0");
             spriteProgress = 0.0f;
         } else if (progress >= endPoint)
         {
             spriteProgress = 1.0f;
+//            Log.d("stuff", "spriteProgress = 1.0");
         } else
         {
             spriteProgress = (progress - startPoint) / FADE_DURATION;
+//            Log.d("stuff", "progress: " + progress + " startPoint: " + startPoint);
         }
+//        Log.d("stuff", "spriteProgress: " + spriteProgress);
+
 
         //fade in closer sprites first
         float newAlpha;
         if (fadingIn)
         {
-            newAlpha = spriteProgress;
+            newAlpha = progress;
         } else
         {
-            newAlpha = 1.0f - spriteProgress;
+            newAlpha = 1.0f - progress;
         }
-
+        Log.d("stuff", "sprite.alpha: " + newAlpha);
         alpha = newAlpha;
     }
 
@@ -278,7 +284,6 @@ public class Sprite
             this.setVertices(queuedSpriteData.positionVertices);
             this.setTextureVertices(queuedSpriteData.textureVertices);
 
-            Log.d("stuff", "queuedSpriteData set to null");
             queuedSpriteData = null;
         }
     }
