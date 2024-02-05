@@ -241,10 +241,10 @@ public class Sprite
         float newAlpha;
         if (fadingIn)
         {
-            newAlpha = progress;
+            newAlpha = spriteProgress;
         } else
         {
-            newAlpha = 1.0f - progress;
+            newAlpha = 1.0f - spriteProgress;
         }
         Log.d("stuff", "sprite.alpha: " + newAlpha);
         alpha = newAlpha;

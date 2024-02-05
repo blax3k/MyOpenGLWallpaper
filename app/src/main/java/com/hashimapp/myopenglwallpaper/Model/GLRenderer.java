@@ -73,8 +73,7 @@ public class GLRenderer implements Renderer
 
         if (camera.TouchOffsetEnabled())
         {
-            float newXOffset = camera.GetXOffset(xOffset);
-            sceneSetter.OffsetChanged(newXOffset);
+            sceneSetter.OffsetChanged(camera.GetXOffset(xOffset));
             return true;
         }
         return false;

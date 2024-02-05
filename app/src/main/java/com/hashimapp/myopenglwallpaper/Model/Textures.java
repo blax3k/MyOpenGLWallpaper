@@ -139,7 +139,6 @@ public class Textures
     public void QueueTextures(List<Integer> bitmapIds)
     {
         for(Integer bitmapId : bitmapIds){
-            Log.d("stuff", "Queue texture bitmapId: " + bitmapId);
             if(textureDataMap.containsKey(bitmapId) || bitmapId <= 0)
             {
                 continue;

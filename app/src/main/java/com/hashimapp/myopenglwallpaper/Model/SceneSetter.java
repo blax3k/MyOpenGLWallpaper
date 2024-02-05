@@ -41,7 +41,7 @@ public class SceneSetter
     public static final int FULL_FADE_TRANSITION = 3;
 
     private static final int FADE_OUT_TRANSITION_DURATION = 500;
-    private static final int FADE_IN_TRANSITION_DURATION = 2000;
+    private static final int FADE_IN_TRANSITION_DURATION = 500;
     private static final int FOCAL_POINT_RESET_DURATION = 1500;
     private static float MIN_PROGRESS = 0.0f;
     private static float MAX_PROGRESS = 1.0f;
@@ -81,6 +81,8 @@ public class SceneSetter
     private long FadeTargetTime;
     private int currentScene;
 
+    private float xOffset;
+
     private boolean _textureSwapRequired;
 
     private GLParticleRenderer particleRenderer;
@@ -101,6 +103,7 @@ public class SceneSetter
         spriteList = new ArrayList<>();
         focalPointStartingPoint = 1.0f;
         focalPointEndingPoint = 0.3f;
+        xOffset = 0;
 
         rackingFocus = false;
         bitmapIdTextureNameHashMap = new HashMap<>();
@@ -254,6 +257,7 @@ public class SceneSetter
 
     public void OffsetChanged(float xOffset)
     {
+        this.xOffset = xOffset;
         for (Sprite sprite : spriteList)
         {
             sprite.SetXOffset(xOffset);
@@ -316,10 +320,6 @@ public class SceneSetter
         if (textureSwapStatus == TextureSwapStatus.FADING_IN || textureSwapStatus == TextureSwapStatus.FADING_OUT)
         {
             fadeStuff();
-//            if(textures.Loading)
-//            {
-//                textureSwapStatus = TextureSwapStatus.SWAPPING;
-//            }
         } else if (textureSwapStatus == TextureSwapStatus.SWAPPING)
         {
             textures.UploadTextures();
@@ -339,6 +339,7 @@ public class SceneSetter
                     sprite.SetTextureData(textures.getTextureData(sprite.spriteData.bitmapID));
                     sprite.TextureVerticeChange();
                     sprite.SetNextTextureVertices();
+                    sprite.SetXOffset(this.xOffset);
                 }
                 ResetFadePoint();
                 textureSwapStatus = TextureSwapStatus.FADING_IN;
@@ -472,7 +473,6 @@ public class SceneSetter
             rackingFocus = false;
         }
     }
-
 
     public void SetToMaxZoomPercent()
     {
