@@ -257,10 +257,11 @@ public class SceneSetter
 
     public void OffsetChanged(float xOffset)
     {
+        long currentTime = System.currentTimeMillis();
         this.xOffset = xOffset;
         for (Sprite sprite : spriteList)
         {
-            sprite.SetXOffset(xOffset);
+            sprite.SetXOffset(xOffset, currentTime);
         }
         particleRenderer.SetXOffset(xOffset);
     }
@@ -333,13 +334,14 @@ public class SceneSetter
                 // do nothing.
             } else
             { //loaded. fade textures back in
+                long time = System.currentTimeMillis();
                 for (Sprite sprite : spriteList)
                 {
                     sprite.DequeueSceneData();
                     sprite.SetTextureData(textures.getTextureData(sprite.spriteData.bitmapID));
                     sprite.TextureVerticeChange();
                     sprite.SetNextTextureVertices();
-                    sprite.SetXOffset(this.xOffset);
+                    sprite.SetXOffset(this.xOffset, time);
                 }
                 ResetFadePoint();
                 textureSwapStatus = TextureSwapStatus.FADING_IN;

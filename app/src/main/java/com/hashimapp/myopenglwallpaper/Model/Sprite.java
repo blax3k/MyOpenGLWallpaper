@@ -55,6 +55,9 @@ public class Sprite
     private float[] currentTextureVertices;
     private float[] currentVertices;
     public SpriteData spriteData;
+    long xScrollOffsetTargetTime = -1;
+    float xScrollOffsetTarget = 0;
+    float xScrollOffsetCurrent = 0;
     float xScrollOffset = 0;
     float yOrientationOffset = 0;
     float xAccelOffset = 0;
@@ -110,13 +113,17 @@ public class Sprite
         this.alphaHandle = alphaHandle;
     }
 
-    public void SetXOffset(float xOffset)
+    public void SetXOffset(float xOffset, long currentTime)
     {
+
         //parallax motion determined by how "far" the sprite is from the camera
         float offsetMultiplier = (GetZVerticeInverse(zVertice));// * 0.9f + 0.1f; //range between 0.1 and 1.0f
 //        if (PortraitOrientation)
 //        {
-        this.xScrollOffset = -1 //reverse movement
+        this.xScrollOffset = this.xScrollOffsetCurrent = xScrollOffsetTarget;
+        xScrollOffsetTargetTime = currentTime;
+
+        this.xScrollOffsetTarget = -1 //reverse movement
                 * (xOffset) * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
                 + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
 //        } else
@@ -333,9 +340,20 @@ public class Sprite
         return spriteData.IsEssentialLayer();
     }
 
+    private long elapsedTimeDeadline = 16;
 
     public void draw(float[] mtrxView, float[] mtrxProjection, float[] mModelMatrix, float[] mMVPMatrix)
     {
+        long currentTimeMillis = System.currentTimeMillis();
+        float elapsedTime = (currentTimeMillis - xScrollOffsetTargetTime);
+        float elapsedTimePercentage = elapsedTime / elapsedTimeDeadline;
+        if(elapsedTimePercentage > 1.0f)
+        {
+            elapsedTimePercentage = 1.0f;
+        }
+        float xStep = xScrollOffsetTarget - xScrollOffsetCurrent;
+        float xStepTimesPercent = elapsedTimePercentage * xStep;
+        xScrollOffset = xScrollOffsetCurrent + xStepTimesPercent;
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset + yOrientationOffset, 1.0f);
         Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, yZoomScale + yTouchScale + yMotionScale, 1.0f);
