@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -218,6 +219,11 @@ public class SceneSetter
         }
     }
 
+    public int QueueScene()
+    {
+        int sceneId = sceneManager.getNextSceneId(currentScene);
+        return QueueScene(sceneId, 0, 0, 0);
+    }
 
     public int QueueScene(int scene, int timePhase, int percentage, int weather)
     {

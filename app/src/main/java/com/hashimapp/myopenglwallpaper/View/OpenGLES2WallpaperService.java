@@ -315,7 +315,7 @@ public class OpenGLES2WallpaperService extends GLWallpaperService
             @Override
             public boolean onDoubleTap(MotionEvent e)
             {
-//                renderer.SwapTextures();
+                renderer.SwapTextures();
 //                renderer.ZoomCamera();
 ////                if(temp){
 ////                    renderer.SetTimeSetting(resources.getString(R.string.time_day));

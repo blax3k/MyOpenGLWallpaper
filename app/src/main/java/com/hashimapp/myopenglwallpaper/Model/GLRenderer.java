@@ -183,6 +183,14 @@ public class GLRenderer implements Renderer
         }
     }
 
+    public void SwapTextures()
+    {
+        if(_created)
+        {
+            sceneSetter.QueueScene();
+        }
+    }
+
     public void SetMotionOffsetStrength(int offsetStrength)
     {
         camera.setMotionOffsetStrength(offsetStrength);

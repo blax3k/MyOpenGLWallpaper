@@ -33,6 +33,14 @@ public class SceneManager
         randomGenerator = new Random();
     }
 
+    public int getNextSceneId(int currentScene)
+    {
+        if(currentScene == GIRL_SITTING)
+        {
+            return GIRL_STANDING;
+        }
+        return GIRL_SITTING;
+    }
 
     public SceneData getScene(int scene)
     {

@@ -25,13 +25,12 @@ public class MainActivity extends Activity
 
     public void launchSettings(View view)
     {
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, SettingsActivityTest.class);
         startActivity(intent);
     }
 
     public void SetWallpaper(View view)
     {
-        Log.d("Live wallpaper chooser", "tried launching the chooser");
         Intent intent = new Intent();
         intent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
         intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, OpenGLES2WallpaperService.class));

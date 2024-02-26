@@ -46,12 +46,10 @@ public class SettingsActivity extends PreferenceActivity
     {
         Resources resources;
         SharedPreferences sharedPreferences;
-        MyLocation locationManager;
 
         @Override
         public void onCreate(final Bundle savedInstanceState)
         {
-            Log.d("Live Wallpaper Chooser", "onCreate reached");
             super.onCreate(savedInstanceState);
             //set the preference file
             resources = this.getResources();
