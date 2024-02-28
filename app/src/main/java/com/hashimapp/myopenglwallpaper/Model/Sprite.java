@@ -53,7 +53,6 @@ public class Sprite
     private int textureName;
     private int textureNameIndex;
     private float[] currentTextureVertices;
-    private float[] currentVertices;
     public SpriteData spriteData;
     long xScrollOffsetTargetTime = -1;
     float xScrollOffsetTarget = 0;
@@ -253,7 +252,6 @@ public class Sprite
         {
             newAlpha = 1.0f - spriteProgress;
         }
-        Log.d("stuff", "sprite.alpha: " + newAlpha);
         alpha = newAlpha;
     }
 
@@ -287,7 +285,7 @@ public class Sprite
         if (queuedSpriteData != null)
         {
             this.spriteData = queuedSpriteData;
-            zVertice = queuedSpriteData.zVertice;
+            this.zVertice = queuedSpriteData.zVertice;
             this.setVertices(queuedSpriteData.positionVertices);
             this.setTextureVertices(queuedSpriteData.textureVertices);
 
@@ -404,7 +402,6 @@ public class Sprite
     {
         if(vertices != null)
         {
-            currentVertices = vertices;
             ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
             bb.order(ByteOrder.nativeOrder());
             vertexBuffer = bb.asFloatBuffer();
