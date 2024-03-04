@@ -27,13 +27,13 @@ public class Sprite
     private static final float ZOOM_MIN = 1.0f;
     private static final float FADE_DURATION = 0.4f; //duration of fade in percentage
 
-    public short indices[];
+    public short[] indices;
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
     public FloatBuffer colorBuffer;
     public FloatBuffer textureVerticeBuffer;
     private int GLTextureIndex;
-    public static float colors[];
+    public static float[] colors;
     private float alpha;
 
     private int mColorHandle;
@@ -116,19 +116,13 @@ public class Sprite
     {
 
         //parallax motion determined by how "far" the sprite is from the camera
-        float offsetMultiplier = (GetZVerticeInverse(zVertice));// * 0.9f + 0.1f; //range between 0.1 and 1.0f
-//        if (PortraitOrientation)
-//        {
+        float offsetMultiplier = (GetZVerticeInverse(zVertice)) * 0.9f + 0.1f; //range between 0.1 and 1.0f
         this.xScrollOffset = this.xScrollOffsetCurrent = xScrollOffsetTarget;
         xScrollOffsetTargetTime = currentTime;
 
         this.xScrollOffsetTarget = -1 //reverse movement
                 * (xOffset) * offsetMultiplier //screen offset position (0.0-1.0) multiplied by Z position parallax effect
-                + spriteXPosOffset; //centers the image depending on whether it's landscape or portrait
-//        } else
-//        {
-//            this.xScrollOffset = -1 * ((xOffset * offsetMultiplier) + (-0.15f * offsetMultiplier));
-//        }
+                + spriteXPosOffset * offsetMultiplier; //centers the image depending on whether it's landscape or portrait
     }
 
     public void SetYOffset(float yOffset)
@@ -147,8 +141,7 @@ public class Sprite
 
     public void SetOrientation(float spriteXPosOffset, float touchScale, float motionScale)
     {
-        float offsetMultiplier = (GetZVerticeInverse(zVertice)) * 0.9f + 0.1f;
-        this.spriteXPosOffset = spriteXPosOffset * offsetMultiplier;
+        this.spriteXPosOffset = spriteXPosOffset;
         SetTouchScale(touchScale);
         SetMotionScale(motionScale);
     }
@@ -223,24 +216,19 @@ public class Sprite
         {
             startPoint = Math.abs(GetZVerticeInverse(zVertice)) * (1.0f - FADE_DURATION);
         }
-//        Log.d("stuff", "startPoint: " + startPoint);
         float endPoint = startPoint + FADE_DURATION;
 
         float spriteProgress;
         if (progress <= startPoint)
         {
-//            Log.d("stuff", "spriteProgress = 0.0");
             spriteProgress = 0.0f;
         } else if (progress >= endPoint)
         {
             spriteProgress = 1.0f;
-//            Log.d("stuff", "spriteProgress = 1.0");
         } else
         {
             spriteProgress = (progress - startPoint) / FADE_DURATION;
-//            Log.d("stuff", "progress: " + progress + " startPoint: " + startPoint);
         }
-//        Log.d("stuff", "spriteProgress: " + spriteProgress);
 
 
         //fade in closer sprites first
@@ -265,16 +253,13 @@ public class Sprite
     public void QueueSceneData(SpriteData nextSpriteData)
     {
         queuedSpriteData = nextSpriteData;
-        Log.d("stuff", "queued sprite bitmap has been set to " + queuedSpriteData.bitmapID);
     }
 
     public int GetQueuedBitmapID()
     {
-        Log.d("stuff",  "GetQueuedBitmapId queuedSpriteData: " + queuedSpriteData);
         if (queuedSpriteData != null &&
                 queuedSpriteData.bitmapID > 0)
         {
-            Log.d("stuff",  "GetQueuedBitmapId" + queuedSpriteData.bitmapID);
             return queuedSpriteData.bitmapID;
         }
         return -1;
@@ -284,6 +269,7 @@ public class Sprite
     {
         if (queuedSpriteData != null)
         {
+            Log.d("stuff", "dequeue zVertice: " + queuedSpriteData.zVertice);
             this.spriteData = queuedSpriteData;
             this.zVertice = queuedSpriteData.zVertice;
             this.setVertices(queuedSpriteData.positionVertices);
@@ -438,7 +424,7 @@ public class Sprite
 
     private float GetZVerticeInverse(float z)
     {
-        return (float) Math.abs(1.0 - zVertice);
+        return (float) Math.abs(1.0 - z);
     }
     //endregion
 }

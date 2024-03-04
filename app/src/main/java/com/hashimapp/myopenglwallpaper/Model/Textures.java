@@ -208,7 +208,6 @@ public class Textures
         texturesToRemove.clear();
 
         for(int bitmapId : textureDataMap.keySet()){
-            Log.d("stuff", "textureDataMap.values: " + bitmapId);
         }
         Loading = false;
     }

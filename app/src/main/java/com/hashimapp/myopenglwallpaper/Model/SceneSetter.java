@@ -14,6 +14,7 @@ import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -236,18 +237,13 @@ public class SceneSetter
             spriteList.subList(sceneData.SpriteDataList.size() - 1, spriteList.size() - 1).clear();
         }
 
+        Log.d("stuff", "queueScene zVertices: " + Arrays.toString(sceneData.SpriteDataList.stream().map(sd -> sd.zVertice).collect(Collectors.toList()).toArray()));
         for(int i = 0; i < sceneData.SpriteDataList.size(); i++){
             if(i >= spriteList.size()) //need to add more sprites to the sprite list
             {
                 spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), currentScene));
-                spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
-            }else{ //queue sprite data in the sprite list
-                spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
             }
-        }
-        for(Sprite sprite : spriteList)
-        {
-            Log.d("stuff", "sprite queued bitmapId: " + sprite.GetQueuedBitmapID());
+            spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
         }
 
         new Thread(() -> {

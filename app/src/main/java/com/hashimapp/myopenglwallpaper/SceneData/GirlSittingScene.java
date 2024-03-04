@@ -59,7 +59,6 @@ public class GirlSittingScene extends SceneData
 
     public GirlSittingScene(){
         super();
-        Log.d("stuff","GirlSittingScene");
         float[][] colors = new float[][]{dawnStartColor, dawnEndColor, dayStartColor, dayEndColor, duskStartColor, duskEndColor, nightStartColor, nightEndColor};
         SpriteData background = new SpriteData(R.drawable.background, new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
@@ -106,8 +105,8 @@ public class GirlSittingScene extends SceneData
                         1.0f, 0.0f
                 }, -0.5f, colors, true);
 
-        this.SpriteDataList.add(background);
-        this.SpriteDataList.add(tower);
+//        this.SpriteDataList.add(background);
+//        this.SpriteDataList.add(tower);
         this.SpriteDataList.add(girl);
         this.SpriteDataList.add(hill);
     }

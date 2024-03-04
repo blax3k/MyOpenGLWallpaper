@@ -119,12 +119,4 @@ public class SpriteData {
         return essentialLayer;
     }
 
-    public SpriteSceneData GetScene(int scene, int timePhase, int percentage, int weather){
-        return new SpriteSceneData(GetBitmapID(scene), GetTextureVertices(scene),
-                positionVertices, zVertice, getColor(timePhase, percentage));
-    }
-
-
-
-
 }

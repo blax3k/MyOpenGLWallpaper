@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.hashimapp.myopenglwallpaper"
@@ -21,6 +20,7 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+    namespace 'com.hashimapp.myopenglwallpaper'
 }
 
 dependencies {
@@ -31,7 +31,7 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:8.2.2'
     }
     repositories {
         mavenCentral()
