@@ -133,7 +133,6 @@ public class Sprite
 
     public void SetTextureData(TextureData textureData)
     {
-        GLTextureIndex = textureData.GLTextureIndex;
         textureName = textureData.textureName;
         textureNameIndex = textureData.textureNameIndex;
     }
@@ -357,9 +356,9 @@ public class Sprite
 
 
         // Set the sampler texture unit to x, where we have saved the texture.
-        GLES20.glActiveTexture(GLTextureIndex);
-        GLES20.glBindTexture(GLTextureIndex, textureName);
-        GLES20.glUniform1i(mSamplerLoc, textureNameIndex);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureName);
+        GLES20.glUniform1i(mSamplerLoc, 0);
 
         GLES20.glUniform1f(biasHandle, bias);
         GLES20.glUniform1f(alphaHandle, alpha);

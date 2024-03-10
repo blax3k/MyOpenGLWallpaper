@@ -85,7 +85,6 @@ public class GLParticleRenderer
 
     public void SetTextureData(TextureData texData)
     {
-        GLTextureIndex = texData.GLTextureIndex;
         textureName = texData.textureName;
         textureNameIndex = texData.textureNameIndex;
     }

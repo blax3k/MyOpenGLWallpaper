@@ -93,7 +93,7 @@ public class Textures
 
         Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
 
-        GLES20.glActiveTexture(textureData.GLTextureIndex);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
         //clamp texture to edge of shape
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
@@ -189,7 +189,7 @@ public class Textures
             }
 
 
-            GLES20.glActiveTexture(textureData.GLTextureIndex);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, uploadData.textureName);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
