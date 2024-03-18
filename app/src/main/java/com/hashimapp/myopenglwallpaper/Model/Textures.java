@@ -88,7 +88,7 @@ public class Textures
             return textureDataMap.get(bitmapID);
         }
 
-        TextureData textureData = new TextureData(GL_TEXTURE_IDS[GetNextGLTextureIDIndex()], textureNames[textureNamesIndex], textureNamesIndex);
+        TextureData textureData = new TextureData(textureNames[textureNamesIndex], textureNamesIndex);
         textureNamesIndex++;
 
         Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), bitmapID);
@@ -184,13 +184,12 @@ public class Textures
                 textureDataMap.remove(texturesToRemove.get(0));
                 texturesToRemove.remove(0);
             }else{
-                textureData = new TextureData(GL_TEXTURE_IDS[GetNextGLTextureIDIndex()], textureNames[textureNamesIndex], textureNamesIndex);
+                textureData = new TextureData(textureNames[textureNamesIndex], textureNamesIndex);
                 textureNamesIndex++;
             }
 
-
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, uploadData.textureName);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureData.textureName);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);

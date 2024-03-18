@@ -24,6 +24,7 @@ public class SceneManager
 
     public static final int GIRL_SITTING = 0;
     public static final int GIRL_STANDING = 1;
+    public static final int GIRL_BACK = 2;
 
 
     Random randomGenerator;
@@ -39,6 +40,10 @@ public class SceneManager
         {
             return GIRL_STANDING;
         }
+        if(currentScene == GIRL_STANDING)
+        {
+            return GIRL_BACK;
+        }
         return GIRL_SITTING;
     }
 
@@ -48,8 +53,10 @@ public class SceneManager
         {
             case GIRL_SITTING:
                 return new GirlSittingScene();
-            default:
+            case GIRL_STANDING:
                 return new GirlStandingScene();
+            default:
+                return new GirlBackScene();
         }
     }
 

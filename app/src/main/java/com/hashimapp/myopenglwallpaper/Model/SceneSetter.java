@@ -7,18 +7,16 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSittingScene;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
 import com.hashimapp.myopenglwallpaper.SceneData.SceneManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -146,6 +144,7 @@ public class SceneSetter
         InitSpriteProgram();
     }
 
+    int mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle;
 
     private void InitSpriteProgram()
     {
@@ -167,19 +166,20 @@ public class SceneSetter
 
 
         // get handle to vertex shader's vPosition member
-        int mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
+        mColorHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_Color");
         // get handle to vertex shader's vPosition member
-        int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
-        int mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
+        mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "vPosition");
+        mTexCoordLoc = GLES20.glGetAttribLocation(riGraphicTools.sp_Image, "a_texCoord");
         // Get handle to shape's transformation matrix and apply it
-        int mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
+        mtrxHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "uMVPMatrix");
         // Get handle to textures locations
-        int mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
-        int biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
-        int alphaHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "alpha");
+        mSamplerLoc = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "s_texture");
+        biasHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "bias");
+        alphaHandle = GLES20.glGetUniformLocation(riGraphicTools.sp_Image, "alpha");
 
         SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
     }
+
 
     float[] mvpMatrix = new float[16];
 
@@ -210,8 +210,6 @@ public class SceneSetter
             int bitmapID = sprite.GetQueuedBitmapID();
             TextureData textureData = textures.AddTexture(bitmapID);
             sprite.SetTextureData(textureData);
-            sprite.TextureVerticeChange();
-            sprite.SetNextTextureVertices();
         }
 
         for (Sprite sprite : spriteList)
@@ -233,17 +231,21 @@ public class SceneSetter
         currentScene = scene;
         SceneData sceneData = sceneManager.getScene(scene);
 
-        if(sceneData.SpriteDataList.size() > spriteList.size()){
-            spriteList.subList(sceneData.SpriteDataList.size() - 1, spriteList.size() - 1).clear();
-        }
-
-        Log.d("stuff", "queueScene zVertices: " + Arrays.toString(sceneData.SpriteDataList.stream().map(sd -> sd.zVertice).collect(Collectors.toList()).toArray()));
         for(int i = 0; i < sceneData.SpriteDataList.size(); i++){
             if(i >= spriteList.size()) //need to add more sprites to the sprite list
             {
                 spriteList.add(new Sprite(sceneData.SpriteDataList.get(i), currentScene));
             }
+            spriteList.get(i).SetSpriteMembers(mColorHandle, mPositionHandle, mTexCoordLoc, mtrxHandle, mSamplerLoc, biasHandle, alphaHandle);
             spriteList.get(i).QueueSceneData(sceneData.SpriteDataList.get(i));
+        }
+
+        if(spriteList.size() > sceneData.SpriteDataList.size())
+        {
+            for(int i = sceneData.SpriteDataList.size() - 1; i < spriteList.size(); i++)
+            {
+                spriteList.get(i).toBeDeleted = true;
+            }
         }
 
         new Thread(() -> {
@@ -261,6 +263,11 @@ public class SceneSetter
     {
         long currentTime = System.currentTimeMillis();
         this.xOffset = xOffset;
+
+        if(textureSwapStatus != TextureSwapStatus.DONE)
+        {
+            return;
+        }
         for (Sprite sprite : spriteList)
         {
             sprite.SetXOffset(xOffset, currentTime);
@@ -270,6 +277,10 @@ public class SceneSetter
 
     public void SensorChanged(float xOffset, float yOffset, boolean invert)
     {
+        if(textureSwapStatus != TextureSwapStatus.DONE)
+        {
+            return;
+        }
         for (Sprite sprite : spriteList)
         {
             sprite.SensorChanged(xOffset, yOffset, invert);
@@ -337,13 +348,19 @@ public class SceneSetter
             } else
             { //loaded. fade textures back in
                 long time = System.currentTimeMillis();
-                for (Sprite sprite : spriteList)
+                Iterator<Sprite> spriteIterator = spriteList.iterator();
+                while (spriteIterator.hasNext())
                 {
-                    sprite.DequeueSceneData();
-                    sprite.SetTextureData(textures.getTextureData(sprite.spriteData.bitmapID));
-                    sprite.TextureVerticeChange();
-                    sprite.SetNextTextureVertices();
-                    sprite.SetXOffset(this.xOffset, time);
+                    Sprite sprite = spriteIterator.next();
+                    if(!sprite.toBeDeleted)
+                    {
+                        sprite.DequeueSceneData();
+                        sprite.SetTextureData(textures.getTextureData(sprite.spriteData.bitmapID));
+                        sprite.SetXOffset(this.xOffset, time);
+                    }
+                    else{
+                        spriteIterator.remove();
+                    }
                 }
                 ResetFadePoint();
                 textureSwapStatus = TextureSwapStatus.FADING_IN;
@@ -531,12 +548,14 @@ public class SceneSetter
         GLES20.glUseProgram(riGraphicTools.sp_Image);
         for (Sprite sprite : spriteList)
         {
-            sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+            if(sprite.visible)
+            {
+                sprite.draw(mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
+            }
         }
         if (particlesEnabled)
         {
             particleRenderer.onDrawFrame(null, mtrxView, mtrxProjection, mModelMatrix, mvpMatrix);
-
         }
 
     }

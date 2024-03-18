@@ -106,8 +106,8 @@ public class GirlStandingScene extends SceneData
                 }, -0.51f, colors, true);
 
 //        this.SpriteDataList.add(background);
-//        this.SpriteDataList.add(tower);
-        this.SpriteDataList.add(hill);
-        this.SpriteDataList.add(girl);
+        this.SpriteDataList.add(tower);
+//        this.SpriteDataList.add(hill);
+//        this.SpriteDataList.add(girl);
     }
 }

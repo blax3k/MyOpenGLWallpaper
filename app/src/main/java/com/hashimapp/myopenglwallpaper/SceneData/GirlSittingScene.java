@@ -107,7 +107,7 @@ public class GirlSittingScene extends SceneData
 
 //        this.SpriteDataList.add(background);
 //        this.SpriteDataList.add(tower);
-        this.SpriteDataList.add(girl);
+//        this.SpriteDataList.add(girl);
         this.SpriteDataList.add(hill);
     }
 }

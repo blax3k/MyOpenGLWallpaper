@@ -70,6 +70,9 @@ public class Sprite
 
     private float bias = 0.0f;
 
+    public boolean visible;
+    public boolean toBeDeleted = false;
+
 
     public Sprite(SpriteData mSpriteData, int scene)
     {
@@ -83,6 +86,7 @@ public class Sprite
         setVertices(spriteData.getShapeVertices(true, false));
         setTextureVertices(spriteData.GetTextureVertices(scene));
         setIndices(indices);
+        visible = false;
     }
 
     public void SensorChanged(float xOffset, float yOffset, boolean inverted)
@@ -268,7 +272,7 @@ public class Sprite
     {
         if (queuedSpriteData != null)
         {
-            Log.d("stuff", "dequeue zVertice: " + queuedSpriteData.zVertice);
+            Log.d("stuff", "dequeue textureVertices: " + Arrays.toString(queuedSpriteData.textureVertices));
             this.spriteData = queuedSpriteData;
             this.zVertice = queuedSpriteData.zVertice;
             this.setVertices(queuedSpriteData.positionVertices);
@@ -276,36 +280,10 @@ public class Sprite
 
             queuedSpriteData = null;
         }
-    }
-
-    public void DequeueColor(){
-        if(queuedSpriteData.defaultColor != null){
-            this.setColor(queuedSpriteData.defaultColor);
-        }
+        visible = true;
     }
 
 
-    public int getTextureName()
-    {
-        return textureName;
-    }
-
-
-    public boolean TextureVerticeChange()
-    {
-        if(currentTextureVertices == null || queuedSpriteData == null || queuedSpriteData.textureVertices == null){
-            return false;
-        }
-        return !Arrays.equals(queuedSpriteData.textureVertices, currentTextureVertices);
-    }
-
-    /*
-    set texture vertices to currentTextureVertices. May have been changed by TextureVerticeChange
-    */
-    public void SetNextTextureVertices()
-    {
-        setTextureVertices(currentTextureVertices);
-    }
 
 
 
@@ -316,11 +294,6 @@ public class Sprite
 
     public boolean isFadeOutRequired(){
         return true;
-    }
-
-    public boolean IsEssentialLayer()
-    {
-        return spriteData.IsEssentialLayer();
     }
 
     private long elapsedTimeDeadline = 16;
