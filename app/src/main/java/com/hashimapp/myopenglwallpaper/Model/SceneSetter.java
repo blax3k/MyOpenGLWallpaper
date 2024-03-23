@@ -7,6 +7,7 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.hashimapp.myopenglwallpaper.SceneData.GirlSittingScene;
 import com.hashimapp.myopenglwallpaper.SceneData.RainParticle;
@@ -242,7 +243,7 @@ public class SceneSetter
 
         if(spriteList.size() > sceneData.SpriteDataList.size())
         {
-            for(int i = sceneData.SpriteDataList.size() - 1; i < spriteList.size(); i++)
+            for(int i = sceneData.SpriteDataList.size(); i < spriteList.size(); i++)
             {
                 spriteList.get(i).toBeDeleted = true;
             }
@@ -352,6 +353,8 @@ public class SceneSetter
                 while (spriteIterator.hasNext())
                 {
                     Sprite sprite = spriteIterator.next();
+                    if(sprite == null)
+                    {continue;}
                     if(!sprite.toBeDeleted)
                     {
                         sprite.DequeueSceneData();
@@ -362,6 +365,7 @@ public class SceneSetter
                         spriteIterator.remove();
                     }
                 }
+                Log.d("stuff", "updateFade spriteList.size: " + spriteList.size());
                 ResetFadePoint();
                 textureSwapStatus = TextureSwapStatus.FADING_IN;
             }
