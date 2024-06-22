@@ -47,7 +47,7 @@ public class SceneSetter
     private static float MIN_PROGRESS = 0.0f;
     private static float MAX_PROGRESS = 1.0f;
     private static float LANDSCAPE_Y_OFFSET_ADJUST = 0.8f;
-    private float motionOffsetPivotPoint = 0.1f;
+    private float motionOffsetPivotPoint = 0.2f;
 
 
     Textures textures;

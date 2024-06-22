@@ -251,7 +251,7 @@ public class GLCamera {
                 break;
         }
 
-        motionOffsetLimit = 0.22f * motionOffsetStrength;
+        motionOffsetLimit = motionOffsetStrength/6;
     }
 
 

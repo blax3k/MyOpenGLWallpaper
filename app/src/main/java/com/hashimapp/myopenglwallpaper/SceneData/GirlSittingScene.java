@@ -60,7 +60,7 @@ public class GirlSittingScene extends SceneData
     public GirlSittingScene(){
         super();
         float[][] colors = new float[][]{dawnStartColor, dawnEndColor, dayStartColor, dayEndColor, duskStartColor, duskEndColor, nightStartColor, nightEndColor};
-        SpriteData background = new SpriteData(R.drawable.background, new float[]{
+        SpriteData background = new SpriteData(R.drawable.bgs_guide, new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right
@@ -70,7 +70,7 @@ public class GirlSittingScene extends SceneData
                 0.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 0.0f
-        }, 0.5f, colors, true);
+        }, 1.0f, colors, true);
         SpriteData tower = new SpriteData(R.drawable.tower, new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
@@ -93,19 +93,19 @@ public class GirlSittingScene extends SceneData
                         0.4f, 1.0f,
                         0.4f, 0.0f
                 }, 0.1f, colors, true);
-        SpriteData hill = new SpriteData(R.drawable.hill, new float[]{
-                -3.0f, 0.0f, 0.0f,   // top left
-                -3.0f, -2.4f, 0.0f,   // bottom left
-                3.0f, -2.4f, 0.0f,   // bottom right
-                3.0f, 0.0f, 0.0f},
+        SpriteData hill = new SpriteData(R.drawable.fgs_guide, new float[]{
+                -2.4f, 2.4f, 0.0f,   // top left
+                -2.4f, -2.4f, 0.0f,   // bottom left
+                2.4f, -2.4f, 0.0f,   // bottom right
+                2.4f, 2.4f, 0.0f},
                 new float[]{
                         0.0f, 0.0f,
                         0.0f, 1.0f,
                         1.0f, 1.0f,
                         1.0f, 0.0f
-                }, -0.5f, colors, true);
+                }, 0.0f, colors, true);
 
-//        this.SpriteDataList.add(background);
+        this.SpriteDataList.add(background);
 //        this.SpriteDataList.add(tower);
 //        this.SpriteDataList.add(girl);
         this.SpriteDataList.add(hill);

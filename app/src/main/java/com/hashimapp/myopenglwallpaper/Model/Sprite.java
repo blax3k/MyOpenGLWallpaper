@@ -86,9 +86,9 @@ public class Sprite
         setVertices(spriteData.getShapeVertices(true, false));
         setTextureVertices(spriteData.GetTextureVertices(scene));
         setIndices(indices);
+
         visible = false;
     }
-
     public void SensorChanged(float xOffset, float yOffset, boolean inverted)
     {
         float inversion = 1.0f;
@@ -96,7 +96,7 @@ public class Sprite
         {
             inversion = -1.0f;
         }
-        float offsetMultiplier = ((motionOffsetPivotPoint - zVertice)) * 2.0f; // z will be a vertice between 0.0 and -1.0f
+        float offsetMultiplier = (motionOffsetPivotPoint - zVertice) * 3; // z will be a vertice between 0.0 and -1.0f
         xAccelOffset = xOffset * offsetMultiplier * inversion;
         yAccelOffset = yOffset * offsetMultiplier * inversion;
     }
@@ -311,7 +311,7 @@ public class Sprite
         float xStepTimesPercent = elapsedTimePercentage * xStep;
         xScrollOffset = xScrollOffsetCurrent + xStepTimesPercent;
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset + yOrientationOffset, 1.0f);
+        Matrix.translateM(mModelMatrix, 0, xScrollOffset + xAccelOffset, yAccelOffset, 1.0f);
         Matrix.scaleM(mModelMatrix, 0, xZoomScale + xTouchScale + xMotionScale, yZoomScale + yTouchScale + yMotionScale, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxView, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mtrxProjection, 0, mMVPMatrix, 0);
