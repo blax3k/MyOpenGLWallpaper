@@ -60,7 +60,7 @@ public class GirlSittingScene extends SceneData
     public GirlSittingScene(){
         super();
         float[][] colors = new float[][]{dawnStartColor, dawnEndColor, dayStartColor, dayEndColor, duskStartColor, duskEndColor, nightStartColor, nightEndColor};
-        SpriteData background = new SpriteData(R.drawable.bgs_guide, new float[]{
+        SpriteData background = new SpriteData(R.drawable.girlspritesheet1, new float[]{
                 -2.4f, 2.4f, 0.0f,   // top left
                 -2.4f, -2.4f, 0.0f,   // bottom left
                 2.4f, -2.4f, 0.0f,   // bottom right

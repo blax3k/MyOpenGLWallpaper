@@ -25,6 +25,11 @@ public class SceneManager
     public static final int GIRL_SITTING = 0;
     public static final int GIRL_STANDING = 1;
     public static final int GIRL_BACK = 2;
+    public static final int GIRL_SQUATTING = 3;
+    public static final int GIRL_PICNIC = 4;
+    public static final int GIRL_STANDING_2 = 5 ;
+
+    public static final int RABBITS = -1;
 
 
     Random randomGenerator;
@@ -36,15 +41,23 @@ public class SceneManager
 
     public int getNextSceneId(int currentScene)
     {
-        if(currentScene == GIRL_SITTING)
+        switch(currentScene)
         {
-            return GIRL_STANDING;
+            case GIRL_SITTING:
+               return GIRL_STANDING;
+            case GIRL_STANDING:
+                return GIRL_BACK;
+            case GIRL_BACK:
+                return GIRL_SQUATTING;
+            case GIRL_SQUATTING:
+                return GIRL_PICNIC;
+            case GIRL_PICNIC:
+                return GIRL_STANDING_2;
+            case GIRL_STANDING_2:
+                return GIRL_SITTING;
+
         }
-        if(currentScene == GIRL_STANDING)
-        {
-            return GIRL_BACK;
-        }
-        return GIRL_SITTING;
+        return RABBITS;
     }
 
     public SceneData getScene(int scene)
@@ -55,6 +68,14 @@ public class SceneManager
                 return new GirlSittingScene();
             case GIRL_STANDING:
                 return new GirlStandingScene();
+            case GIRL_BACK:
+                return GIRL_SQUATTING;
+            case GIRL_SQUATTING:
+                return GIRL_PICNIC;
+            case GIRL_PICNIC:
+                return GIRL_STANDING_2;
+            case GIRL_STANDING_2:
+                return GIRL_SITTING;
             default:
                 return new GirlBackScene();
         }
